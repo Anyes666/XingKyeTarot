@@ -1,0 +1,71 @@
+/**
+ * 星钥塔罗 — 全局主题 Token
+ * 新中式星空风格：深蓝紫底色 + 温润金色点缀 + 青绿极光辅助
+ */
+export class Theme {
+  // ── 背景色 ──
+  static readonly BG_PRIMARY: string = '#10172F';
+  static readonly BG_DEEP: string = '#080B18';
+  static readonly BG_CARD: string = '#171D3A';
+  static readonly BG_OVERLAY: string = 'rgba(8, 11, 24, 0.85)';
+
+  // ── 点缀色 ──
+  static readonly GOLD: string = '#D8B45A';
+  static readonly GOLD_SOFT: string = '#F1DFA5';
+  static readonly GOLD_DIM: string = '#8B7340';
+
+  // ── 辅助色 ──
+  static readonly AURORA: string = '#5ED7D2';
+  static readonly AURORA_SOFT: string = '#A8EDEA';
+  static readonly PURPLE_MIST: string = '#8B7EC8';
+  static readonly PURPLE_SOFT: string = '#C4BDF0';
+
+  // ── 文字色 ──
+  static readonly TEXT_PRIMARY: string = '#F8F3E7';
+  static readonly TEXT_SECONDARY: string = '#B8B0C8';
+  static readonly TEXT_MUTED: string = '#6B6380';
+
+  // ── 功能色 ──
+  static readonly DANGER_SOFT: string = '#F4C7C3';
+  static readonly SUCCESS_SOFT: string = '#B8E6C8';
+
+  // ── 间距 ──
+  static readonly SPACE_XS: number = 4;
+  static readonly SPACE_SM: number = 8;
+  static readonly SPACE_MD: number = 16;
+  static readonly SPACE_LG: number = 24;
+  static readonly SPACE_XL: number = 32;
+  static readonly SPACE_XXL: number = 48;
+
+  // ── 圆角 ──
+  static readonly RADIUS_SM: number = 6;
+  static readonly RADIUS_MD: number = 12;
+  static readonly RADIUS_LG: number = 20;
+  static readonly RADIUS_FULL: number = 999;
+
+  // ── 字号 ──
+  static readonly FONT_CAPTION: number = 12;
+  static readonly FONT_BODY: number = 15;
+  static readonly FONT_SUBTITLE: number = 18;
+  static readonly FONT_TITLE: number = 24;
+  static readonly FONT_HEADLINE: number = 32;
+
+  // ── 卡片尺寸 ──
+  static readonly TAROT_CARD_WIDTH: number = 100;
+  static readonly TAROT_CARD_HEIGHT: number = 160;
+  static readonly TAROT_CARD_RADIUS: number = 10;
+
+  /**
+   * 生成星空渐变背景色值（从上到下）
+   */
+  static bgGradient(): string {
+    return `linear-gradient(180deg, ${Theme.BG_DEEP} 0%, ${Theme.BG_PRIMARY} 50%, ${Theme.BG_DEEP} 100%)`;
+  }
+
+  /**
+   * 生成金色按钮渐变
+   */
+  static goldButtonGradient(): string {
+    return `linear-gradient(135deg, ${Theme.GOLD} 0%, ${Theme.GOLD_DIM} 100%)`;
+  }
+}

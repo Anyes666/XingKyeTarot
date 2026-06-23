@@ -1,0 +1,31 @@
+{
+  "forms": [
+    {
+      "name": "DailyFortuneWidget",
+      "description": "每日一占桌面卡片",
+      "src": "./ets/widget/DailyFortuneWidget.ets",
+      "uiSyntax": "arkts",
+      "window": {
+        "designWidth": 720,
+        "autoDesignWidth": true
+      },
+      "colorMode": "auto",
+      "isDynamic": true,
+      "isDefault": true,
+      "updateEnabled": true,
+      "scheduledUpdateTime": "06:00",
+      "updateDuration": 48,
+      "defaultDimension": "2*2",
+      "supportDimensions": [
+        "2*2"
+      ],
+      "formConfigAbility": "ability://EntryAbility",
+      "metadata": [
+        {
+          "name": "ohos.extension.form",
+          "resource": "$profile:form_config"
+        }
+      ]
+    }
+  ]
+}

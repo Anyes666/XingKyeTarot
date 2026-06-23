@@ -1,0 +1,23 @@
+# HarmonyOS / DevEco generated files
+.hvigor/
+oh_modules/
+build/
+**/build/
+**/.preview/
+**/.cxx/
+
+# Local IDE and SDK settings
+.idea/
+local.properties
+
+# Signing materials and certificates
+signing/
+*.p12
+*.p12.bak
+*.csr
+*.cer
+*.p7b
+
+# Logs and temporary files
+*.log
+*.tmp

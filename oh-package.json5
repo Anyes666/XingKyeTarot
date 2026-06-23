@@ -1,0 +1,8 @@
+{
+  "modelVersion": "6.1.1",
+  "description": "星钥塔罗 HarmonyOS MVP",
+  "dependencies": {},
+  "devDependencies": {
+    "@ohos/hypium": "1.0.15"
+  }
+}

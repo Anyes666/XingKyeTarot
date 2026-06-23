@@ -1,0 +1,208 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "星钥塔罗入口模块"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "星钥塔罗主能力"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "星钥塔罗"
+    },
+    {
+      "name": "bg_run_reason",
+      "value": "用于在后台定时更新每日运势桌面卡片，确保卡片数据保持最新"
+    },
+    {
+      "name": "save_image_reason",
+      "value": "用于将占卜结果图片保存到系统相册"
+    },
+    {
+      "name": "disclaimer_title",
+      "value": "免责声明"
+    },
+    {
+      "name": "disclaimer_content",
+      "value": "本应用提供的塔罗内容仅供娱乐和自我探索参考，不构成心理、医疗、财务、法律等专业建议。请理性看待结果。"
+    },
+    {
+      "name": "compliance_footer",
+      "value": "仅供娱乐，不构成任何专业建议"
+    },
+    {
+      "name": "today_fortune",
+      "value": "今日一占"
+    },
+    {
+      "name": "start_divination",
+      "value": "开始占卜"
+    },
+    {
+      "name": "sacred_triangle",
+      "value": "圣三角占卜"
+    },
+    {
+      "name": "past_present_future",
+      "value": "过去 · 现在 · 未来"
+    },
+    {
+      "name": "sacred_triangle_result",
+      "value": "圣三角解读"
+    },
+    {
+      "name": "entertainment_only",
+      "value": "结果仅供娱乐，请理性参考"
+    },
+    {
+      "name": "explore_inner",
+      "value": "探索内心，点亮星光"
+    },
+    {
+      "name": "skip",
+      "value": "跳过"
+    },
+    {
+      "name": "next_step",
+      "value": "下一步"
+    },
+    {
+      "name": "start_experience",
+      "value": "开始体验"
+    },
+    {
+      "name": "i_understand",
+      "value": "我已了解"
+    },
+    {
+      "name": "view_detail",
+      "value": "查看详情 >"
+    },
+    {
+      "name": "view_interpretation",
+      "value": "查看解读"
+    },
+    {
+      "name": "back_home",
+      "value": "返回首页"
+    },
+    {
+      "name": "go_back",
+      "value": "返回"
+    },
+    {
+      "name": "share_copied",
+      "value": "已复制分享内容，可粘贴至微信/朋友圈"
+    },
+    {
+      "name": "share_failed",
+      "value": "分享失败，请稍后重试"
+    },
+    {
+      "name": "card_load_failed",
+      "value": "牌面加载失败，请返回重试"
+    },
+    {
+      "name": "fortune_load_failed",
+      "value": "运势加载失败，请返回重试"
+    },
+    {
+      "name": "no_record_found",
+      "value": "未找到占卜记录"
+    },
+    {
+      "name": "loading",
+      "value": "加载中…"
+    },
+    {
+      "name": "reversed_label",
+      "value": "逆位"
+    },
+    {
+      "name": "reversed_short",
+      "value": "逆"
+    },
+    {
+      "name": "reversed_paren",
+      "value": "（逆位）"
+    },
+    {
+      "name": "tap_cards_instruction",
+      "value": "请依次点击三张牌\\n从左到右，感受内心的指引"
+    },
+    {
+      "name": "cards_revealed_progress",
+      "value": "已翻开 %d / 3 张牌\\n继续点击剩余的牌"
+    },
+    {
+      "name": "onboarding_title_1",
+      "value": "抽一张牌\\n不是预测命运"
+    },
+    {
+      "name": "onboarding_desc_1",
+      "value": "星钥塔罗是你自我探索的伙伴。\\n每一张牌都是一面镜子，\\n帮助你看见内心的不同面向。"
+    },
+    {
+      "name": "onboarding_title_2",
+      "value": "圣三角牌阵"
+    },
+    {
+      "name": "onboarding_desc_2",
+      "value": "过去 · 现在 · 未来\\n\\n三张牌对应三个时间维度，\\n帮你理清当下的状态与可能的方向。\\n请保持开放心态，享受这个过程。"
+    },
+    {
+      "name": "onboarding_title_3",
+      "value": "每日一占"
+    },
+    {
+      "name": "onboarding_desc_3",
+      "value": "每天一张牌，一个关键词。\\n适合作为一天的灵感提醒，\\n也可以记录心情变化。\\n\\n结果仅供娱乐，请理性参考。"
+    },
+    {
+      "name": "widget_card_name_placeholder",
+      "value": "加载中…"
+    },
+    {
+      "name": "widget_keyword_placeholder",
+      "value": "请打开App刷新"
+    },
+    {
+      "name": "widget_today_label",
+      "value": "今日一占"
+    },
+    {
+      "name": "widget_click_hint",
+      "value": "点击查看详情"
+    },
+    {
+      "name": "share_title",
+      "value": "🔮 圣三角占卜"
+    },
+    {
+      "name": "share_from",
+      "value": "来自 星钥塔罗"
+    },
+    {
+      "name": "sacred_triangle_share",
+      "value": "圣三角 · 占卜结果"
+    },
+    {
+      "name": "tarot_app_tagline",
+      "value": "— 星钥塔罗 —"
+    },
+    {
+      "name": "position_past",
+      "value": "过去"
+    },
+    {
+      "name": "position_present",
+      "value": "现在"
+    },
+    {
+      "name": "position_future",
+      "value": "未来"
+    }
+  ]
+}
