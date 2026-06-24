@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { display } from '@kit.ArkUI';
 import { Theme } from '../common/Theme';
 import { Routes } from '../common/Routes';
 import { Constants } from '../common/Constants';
@@ -45,6 +46,9 @@ struct Index {
 
   async aboutToAppear(): Promise<void> {
     const ctx: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
+
+    // 初始化响应式窗口宽度（vp），供所有组件 breakpoint 自适应
+    this.initWindowMetrics();
 
     const complianceAccepted: boolean = await UserStateService.isComplianceAccepted(ctx);
     if (!complianceAccepted) {
@@ -205,6 +209,7 @@ struct Index {
 
         this.FeatureGrid()
         this.HistoryEntry()
+        this.TarotLibraryEntry()
 
         Text('结果仅供娱乐，请理性参考')
           .fontSize(Theme.FONT_CAPTION)
@@ -286,6 +291,46 @@ struct Index {
         this.getUIContext().getRouter().pushUrl({ url: Routes.DIVINATION_HISTORY });
       } catch (err) {
         hilog.error(0x0000, 'Index', 'Router push error: %{public}s', JSON.stringify(err));
+      }
+    })
+  }
+
+  @Builder
+  TarotLibraryEntry(): void {
+    Row() {
+      Column() {
+        Text('塔罗库')
+          .fontSize(Theme.FONT_SUBTITLE)
+          .fontColor(Theme.TEXT_MUTED)
+          .fontWeight(FontWeight.Medium)
+
+        Text('78 张牌全览 · 即将上线')
+          .fontSize(Theme.FONT_CAPTION)
+          .fontColor(Theme.TEXT_MUTED)
+          .margin({ top: 4 })
+      }
+      .alignItems(HorizontalAlign.Start)
+      .layoutWeight(1)
+
+      Text('敬请期待')
+        .fontSize(Theme.FONT_CAPTION)
+        .fontColor(Theme.GOLD_SOFT)
+        .opacity(0.55)
+    }
+    .width('85%')
+    .padding(Theme.SPACE_MD)
+    .margin({ top: Theme.SPACE_SM })
+    .backgroundColor('rgba(23, 29, 58, 0.46)')
+    .borderRadius(Theme.RADIUS_MD)
+    .border({ width: 1, color: 'rgba(255, 255, 255, 0.08)' })
+    .onClick(() => {
+      try {
+        this.getUIContext().getPromptAction().showToast({
+          message: '塔罗库即将上线，敬请期待',
+          duration: 1800
+        });
+      } catch (err) {
+        hilog.error(0x0000, 'Index', 'Toast error: %{public}s', JSON.stringify(err));
       }
     })
   }
@@ -444,6 +489,18 @@ struct Index {
     .width('100%')
     .height('100%')
     .backgroundColor(Theme.BG_DEEP)
+  }
+
+  private initWindowMetrics(): void {
+    try {
+      const displayInfo = display.getDefaultDisplaySync();
+      // px2vp 来自 @kit.ArkUI，将物理像素转为 vp
+      const screenVp: number = px2vp(displayInfo.width);
+      AppStorage.setOrCreate('windowWidth', screenVp);
+    } catch (e) {
+      // 降级：使用默认手机宽度
+      AppStorage.setOrCreate('windowWidth', 360);
+    }
   }
 
   private openLegalDetail(title: string, content: string): void {

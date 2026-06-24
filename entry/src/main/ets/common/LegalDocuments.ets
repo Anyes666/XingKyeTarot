@@ -1,9 +1,16 @@
 export class LegalDocuments {
+  /**
+   * ⚠️ 每次发版前请更新此版本号。
+   * 此版本号会注入用户协议和隐私政策中。
+   */
+  static readonly APP_VERSION: string = 'v1.1.0';
+
   static readonly USER_AGREEMENT_TITLE: string = '用户协议';
   static readonly PRIVACY_POLICY_TITLE: string = '隐私政策';
 
   static readonly USER_AGREEMENT: string =
     '星钥塔罗 用户协议\n\n' +
+    `版本：${LegalDocuments.APP_VERSION}\n` +
     '生效日期：2026年6月22日\n\n' +
     '欢迎使用星钥塔罗。请在使用本应用前仔细阅读本协议。点击同意即表示您已阅读、理解并接受本协议及隐私政策。\n\n' +
     '一、服务说明\n' +
@@ -26,6 +33,7 @@ export class LegalDocuments {
 
   static readonly PRIVACY_POLICY: string =
     '星钥塔罗 隐私政策\n\n' +
+    `版本：${LegalDocuments.APP_VERSION}\n` +
     '生效日期：2026年6月22日\n\n' +
     '星钥塔罗高度重视用户隐私保护。本政策说明本应用如何处理与用户相关的信息。点击同意即表示您已阅读并同意本隐私政策。\n\n' +
     '一、我们收集的信息\n' +

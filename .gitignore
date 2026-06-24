@@ -21,3 +21,4 @@ signing/
 # Logs and temporary files
 *.log
 *.tmp
+.git-push.sh

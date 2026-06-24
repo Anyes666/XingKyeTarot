@@ -54,6 +54,12 @@ export class Theme {
   static readonly TAROT_CARD_WIDTH: number = 100;
   static readonly TAROT_CARD_HEIGHT: number = 160;
   static readonly TAROT_CARD_RADIUS: number = 10;
+  static readonly TAROT_CARD_ASPECT_RATIO: number = 1.6; // height / width
+
+  // ── 响应式断点（vp）──
+  static readonly BREAKPOINT_SM: number = 320;
+  static readonly BREAKPOINT_MD: number = 600;
+  static readonly BREAKPOINT_LG: number = 840;
 
   /**
    * 生成星空渐变背景色值（从上到下）

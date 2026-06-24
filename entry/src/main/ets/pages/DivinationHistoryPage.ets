@@ -45,13 +45,13 @@ struct DivinationHistoryPage {
 
           if (this.history.length > 0) {
             Button('清除')
-              .width(56)
               .height(32)
               .fontSize(Theme.FONT_CAPTION)
               .fontColor(Theme.GOLD_SOFT)
               .backgroundColor('rgba(8, 11, 24, 0.48)')
               .borderRadius(Theme.RADIUS_FULL)
               .border({ width: 1, color: 'rgba(216, 180, 90, 0.42)' })
+              .padding({ left: 14, right: 14 })
               .onClick(() => {
                 this.clearHistory();
               })
