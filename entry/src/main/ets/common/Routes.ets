@@ -4,4 +4,5 @@ export class Routes {
   static readonly DIVINATION: string = 'pages/DivinationPage';
   static readonly RESULT: string = 'pages/DivinationResultPage';
   static readonly DAILY_FORTUNE: string = 'pages/DailyFortunePage';
+  static readonly DIVINATION_HISTORY: string = 'pages/DivinationHistoryPage';
 }

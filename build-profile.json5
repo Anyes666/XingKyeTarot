@@ -3,9 +3,25 @@
     "products": [
       {
         "name": "default",
+        "signingConfig": "default1",
         "compatibleSdkVersion": "5.0.0(12)",
         "runtimeOS": "HarmonyOS",
         "targetSdkVersion": "5.0.0(12)"
+      }
+    ],
+    "signingConfigs": [
+      {
+        "name": "default1",
+        "type": "HarmonyOS",
+        "material": {
+          "certpath": "C:\\Users\\pc\\.ohos\\config\\default1_XingKeyTarot_7b6Qe0V1i69Dfz1gQdk6527UNfWOdcDTduVdWk55zFw=.cer",
+          "keyAlias": "debugKey",
+          "keyPassword": "0000001ACCBF25D52DADDA7570ACD9F86CA334409BF87EBEDE1A5F849F5F1C11BCF59B3E906CACBB73E6",
+          "profile": "C:\\Users\\pc\\.ohos\\config\\default1_XingKeyTarot_7b6Qe0V1i69Dfz1gQdk6527UNfWOdcDTduVdWk55zFw=.p7b",
+          "signAlg": "SHA256withECDSA",
+          "storeFile": "C:\\Users\\pc\\.ohos\\config\\default1_XingKeyTarot_7b6Qe0V1i69Dfz1gQdk6527UNfWOdcDTduVdWk55zFw=.p12",
+          "storePassword": "0000001AE61AD8F09F1EECF1AB543C5E53A08D1AD8280C957F9D19CA1246CAC34B0E7F9A084CCA4CA81B"
+        }
       }
     ]
   },

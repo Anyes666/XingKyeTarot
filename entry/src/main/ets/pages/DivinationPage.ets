@@ -1,4 +1,3 @@
-import { router } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Theme } from '../common/Theme';
@@ -7,10 +6,12 @@ import { Constants } from '../common/Constants';
 import { UserStateService } from '../service/UserStateService';
 import { DivinationService } from '../service/DivinationService';
 import { DivinationRecord, DrawnCard } from '../model/DivinationRecord';
+import { SpreadTemplate, getSpreadById } from '../model/Spread';
 import { StarBackground } from '../components/StarBackground';
 import { TarotCardView, CardDisplayState } from '../components/TarotCardView';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { ComplianceFooter } from '../components/ComplianceFooter';
+import { AppBackButton } from '../components/AppBackButton';
 
 enum DivinationPhase {
   SELECT_TOPIC = 'selectTopic',
@@ -45,25 +46,46 @@ struct DivinationPage {
   @State drawnCards: DrawnCard[] = [];
   @State isLoading: boolean = false;
   @State errorMessage: string = '';
+  @State selectedSpreadId: string = 'sacred_triangle';
+  @State selectedSpreadName: string = '圣三角';
+  @State selectedSpreadSubtitle: string = '过去 · 现在 · 未来';
   private revealTimerId: number = -1;
 
   aboutToAppear(): void {
-    // 主题选择阶段不预先抽牌，等用户选定后再抽
+    const spreadId: string = AppStorage.get<string>('selectedSpreadId') ?? 'sacred_triangle';
+    const spread: SpreadTemplate = getSpreadById(spreadId);
+    const spreadChanged: boolean = this.selectedSpreadId !== spread.id;
+    this.selectedSpreadId = spread.id;
+    this.selectedSpreadName = spread.name;
+    this.selectedSpreadSubtitle = spread.positions.map((position) => position.name).join(' · ');
+
+    if (spreadChanged) {
+      this.record = null;
+      this.drawnCards = [];
+      this.revealedCount = 0;
+      this.errorMessage = '';
+      this.phase = DivinationPhase.SELECT_TOPIC;
+    }
+
+    if (spread.id === 'single_card' && !this.record && !this.isLoading) {
+      this.drawSingleCardQuickly();
+    }
   }
 
   build() {
     Stack() {
       StarBackground()
+      AppBackButton()
 
       Column() {
         Column() {
-          Text('圣三角占卜')
+          Text(this.selectedSpreadName)
             .fontSize(Theme.FONT_TITLE)
             .fontColor(Theme.GOLD)
             .fontWeight(FontWeight.Bold)
             .letterSpacing(2)
 
-          Text('过去 · 现在 · 未来')
+          Text(this.selectedSpreadSubtitle)
             .fontSize(Theme.FONT_CAPTION)
             .fontColor(Theme.TEXT_MUTED)
             .margin({ top: Theme.SPACE_XS })
@@ -244,13 +266,32 @@ struct DivinationPage {
     this.phase = DivinationPhase.IDLE;
     this.isLoading = true;
 
-    const ctx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+    const ctx: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
     try {
       const userId: string = await UserStateService.getUserId(ctx);
       const seed: string = `${userId}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
-      this.record = await DivinationService.drawSacredTriangle(topicId, seed);
+      this.record = await DivinationService.drawBySpreadId(this.selectedSpreadId, topicId, seed);
       this.drawnCards = this.record.cards;
       this.revealedCount = 0;
+      this.isLoading = false;
+    } catch (err) {
+      this.errorMessage = '牌面加载失败，请返回重试';
+      this.isLoading = false;
+    }
+  }
+
+  private async drawSingleCardQuickly(): Promise<void> {
+    this.phase = DivinationPhase.IDLE;
+    this.isLoading = true;
+
+    const ctx: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    try {
+      const userId: string = await UserStateService.getUserId(ctx);
+      const seed: string = `${userId}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+      this.record = await DivinationService.drawBySpreadId('single_card', 'general', seed);
+      this.drawnCards = this.record.cards;
+      this.revealedCount = this.drawnCards.length;
+      this.phase = DivinationPhase.REVEALED;
       this.isLoading = false;
     } catch (err) {
       this.errorMessage = '牌面加载失败，请返回重试';
@@ -261,9 +302,9 @@ struct DivinationPage {
   private getInstructionText(): string {
     switch (this.phase) {
       case DivinationPhase.IDLE:
-        return '请依次点击三张牌\n从左到右，感受内心的指引';
+        return this.drawnCards.length === 1 ? '请点击牌面\n获得此刻的指引' : `请依次点击 ${this.drawnCards.length} 张牌\n从左到右，感受内心的指引`;
       case DivinationPhase.DRAWING:
-        return `已翻开 ${this.revealedCount} / 3 张牌\n继续点击剩余的牌`;
+        return `已翻开 ${this.revealedCount} / ${this.drawnCards.length} 张牌\n继续点击剩余的牌`;
       default:
         return '';
     }
@@ -283,7 +324,7 @@ struct DivinationPage {
     this.phase = DivinationPhase.DRAWING;
     this.revealedCount++;
 
-    if (this.revealedCount >= 3) {
+    if (this.revealedCount >= this.drawnCards.length) {
       this.revealTimerId = setTimeout(() => {
         this.phase = DivinationPhase.REVEALED;
       }, 500);
@@ -303,7 +344,7 @@ struct DivinationPage {
     }
     AppStorage.setOrCreate('currentDivinationRecord', this.record);
     try {
-      router.pushUrl({ url: Routes.RESULT });
+      this.getUIContext().getRouter().pushUrl({ url: Routes.RESULT });
     } catch (err) {
       hilog.error(0x0000, 'DivinationPage', 'Router push error: %{public}s', JSON.stringify(err));
     }

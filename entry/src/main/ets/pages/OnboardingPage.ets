@@ -1,4 +1,3 @@
-import { router } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Theme } from '../common/Theme';
@@ -7,6 +6,7 @@ import { Constants } from '../common/Constants';
 import { UserStateService } from '../service/UserStateService';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { StarBackground } from '../components/StarBackground';
+import { AppBackButton } from '../components/AppBackButton';
 
 interface OnboardingPageData {
   title: string;
@@ -40,6 +40,7 @@ struct OnboardingPage {
   build() {
     Stack() {
       StarBackground()
+      AppBackButton()
 
       Column() {
         Row() {
@@ -138,13 +139,13 @@ struct OnboardingPage {
 
   private async finishOnboarding(): Promise<void> {
     try {
-      const ctx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+      const ctx: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
       await UserStateService.completeOnboarding(ctx);
     } catch (e) {
       // Preference write may fail in some test contexts — still navigate
     }
     try {
-      router.replaceUrl({ url: Routes.HOME });
+      await this.getUIContext().getRouter().replaceUrl({ url: Routes.HOME });
     } catch (err) {
       hilog.error(0x0000, 'OnboardingPage', 'Router replace error: %{public}s', JSON.stringify(err));
     }

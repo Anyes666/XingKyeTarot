@@ -85,5 +85,31 @@ export default function dailyFortuneServiceTest(): void {
         done();
       }
     });
+
+    /**
+     * Today's fortune is archived once and can be read back from local history.
+     */
+    it('getTodayFortune_archives_today_once', 0, async (done: Function) => {
+      try {
+        const dataSvc: TarotDataService = TarotDataService.getInstance();
+        const ctx: Context = getContext();
+        await dataSvc.init(ctx.resourceManager);
+
+        await DailyFortuneService.clearTodayCache(ctx);
+        await DailyFortuneService.clearHistoryForTest(ctx);
+
+        const fortune: DailyFortune = await DailyFortuneService.getTodayFortune('history-user', ctx);
+        await DailyFortuneService.getTodayFortune('history-user', ctx);
+
+        const history: DailyFortune[] = await DailyFortuneService.getRecentFortunes(ctx);
+        expect(history.length).assertEqual(1);
+        expect(history[0].dateKey).assertEqual(fortune.dateKey);
+        expect(history[0].card.id).assertEqual(fortune.card.id);
+        done();
+      } catch (err) {
+        expect(false).assertEqual(true);
+        done();
+      }
+    });
   });
 }

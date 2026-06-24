@@ -4,6 +4,7 @@
     "pages/OnboardingPage",
     "pages/DivinationPage",
     "pages/DivinationResultPage",
-    "pages/DailyFortunePage"
+    "pages/DailyFortunePage",
+    "pages/DivinationHistoryPage"
   ]
 }

@@ -1,7 +1,7 @@
 {
   "app": {
     "bundleName": "com.xingkey.tarot",
-    "vendor": "xingkey",
+    "vendor": "Anyes",
     "versionCode": 1000000,
     "versionName": "1.0.0",
     "icon": "$media:app_icon",

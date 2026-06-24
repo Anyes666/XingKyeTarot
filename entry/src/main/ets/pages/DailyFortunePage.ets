@@ -1,4 +1,3 @@
-import { router } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Theme } from '../common/Theme';
@@ -11,21 +10,25 @@ import { StarBackground } from '../components/StarBackground';
 import { TarotCardView, CardDisplayState } from '../components/TarotCardView';
 import { ComplianceFooter } from '../components/ComplianceFooter';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { AppBackButton } from '../components/AppBackButton';
 
 @Entry
 @Component
 struct DailyFortunePage {
   @State fortune: DailyFortune | null = null;
+  @State history: DailyFortune[] = [];
   @State isLoading: boolean = true;
   @State errorMessage: string = '';
 
   async aboutToAppear(): Promise<void> {
-    const ctx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+    const ctx: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
     try {
       // TarotDataService 已在 EntryAbility.onWindowStageCreate 中初始化
       const userId: string = await UserStateService.getUserId(ctx);
       const fortune: DailyFortune = await DailyFortuneService.getTodayFortune(userId, ctx);
+      const history: DailyFortune[] = await DailyFortuneService.getRecentFortunes(ctx);
       this.fortune = fortune;
+      this.history = history;
       this.isLoading = false;
     } catch (err) {
       this.errorMessage = '运势加载失败，请返回重试';
@@ -36,6 +39,7 @@ struct DailyFortunePage {
   build() {
     Stack() {
       StarBackground()
+      AppBackButton()
 
       if (this.isLoading) {
         Column() {
@@ -56,7 +60,7 @@ struct DailyFortunePage {
             .margin({ top: Theme.SPACE_MD })
             .onClick(() => {
               try {
-                router.back();
+                this.getUIContext().getRouter().back();
               } catch (err) {
                 hilog.error(0x0000, 'DailyFortunePage', 'Router back error: %{public}s', JSON.stringify(err));
               }
@@ -119,11 +123,13 @@ struct DailyFortunePage {
               .padding({ left: Theme.SPACE_LG, right: Theme.SPACE_LG })
               .margin({ bottom: Theme.SPACE_XXL })
 
+            this.HistorySection()
+
             PrimaryButton({
               buttonLabel: '返回首页',
               onTap: () => {
                 try {
-                  router.replaceUrl({ url: Routes.HOME });
+                  this.getUIContext().getRouter().replaceUrl({ url: Routes.HOME });
                 } catch (err) {
                   hilog.error(0x0000, 'DailyFortunePage', 'Router replace error: %{public}s', JSON.stringify(err));
                 }
@@ -144,5 +150,76 @@ struct DailyFortunePage {
         .scrollBar(BarState.Off)
       }
     }
+  }
+
+  @Builder
+  HistorySection(): void {
+    Column() {
+      Row() {
+        Text('最近记录')
+          .fontSize(Theme.FONT_SUBTITLE)
+          .fontColor(Theme.TEXT_PRIMARY)
+          .fontWeight(FontWeight.Medium)
+          .layoutWeight(1)
+
+        Text(`${this.history.length} 条`)
+          .fontSize(Theme.FONT_CAPTION)
+          .fontColor(Theme.TEXT_MUTED)
+      }
+      .width('100%')
+      .margin({ bottom: Theme.SPACE_MD })
+
+      if (this.history.length === 0) {
+        Text('还没有历史记录')
+          .fontSize(Theme.FONT_BODY)
+          .fontColor(Theme.TEXT_MUTED)
+          .width('100%')
+          .textAlign(TextAlign.Start)
+      } else {
+        ForEach(this.history, (item: DailyFortune) => {
+          this.HistoryItem(item)
+        }, (item: DailyFortune) => item.dateKey)
+      }
+    }
+    .width('88%')
+    .padding(Theme.SPACE_MD)
+    .backgroundColor('rgba(23, 29, 58, 0.72)')
+    .borderRadius(Theme.RADIUS_MD)
+    .border({ width: 1, color: 'rgba(216, 180, 90, 0.16)' })
+    .margin({ bottom: Theme.SPACE_LG })
+  }
+
+  @Builder
+  HistoryItem(item: DailyFortune): void {
+    Row() {
+      Column() {
+        Text(item.dateKey)
+          .fontSize(Theme.FONT_CAPTION)
+          .fontColor(Theme.TEXT_MUTED)
+          .margin({ bottom: 4 })
+
+        Text(`${item.card.nameZh}${item.isReversed ? ' · 逆位' : ''}`)
+          .fontSize(Theme.FONT_BODY)
+          .fontColor(Theme.TEXT_PRIMARY)
+          .fontWeight(FontWeight.Medium)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      }
+      .alignItems(HorizontalAlign.Start)
+      .layoutWeight(1)
+
+      Text(item.keyword)
+        .fontSize(Theme.FONT_CAPTION)
+        .fontColor(Theme.AURORA)
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis })
+        .padding({ left: Theme.SPACE_SM, right: Theme.SPACE_SM, top: 4, bottom: 4 })
+        .borderRadius(Theme.RADIUS_SM)
+        .backgroundColor('rgba(94, 215, 210, 0.1)')
+        .margin({ left: Theme.SPACE_MD })
+    }
+    .width('100%')
+    .padding({ top: Theme.SPACE_SM, bottom: Theme.SPACE_SM })
+    .border({ width: { bottom: 1 }, color: 'rgba(255, 255, 255, 0.06)' })
   }
 }

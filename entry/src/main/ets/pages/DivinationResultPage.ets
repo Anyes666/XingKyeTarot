@@ -1,5 +1,3 @@
-import { router } from '@kit.ArkUI';
-import { promptAction } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Theme } from '../common/Theme';
@@ -14,6 +12,8 @@ import { PrimaryButton } from '../components/PrimaryButton';
 import { SharePreview } from '../components/SharePreview';
 import { ShareService } from '../service/ShareService';
 import { ShareImageService } from '../service/ShareImageService';
+import { AppBackButton } from '../components/AppBackButton';
+import { DivinationHistoryService } from '../service/DivinationHistoryService';
 
 /**
  * 占卜结果页
@@ -25,17 +25,24 @@ struct DivinationResultPage {
   @State isSharing: boolean = false;
   @State showSharePreview: boolean = false;
 
-  aboutToAppear(): void {
+  async aboutToAppear(): Promise<void> {
     const stored: DivinationRecord | null =
       AppStorage.get<DivinationRecord | null>('currentDivinationRecord') ?? null;
     if (stored) {
       this.record = stored;
+      try {
+        const ctx: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
+        await DivinationHistoryService.saveRecord(stored, ctx);
+      } catch (err) {
+        hilog.error(0x0000, 'DivinationResultPage', 'Archive history error: %{public}s', JSON.stringify(err));
+      }
     }
   }
 
   build() {
     Stack() {
       StarBackground()
+      AppBackButton()
 
       if (!this.record) {
         Column() {
@@ -46,7 +53,7 @@ struct DivinationResultPage {
             .margin({ top: Theme.SPACE_MD })
             .onClick(() => {
               try {
-                router.replaceUrl({ url: Routes.HOME });
+                this.getUIContext().getRouter().replaceUrl({ url: Routes.HOME });
               } catch (err) {
                 hilog.error(0x0000, 'DivinationResultPage', 'Router replace error: %{public}s', JSON.stringify(err));
               }
@@ -58,14 +65,14 @@ struct DivinationResultPage {
       } else {
         Scroll() {
           Column() {
-            Text('圣三角解读')
+            Text(`${this.record.spread.name}解读`)
               .fontSize(Theme.FONT_TITLE)
               .fontColor(Theme.GOLD)
               .fontWeight(FontWeight.Bold)
               .letterSpacing(2)
               .margin({ top: 48, bottom: Theme.SPACE_XS })
 
-            Text('过去 · 现在 · 未来')
+            Text(this.getSpreadSubtitle(this.record))
               .fontSize(Theme.FONT_CAPTION)
               .fontColor(Theme.TEXT_MUTED)
               .margin({ bottom: Theme.SPACE_XS })
@@ -137,12 +144,9 @@ struct DivinationResultPage {
           SharePreview({ record: this.record })
             .id('sharePreviewRoot')
         }
-        .position({ x: -2000, y: -2000 })
         .width(1080)
         .height(1920)
-        .opacity(0.01)
-        .enabled(false)
-        .hitTestBehavior(HitTestMode.None)
+        .visibility(Visibility.Hidden)
       }
     }
   }
@@ -155,12 +159,21 @@ struct DivinationResultPage {
     this.isSharing = true;
 
     try {
-      const ctx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+      const ctx: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
       this.showSharePreview = true;
       await this.waitForPreviewRender();
-      await ShareImageService.saveSharePreviewToGallery(ctx, 'sharePreviewRoot', this.record!);
+
+      // 使用 UIContext 获取 ComponentSnapshot（全局 componentSnapshot 已废弃）
+      const snapshot = this.getUIContext().getComponentSnapshot();
+      const pixelMap = await snapshot.get('sharePreviewRoot', {
+        scale: 1,
+        waitUntilRenderFinished: true
+      });
+      const fileName: string = ShareImageService.buildShareImageFileName(this.record!.id);
+      await ShareImageService.savePixelMapToGallery(ctx, pixelMap, fileName);
+
       try {
-        promptAction.showToast({
+        this.getUIContext().getPromptAction().showToast({
           message: '已保存到相册',
           duration: 2000
         });
@@ -171,7 +184,7 @@ struct DivinationResultPage {
       hilog.error(0x0000, 'DivinationResultPage', 'Share failed: %{public}s', JSON.stringify(err));
       try {
         await ShareService.generateAndShare(this.record!);
-        promptAction.showToast({
+        this.getUIContext().getPromptAction().showToast({
           message: '保存图片失败，已复制文字内容',
           duration: 2000
         });
@@ -188,7 +201,7 @@ struct DivinationResultPage {
     return new Promise<void>((resolve: () => void) => {
       setTimeout(() => {
         resolve();
-      }, 100);
+      }, 300);
     });
   }
 
@@ -202,5 +215,9 @@ struct DivinationResultPage {
       'general': '🔮 通用综合'
     };
     return labels[questionType] ?? '🔮 通用综合';
+  }
+
+  private getSpreadSubtitle(record: DivinationRecord): string {
+    return record.spread.positions.map((position) => position.name).join(' · ');
   }
 }

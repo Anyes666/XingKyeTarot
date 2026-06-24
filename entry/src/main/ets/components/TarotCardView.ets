@@ -47,7 +47,7 @@ export struct TarotCardView {
         // 牌面（带正逆位旋转）
         Column() {
           // 牌图
-          Image($r('app.media.placeholder_card'))
+          Image(this.getCardImageResource())
             .width(this.cardWidth)
             .height(this.cardHeight * 0.65)
             .objectFit(ImageFit.Cover)
@@ -101,5 +101,56 @@ export struct TarotCardView {
         this.onTap();
       }
     })
+  }
+
+  private getCardImageResource(): Resource {
+    switch (this.cardImage) {
+      case 'tarot_major_00_fool.png':
+        return $r('app.media.tarot_major_00_fool');
+      case 'tarot_major_01_magician.png':
+        return $r('app.media.tarot_major_01_magician');
+      case 'tarot_major_02_high_priestess.png':
+        return $r('app.media.tarot_major_02_high_priestess');
+      case 'tarot_major_03_empress.png':
+        return $r('app.media.tarot_major_03_empress');
+      case 'tarot_major_04_emperor.png':
+        return $r('app.media.tarot_major_04_emperor');
+      case 'tarot_major_05_hierophant.png':
+        return $r('app.media.tarot_major_05_hierophant');
+      case 'tarot_major_06_lovers.png':
+        return $r('app.media.tarot_major_06_lovers');
+      case 'tarot_major_07_chariot.png':
+        return $r('app.media.tarot_major_07_chariot');
+      case 'tarot_major_08_strength.png':
+        return $r('app.media.tarot_major_08_strength');
+      case 'tarot_major_09_hermit.png':
+        return $r('app.media.tarot_major_09_hermit');
+      case 'tarot_major_10_wheel_of_fortune.png':
+        return $r('app.media.tarot_major_10_wheel_of_fortune');
+      case 'tarot_major_11_justice.png':
+        return $r('app.media.tarot_major_11_justice');
+      case 'tarot_major_12_hanged_man.png':
+        return $r('app.media.tarot_major_12_hanged_man');
+      case 'tarot_major_13_death.png':
+        return $r('app.media.tarot_major_13_death');
+      case 'tarot_major_14_temperance.png':
+        return $r('app.media.tarot_major_14_temperance');
+      case 'tarot_major_15_devil.png':
+        return $r('app.media.tarot_major_15_devil');
+      case 'tarot_major_16_tower.png':
+        return $r('app.media.tarot_major_16_tower');
+      case 'tarot_major_17_star.png':
+        return $r('app.media.tarot_major_17_star');
+      case 'tarot_major_18_moon.png':
+        return $r('app.media.tarot_major_18_moon');
+      case 'tarot_major_19_sun.png':
+        return $r('app.media.tarot_major_19_sun');
+      case 'tarot_major_20_judgement.png':
+        return $r('app.media.tarot_major_20_judgement');
+      case 'tarot_major_21_world.png':
+        return $r('app.media.tarot_major_21_world');
+      default:
+        return $r('app.media.placeholder_card');
+    }
   }
 }

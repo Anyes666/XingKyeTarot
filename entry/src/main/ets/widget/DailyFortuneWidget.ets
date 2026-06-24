@@ -3,7 +3,9 @@
  * 通过 formBindingData 接收主 App 推送的数据。
  * 点击卡片跳转至每日运势详情页。
  */
-@Entry
+let storage: LocalStorage = new LocalStorage();
+
+@Entry(storage)
 @Component
 struct DailyFortuneWidget {
   @LocalStorageProp('cardName') cardName: string = '今日运势';
@@ -13,17 +15,6 @@ struct DailyFortuneWidget {
 
   build() {
     Stack() {
-      Column()
-        .width('100%')
-        .height('100%')
-        .linearGradient({
-          direction: GradientDirection.Bottom,
-          colors: [
-            ['#080B18', 0.0],
-            ['#10172F', 1.0]
-          ]
-        })
-
       Column() {
         Row() {
           Text('⭐')
@@ -71,8 +62,17 @@ struct DailyFortuneWidget {
     }
     .width('100%')
     .height('100%')
-    .borderRadius(12)
-    .border({ width: 1, color: 'rgba(216, 180, 90, 0.3)' })
+    .backgroundColor('#080B18')
+    .linearGradient({
+      direction: GradientDirection.Bottom,
+      colors: [
+        ['#080B18', 0.0],
+        ['#10172F', 1.0]
+      ]
+    })
+    .borderRadius(18)
+    .clip(true)
+    .border({ width: 0.5, color: 'rgba(216, 180, 90, 0.12)' })
     .onClick(() => {
       postCardAction(this, {
         'action': 'router',

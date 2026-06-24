@@ -1,7 +1,6 @@
 import { wantConstant, Want } from '@kit.AbilityKit';
 import { common } from '@kit.AbilityKit';
 import { pasteboard } from '@kit.BasicServicesKit';
-import { promptAction } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { DivinationRecord, DrawnCard } from '../model/DivinationRecord';
 import { Constants } from '../common/Constants';
@@ -29,15 +28,6 @@ export class ShareService {
 
       hilog.info(0x0000, TAG, 'Share text copied to clipboard');
 
-      // 提示用户
-      try {
-        promptAction.showToast({
-          message: '已复制分享内容，可粘贴至微信/朋友圈',
-          duration: 2500
-        });
-      } catch (toastErr) {
-        hilog.error(0x0000, TAG, 'Toast error: %{public}s', JSON.stringify(toastErr));
-      }
     } catch (err) {
       hilog.error(0x0000, TAG, 'Share failed: %{public}s', JSON.stringify(err));
       throw new Error('分享失败');

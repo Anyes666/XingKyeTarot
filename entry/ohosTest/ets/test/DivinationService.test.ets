@@ -118,5 +118,45 @@ export default function divinationServiceTest(): void {
         done();
       }
     });
+
+    /**
+     * Single card spread draws exactly one card.
+     */
+    it('single_card_spread_returns_1_card', 0, async (done: Function) => {
+      try {
+        const dataSvc: TarotDataService = TarotDataService.getInstance();
+        const ctx: Context = getContext();
+        await dataSvc.init(ctx.resourceManager);
+
+        const record: DivinationRecord = await DivinationService.drawBySpreadId('single_card', 'general', 'single-test');
+        expect(record.spread.id).assertEqual('single_card');
+        expect(record.cards.length).assertEqual(1);
+        expect(record.cards[0].positionName).assertEqual('指引');
+        done();
+      } catch (err) {
+        done();
+      }
+    });
+
+    /**
+     * Relationship spread reuses 3-card draw with relationship position names.
+     */
+    it('relationship_spread_returns_relationship_positions', 0, async (done: Function) => {
+      try {
+        const dataSvc: TarotDataService = TarotDataService.getInstance();
+        const ctx: Context = getContext();
+        await dataSvc.init(ctx.resourceManager);
+
+        const record: DivinationRecord = await DivinationService.drawBySpreadId('relationship', 'love', 'relationship-test');
+        expect(record.spread.id).assertEqual('relationship');
+        expect(record.cards.length).assertEqual(3);
+        expect(record.cards[0].positionName).assertEqual('我的状态');
+        expect(record.cards[1].positionName).assertEqual('对方状态');
+        expect(record.cards[2].positionName).assertEqual('关系走向');
+        done();
+      } catch (err) {
+        done();
+      }
+    });
   });
 }

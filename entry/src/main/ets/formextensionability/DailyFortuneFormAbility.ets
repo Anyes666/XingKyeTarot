@@ -1,7 +1,11 @@
-import { formBindingData, FormExtensionAbility } from '@kit.FormKit';
+import { formBindingData, FormExtensionAbility, formProvider } from '@kit.FormKit';
 import { Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { PreferenceStore } from '../data/PreferenceStore';
+import { TarotDataService } from '../service/TarotDataService';
+import { DailyFortuneService } from '../service/DailyFortuneService';
+import { UserStateService } from '../service/UserStateService';
+import { DailyFortune } from '../model/DailyFortune';
 
 const TAG: string = 'DailyFortuneFormAbility';
 const FORM_IDS_KEY: string = 'widget_form_ids';
@@ -13,6 +17,7 @@ export default class DailyFortuneFormAbility extends FormExtensionAbility {
     // 异步持久化formId（不阻塞onAddForm返回值）
     if (formId.length > 0) {
       this.persistFormId(formId);
+      this.refreshFormData(formId);
     }
     const formData: Record<string, string | number> = {
       'cardName': '加载中…',
@@ -25,7 +30,7 @@ export default class DailyFortuneFormAbility extends FormExtensionAbility {
 
   onUpdateForm(formId: string): void {
     hilog.info(0x0000, TAG, 'onUpdateForm (system scheduled): %{public}s', formId);
-    // 系统定时更新回调（兜底）。实际数据由主 App 主动推送。
+    this.refreshFormData(formId);
   }
 
   onCastToNormalForm(formId: string): void {
@@ -40,6 +45,27 @@ export default class DailyFortuneFormAbility extends FormExtensionAbility {
 
   onFormEvent(formId: string, message: string): void {
     hilog.info(0x0000, TAG, 'onFormEvent: %{public}s, %{public}s', formId, message);
+  }
+
+  private async refreshFormData(formId: string): Promise<void> {
+    try {
+      const ctx: Context = this.context;
+      await TarotDataService.getInstance().init();
+      const userId: string = await UserStateService.getUserId(ctx);
+      const fortune: DailyFortune = await DailyFortuneService.getTodayFortune(userId, ctx);
+      const formData: Record<string, string | number> = {
+        'cardName': fortune.card.nameZh,
+        'cardKeyword': fortune.keyword,
+        'isReversed': fortune.isReversed ? 1 : 0,
+        'dateKey': fortune.dateKey
+      };
+      const bindingData: formBindingData.FormBindingData =
+        formBindingData.createFormBindingData(formData);
+      await formProvider.updateForm(formId, bindingData);
+      hilog.info(0x0000, TAG, 'Form data refreshed: %{public}s', formId);
+    } catch (err) {
+      hilog.error(0x0000, TAG, 'Failed to refresh form data: %{public}s', JSON.stringify(err));
+    }
   }
 
   private async persistFormId(formId: string): Promise<void> {

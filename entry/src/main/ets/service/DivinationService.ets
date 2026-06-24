@@ -1,4 +1,4 @@
-import { SACRED_TRIANGLE_SPREAD } from '../model/Spread';
+import { SACRED_TRIANGLE_SPREAD, SpreadTemplate, getSpreadById } from '../model/Spread';
 import { DivinationRecord, DrawnCard } from '../model/DivinationRecord';
 import { TarotCard } from '../model/TarotCard';
 import { RandomUtil } from '../utils/RandomUtil';
@@ -12,14 +12,31 @@ export class DivinationService {
     questionType: string = 'general',
     seed: string = `${Date.now()}`
   ): Promise<DivinationRecord> {
+    return DivinationService.drawSpread(SACRED_TRIANGLE_SPREAD, questionType, seed);
+  }
+
+  static async drawBySpreadId(
+    spreadId: string,
+    questionType: string = 'general',
+    seed: string = `${Date.now()}`
+  ): Promise<DivinationRecord> {
+    return DivinationService.drawSpread(getSpreadById(spreadId), questionType, seed);
+  }
+
+  private static async drawSpread(
+    spread: SpreadTemplate,
+    questionType: string,
+    seed: string
+  ): Promise<DivinationRecord> {
     const data: TarotDataService = TarotDataService.getInstance();
     const cards: TarotCard[] = data.getAllCards();
+    const drawCount: number = spread.positions.length;
 
-    if (cards.length < 3) {
-      throw new Error(`Not enough cards for a 3-card draw: only ${cards.length} available`);
+    if (cards.length < drawCount) {
+      throw new Error(`Not enough cards for a ${drawCount}-card draw: only ${cards.length} available`);
     }
 
-    const indexes: number[] = RandomUtil.drawUniqueIndexes(cards.length, 3, seed);
+    const indexes: number[] = RandomUtil.drawUniqueIndexes(cards.length, drawCount, seed);
 
     const drawn: DrawnCard[] = indexes.map((cardIndex: number, positionIndex: number) => {
       const card: TarotCard = cards[cardIndex];
@@ -27,7 +44,7 @@ export class DivinationService {
       const result: DrawnCard = {
         card: card,
         positionIndex: positionIndex,
-        positionName: SACRED_TRIANGLE_SPREAD.positions[positionIndex].name,
+        positionName: spread.positions[positionIndex].name,
         isReversed: isReversed,
         interpretation: data.getInterpretation(card.id, isReversed),
         keywords: data.getKeywords(card.id, isReversed)
@@ -38,7 +55,7 @@ export class DivinationService {
     const record: DivinationRecord = {
       id: `record_${Date.now()}`,
       questionType: questionType,
-      spread: SACRED_TRIANGLE_SPREAD,
+      spread: spread,
       cards: drawn,
       createdAt: Date.now()
     };

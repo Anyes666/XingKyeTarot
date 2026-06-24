@@ -7,7 +7,11 @@ export class Constants {
   static readonly DAILY_REFRESH_HOUR: number = 6;
   static readonly SHARE_IMAGE_WIDTH: number = 1080;
   static readonly SHARE_IMAGE_HEIGHT: number = 1920;
-  static readonly PREF_KEY_COMPLIANCE: string = 'is_compliance_accepted';
+  static readonly PREF_KEY_COMPLIANCE: string = 'is_legal_agreement_accepted_v1';
   static readonly PREF_KEY_ONBOARDING: string = 'is_onboarding_completed';
   static readonly PREF_KEY_DEVICE_ID: string = 'device_user_id';
+  static readonly PREF_KEY_DAILY_FORTUNE_HISTORY: string = 'daily_fortune_history';
+  static readonly DAILY_FORTUNE_HISTORY_LIMIT: number = 30;
+  static readonly PREF_KEY_DIVINATION_HISTORY: string = 'divination_history';
+  static readonly DIVINATION_HISTORY_LIMIT: number = 50;
 }

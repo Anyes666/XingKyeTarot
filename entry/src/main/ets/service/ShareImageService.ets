@@ -1,26 +1,27 @@
 import { abilityAccessCtrl, common, Permissions } from '@kit.AbilityKit';
-import { componentSnapshot } from '@kit.ArkUI';
-import { fileIo } from '@kit.CoreFileKit';
 import { image } from '@kit.ImageKit';
+import { fileIo } from '@kit.CoreFileKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { DivinationRecord } from '../model/DivinationRecord';
 
 const TAG: string = 'ShareImageService';
 
 export class ShareImageService {
-  static buildShareImageFileName(record: DivinationRecord): string {
-    return 'xingkey_tarot_' + record.id + '.png';
+  static buildShareImageFileName(recordId: string): string {
+    return 'xingkey_tarot_' + recordId + '.png';
   }
 
-  static async saveSharePreviewToGallery(
+  /**
+   * 将 PixelMap 编码为 PNG 并保存到系统相册。
+   * 截图逻辑在组件层完成（DivinationResultPage），此处只做编码+存储。
+   */
+  static async savePixelMapToGallery(
     context: common.UIAbilityContext,
-    componentId: string,
-    record: DivinationRecord
+    pixelMap: image.PixelMap,
+    fileName: string
   ): Promise<string> {
-    const pixelMap: image.PixelMap = await componentSnapshot.get(componentId);
     const pngData: ArrayBuffer = await ShareImageService.packPixelMapToPng(pixelMap);
-    return ShareImageService.savePngDataToGallery(context, pngData, ShareImageService.buildShareImageFileName(record));
+    return ShareImageService.savePngDataToGallery(context, pngData, fileName);
   }
 
   private static async packPixelMapToPng(pixelMap: image.PixelMap): Promise<ArrayBuffer> {
@@ -30,7 +31,7 @@ export class ShareImageService {
         format: 'image/png',
         quality: 100
       };
-      return await packer.packing(pixelMap, options);
+      return await packer.packToData(pixelMap, options);
     } catch (err) {
       hilog.error(0x0000, TAG, 'Pack share image failed: %{public}s', JSON.stringify(err));
       throw new Error('生成分享图片失败');
@@ -45,7 +46,11 @@ export class ShareImageService {
     _fileName: string
   ): Promise<string> {
     try {
-      await ShareImageService.ensureAlbumPermission(context);
+      const granted: boolean = await ShareImageService.ensureAlbumPermission(context);
+      if (!granted) {
+        hilog.warn(0x0000, TAG, 'Album permission denied');
+        throw new Error('未获得相册保存权限');
+      }
       const helper = photoAccessHelper.getPhotoAccessHelper(context);
       const uri: string = await helper.createAsset(photoAccessHelper.PhotoType.IMAGE, 'png');
       const file: fileIo.File = fileIo.openSync(uri, fileIo.OpenMode.READ_WRITE);
@@ -62,13 +67,15 @@ export class ShareImageService {
     }
   }
 
-  private static async ensureAlbumPermission(context: common.UIAbilityContext): Promise<void> {
-    const permissions: Permissions[] = ['ohos.permission.WRITE_IMAGEVIDEO'];
-    const atManager = abilityAccessCtrl.createAtManager();
-    const result = await atManager.requestPermissionsFromUser(context, permissions);
-    const granted: boolean = result.authResults.length > 0 && result.authResults[0] === 0;
-    if (!granted) {
-      throw new Error('未获得相册保存权限');
+  private static async ensureAlbumPermission(context: common.UIAbilityContext): Promise<boolean> {
+    try {
+      const permissions: Permissions[] = ['ohos.permission.WRITE_IMAGEVIDEO'];
+      const atManager = abilityAccessCtrl.createAtManager();
+      const result = await atManager.requestPermissionsFromUser(context, permissions);
+      return result.authResults.length > 0 && result.authResults[0] === 0;
+    } catch (err) {
+      hilog.error(0x0000, TAG, 'Request album permission failed: %{public}s', JSON.stringify(err));
+      return false;
     }
   }
 }

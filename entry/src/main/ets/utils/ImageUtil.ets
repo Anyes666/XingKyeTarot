@@ -6,8 +6,7 @@ import { hilog } from '@kit.PerformanceAnalysisKit';
 const TAG: string = 'ImageUtil';
 
 export class ImageUtil {
-  static async savePixelMapToCache(pixelMap: image.PixelMap, fileName: string): Promise<string> {
-    const context: Context = getContext();
+  static async savePixelMapToCache(context: Context, pixelMap: image.PixelMap, fileName: string): Promise<string> {
     const cacheDir: string = context.cacheDir;
     const filePath: string = `${cacheDir}/${fileName}`;
 
@@ -18,7 +17,7 @@ export class ImageUtil {
     };
 
     try {
-      const data: ArrayBuffer = await packer.packing(pixelMap, packOpts);
+      const data: ArrayBuffer = await packer.packToData(pixelMap, packOpts);
       const file: fileIo.File = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY);
       fileIo.writeSync(file.fd, data);
       fileIo.closeSync(file);
