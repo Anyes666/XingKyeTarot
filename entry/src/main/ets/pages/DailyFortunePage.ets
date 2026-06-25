@@ -1,3 +1,4 @@
+import { router } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Theme } from '../common/Theme';
@@ -39,117 +40,131 @@ struct DailyFortunePage {
   build() {
     Stack() {
       StarBackground()
-      AppBackButton()
 
-      if (this.isLoading) {
-        Column() {
-          LoadingProgress()
-            .width(48)
-            .height(48)
-            .color(Theme.GOLD)
+      Column() {
+        // ── 顶部返回按钮 ──
+        Row() {
+          AppBackButton({ fallbackUrl: Routes.NEW_HOME })
         }
         .width('100%')
-        .height('100%')
-        .justifyContent(FlexAlign.Center)
-      } else if (this.errorMessage.length > 0) {
-        Column() {
-          Text(this.errorMessage)
-            .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.DANGER_SOFT)
-          Button('返回')
-            .margin({ top: Theme.SPACE_MD })
-            .onClick(() => {
-              try {
-                this.getUIContext().getRouter().back();
-              } catch (err) {
-                hilog.error(0x0000, 'DailyFortunePage', 'Router back error: %{public}s', JSON.stringify(err));
-              }
-            })
-        }
-        .width('100%')
-        .height('100%')
-        .justifyContent(FlexAlign.Center)
-      } else if (this.fortune) {
-        Scroll() {
+        .padding({ top: 20, left: Theme.SPACE_MD, right: Theme.SPACE_MD })
+
+        if (this.isLoading) {
           Column() {
-            Text('今日一占')
-              .fontSize(Theme.FONT_TITLE)
-              .fontColor(Theme.GOLD)
-              .fontWeight(FontWeight.Bold)
-              .letterSpacing(2)
-              .margin({ top: 48, bottom: Theme.SPACE_XS })
-
-            Text(this.fortune.dateKey)
-              .fontSize(Theme.FONT_CAPTION)
-              .fontColor(Theme.TEXT_MUTED)
-              .margin({ bottom: Theme.SPACE_LG })
-
-            TarotCardView({
-              cardName: this.fortune.card.nameZh,
-              cardImage: this.fortune.card.image,
-              isReversed: this.fortune.isReversed,
-              displayState: CardDisplayState.REVEALED,
-              cardWidth: 120,
-              cardHeight: 192
-            })
-              .margin({ bottom: Theme.SPACE_LG })
-
-            Text(this.fortune.card.nameZh)
-              .fontSize(Theme.FONT_SUBTITLE)
-              .fontColor(Theme.TEXT_PRIMARY)
-              .fontWeight(FontWeight.Medium)
-
-            if (this.fortune.isReversed) {
-              Text('逆位')
-                .fontSize(Theme.FONT_CAPTION)
-                .fontColor(Theme.DANGER_SOFT)
-                .margin({ top: 4 })
-            }
-
-            Text(this.fortune.keyword)
-              .fontSize(Theme.FONT_BODY)
-              .fontColor(Theme.AURORA)
-              .fontWeight(FontWeight.Medium)
-              .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, top: 6, bottom: 6 })
-              .borderRadius(Theme.RADIUS_SM)
-              .backgroundColor('rgba(94, 215, 210, 0.1)')
-              .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_LG })
-
-            Text(this.fortune.summary)
-              .fontSize(Theme.FONT_BODY)
-              .fontColor(Theme.TEXT_SECONDARY)
-              .lineHeight(26)
-              .textAlign(TextAlign.Center)
-              .padding({ left: Theme.SPACE_LG, right: Theme.SPACE_LG })
-              .margin({ bottom: Theme.SPACE_XXL })
-
-            this.HistorySection()
-
-            PrimaryButton({
-              buttonLabel: '返回首页',
-              onTap: () => {
-                try {
-                  this.getUIContext().getRouter().replaceUrl({ url: Routes.HOME });
-                } catch (err) {
-                  hilog.error(0x0000, 'DailyFortunePage', 'Router replace error: %{public}s', JSON.stringify(err));
-                }
-              }
-            })
-              .margin({ bottom: Theme.SPACE_MD })
-
-            ComplianceFooter()
-
-            Blank()
-              .height(Theme.SPACE_LG)
+            LoadingProgress()
+              .width(48)
+              .height(48)
+              .color(Theme.GOLD)
           }
           .width('100%')
-          .alignItems(HorizontalAlign.Center)
+          .layoutWeight(1)
+          .justifyContent(FlexAlign.Center)
+        } else if (this.errorMessage.length > 0) {
+          Column() {
+            Text(this.errorMessage)
+              .fontSize(Theme.FONT_BODY)
+              .fontColor(Theme.DANGER_SOFT)
+            Button('返回')
+              .margin({ top: Theme.SPACE_MD })
+              .onClick(() => {
+                try {
+                  this.getUIContext().getRouter().back();
+                } catch (err) {
+                  hilog.error(0x0000, 'DailyFortunePage', 'Router back error: %{public}s', JSON.stringify(err));
+                }
+              })
+          }
+          .width('100%')
+          .layoutWeight(1)
+          .justifyContent(FlexAlign.Center)
+        } else if (this.fortune) {
+          Scroll() {
+            Column() {
+              Text('今日星钥')
+                .fontSize(Theme.FONT_TITLE)
+                .fontColor(Theme.GOLD)
+                .fontWeight(FontWeight.Bold)
+                .letterSpacing(2)
+                .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_XS })
+
+              Text(this.fortune.dateKey)
+                .fontSize(Theme.FONT_CAPTION)
+                .fontColor(Theme.TEXT_MUTED)
+                .margin({ bottom: Theme.SPACE_LG })
+
+              TarotCardView({
+                cardName: this.fortune.card.nameZh,
+                cardImage: this.fortune.card.image,
+                isReversed: this.fortune.isReversed,
+                displayState: CardDisplayState.REVEALED,
+                cardWidth: 120,
+                cardHeight: 192
+              })
+                .margin({ bottom: Theme.SPACE_LG })
+
+              Text(this.fortune.card.nameZh)
+                .fontSize(Theme.FONT_SUBTITLE)
+                .fontColor(Theme.TEXT_PRIMARY)
+                .fontWeight(FontWeight.Medium)
+
+              if (this.fortune.isReversed) {
+                Text('逆位')
+                  .fontSize(Theme.FONT_CAPTION)
+                  .fontColor(Theme.DANGER_SOFT)
+                  .margin({ top: 4 })
+              }
+
+              Text(this.fortune.keyword)
+                .fontSize(Theme.FONT_BODY)
+                .fontColor(Theme.AURORA)
+                .fontWeight(FontWeight.Medium)
+                .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, top: 6, bottom: 6 })
+                .borderRadius(Theme.RADIUS_SM)
+                .backgroundColor('rgba(94, 215, 210, 0.1)')
+                .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_LG })
+
+              Text(this.fortune.summary)
+                .fontSize(Theme.FONT_BODY)
+                .fontColor(Theme.TEXT_SECONDARY)
+                .lineHeight(26)
+                .textAlign(TextAlign.Center)
+                .padding({ left: Theme.SPACE_LG, right: Theme.SPACE_LG })
+                .margin({ bottom: Theme.SPACE_XXL })
+
+              this.HistorySection()
+
+              PrimaryButton({
+                buttonLabel: '返回首页',
+                onTap: () => {
+                  try {
+                    const routeOptions: router.RouterOptions = { url: Routes.NEW_HOME };
+                    this.getUIContext().getRouter().replaceUrl(routeOptions);
+                  } catch (err) {
+                    hilog.error(0x0000, 'DailyFortunePage', 'Router replace error: %{public}s', JSON.stringify(err));
+                  }
+                }
+              })
+                .margin({ bottom: Theme.SPACE_MD })
+
+              ComplianceFooter()
+
+              Blank()
+                .height(Theme.SPACE_LG)
+            }
+            .width('100%')
+            .alignItems(HorizontalAlign.Center)
+          }
+          .width('100%')
+          .layoutWeight(1)
+          .scrollBar(BarState.Off)
         }
-        .width('100%')
-        .height('100%')
-        .scrollBar(BarState.Off)
       }
+      .width('100%')
+      .height('100%')
     }
+    .width('100%')
+    .height('100%')
+    .backgroundColor(Theme.BG_DEEP_INDIGO)
   }
 
   @Builder

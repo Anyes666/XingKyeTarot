@@ -29,7 +29,7 @@ struct RelationIntroPage {
         AppBackButton({ fallbackUrl: Routes.HOME })
       }
       .width('100%')
-      .padding({ top: 48 })
+      .padding({ top: 20 })
 
       // ── 标题区 ──
       Column() {

@@ -81,7 +81,7 @@ struct AskHeartPage {
         AppBackButton({ fallbackUrl: Routes.HOME })
       }
       .width('100%')
-      .padding({ top: 48 })
+      .padding({ top: 20 })
 
       // ── 标题区 ──
       Column() {
@@ -100,7 +100,7 @@ struct AskHeartPage {
           .margin({ top: Theme.SPACE_SM })
       }
       .width('100%')
-      .margin({ top: 60, bottom: Theme.SPACE_XL })
+      .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_LG })
 
       // ── 6 个问心选项 ──
       Scroll() {

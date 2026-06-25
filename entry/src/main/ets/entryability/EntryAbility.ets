@@ -8,6 +8,7 @@ import { UserStateService } from '../service/UserStateService';
 import { PreferenceStore } from '../data/PreferenceStore';
 import { Routes } from '../common/Routes';
 import { Constants } from '../common/Constants';
+import { AppStateStore } from '../common/AppStateStore';
 
 const TAG: string = 'XingKeyTarot';
 const FORM_IDS_KEY: string = 'widget_form_ids';
@@ -46,6 +47,35 @@ export default class EntryAbility extends UIAbility {
     // 推送数据到桌面卡片
     await this.refreshWidgetData(userId, context);
 
+    // 设置窗口背景色为深蓝黑，避免状态栏/手势条区域白边
+    try {
+      const win: window.Window = await windowStage.getMainWindow();
+      win.setWindowBackgroundColor('#0F0F23');
+    } catch (err) {
+      hilog.warn(0x0000, TAG, 'setWindowBackgroundColor failed: %{public}s', JSON.stringify(err));
+    }
+
+    // 隐私门禁守卫：未同意用户协议与隐私政策时，所有入口（含服务卡片）一律进入 LaunchPage
+    let privacyAccepted: boolean = false;
+    try {
+      privacyAccepted = await AppStateStore.isPrivacyAccepted(context);
+    } catch (err) {
+      hilog.warn(0x0000, TAG, 'isPrivacyAccepted failed: %{public}s', JSON.stringify(err));
+    }
+
+    if (!privacyAccepted) {
+      // 未同意协议：忽略卡片 targetPage，强制进入 LaunchPage 协议门禁
+      windowStage.loadContent('pages/LaunchPage', (err) => {
+        if (err.code) {
+          hilog.error(0x0000, TAG, 'Failed to load LaunchPage (privacy gate): %{public}s', JSON.stringify(err));
+          return;
+        }
+        hilog.info(0x0000, TAG, 'LaunchPage loaded (privacy gate active)');
+      });
+      return;
+    }
+
+    // 已同意协议后，按 targetPage 分发
     // 检查是否从Widget冷启动跳转（onNewWant在冷启动时不会被调用）
     const startParams: Record<string, string> | undefined =
       this.savedLaunchWant?.parameters as Record<string, string> | undefined;
@@ -71,9 +101,33 @@ export default class EntryAbility extends UIAbility {
     }
   }
 
-  onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+  async onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
     hilog.info(0x0000, TAG, 'Ability onNewWant: %{public}s', JSON.stringify(want));
 
+    const context: Context = this.context;
+
+    // 隐私门禁守卫（热启动入口同样适用）：未同意协议时强制进入 LaunchPage
+    let privacyAccepted: boolean = false;
+    try {
+      privacyAccepted = await AppStateStore.isPrivacyAccepted(context);
+    } catch (err) {
+      hilog.warn(0x0000, TAG, 'onNewWant isPrivacyAccepted failed: %{public}s', JSON.stringify(err));
+    }
+
+    if (!privacyAccepted) {
+      if (this.windowStage) {
+        this.windowStage.loadContent('pages/LaunchPage', (err) => {
+          if (err.code) {
+            hilog.error(0x0000, TAG, 'onNewWant Failed to load LaunchPage (privacy gate): %{public}s', JSON.stringify(err));
+            return;
+          }
+          hilog.info(0x0000, TAG, 'onNewWant LaunchPage loaded (privacy gate active)');
+        });
+      }
+      return;
+    }
+
+    // 已同意协议后，按 targetPage 分发
     const params: Record<string, string> | undefined = want.parameters as Record<string, string> | undefined;
     const targetPage: string = params?.['targetPage'] ?? '';
     if (targetPage === 'dailyFortune') {
