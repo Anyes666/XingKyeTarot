@@ -45,6 +45,9 @@ struct Index {
   @State legalDetailContent: string = '';
 
   async aboutToAppear(): Promise<void> {
+    // ── P0 MVP 已通过 EntryAbility 直接加载 AskHeartPage，此处不再 redirect ──
+    // （保留原始 v1.x 首页逻辑，供后续从其他入口访问）
+
     const ctx: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
 
     // 初始化响应式窗口宽度（vp），供所有组件 breakpoint 自适应
@@ -211,7 +214,7 @@ struct Index {
         this.HistoryEntry()
         this.TarotLibraryEntry()
 
-        Text('结果仅供娱乐，请理性参考')
+        Text(Constants.COMPLIANCE_FOOTER)
           .fontSize(Theme.FONT_CAPTION)
           .fontColor(Theme.TEXT_MUTED)
           .opacity(0.6)

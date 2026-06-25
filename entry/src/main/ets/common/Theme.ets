@@ -29,6 +29,30 @@ export class Theme {
   static readonly DANGER_SOFT: string = '#F4C7C3';
   static readonly SUCCESS_SOFT: string = '#B8E6C8';
 
+  // ── MVP P0 新增：极深靛蓝底 + 琥珀金主色（Ardot 原型色板）──
+  static readonly BG_DEEP_INDIGO: string = '#0F0F23';
+  static readonly BG_CARD_DARK: string = '#1B1B30';
+  static readonly BG_CARD_LIGHTER: string = '#242440';
+
+  // 琥珀金系统
+  static readonly GOLD_AMBER: string = '#CA8A04';
+  static readonly GOLD_LIGHT: string = '#E5A50A';
+  static readonly GOLD_PALE: string = '#F5D77A';
+
+  // ── 黑金按钮配色（ShareCard 保存按钮专用）──
+  static readonly GOLD_MAIN: string = '#D99A00';
+  static readonly BTN_DARK_TEXT: string = '#0F0F23';
+
+  // 月白色（高亮文字）
+  static readonly TEXT_PRIMARY_LIGHT: string = '#F8FAFC';
+  static readonly MOON_MUTED: string = '#94A3B8';
+
+  // 深星色（边框/分割线）
+  static readonly DEEP_STARRY: string = '#2A2A4A';
+
+  // 危险操作红（MVP 新增）
+  static readonly DANGER_RED: string = '#EF4444';
+
   // ── 间距 ──
   static readonly SPACE_XS: number = 4;
   static readonly SPACE_SM: number = 8;
@@ -50,6 +74,15 @@ export class Theme {
   static readonly FONT_TITLE: number = 24;
   static readonly FONT_HEADLINE: number = 32;
 
+  // ── MVP 新增字号 ──
+  static readonly FONT_DISPLAY: number = 36;
+  static readonly FONT_CARD_NAME: number = 28;
+  static readonly FONT_FOLLOWUP: number = 17;
+
+  // ── MVP 新增间距 ──
+  static readonly SPACE_RESULT_GAP: number = 40;
+  static readonly SPACE_SCREEN_PAD: number = 24;
+
   // ── 卡片尺寸 ──
   static readonly TAROT_CARD_WIDTH: number = 100;
   static readonly TAROT_CARD_HEIGHT: number = 160;
@@ -60,6 +93,13 @@ export class Theme {
   static readonly BREAKPOINT_SM: number = 320;
   static readonly BREAKPOINT_MD: number = 600;
   static readonly BREAKPOINT_LG: number = 840;
+
+  // ── MVP 动画 Token ──
+  static readonly ANIM_DRAW_DURATION: number = 1500;
+  static readonly ANIM_FLIP_DURATION: number = 600;
+  static readonly ANIM_FADE_IN: number = 400;
+  static readonly ANIM_SLIDE_UP: number = 350;
+  static readonly ANIM_STAR_TWINKLE: number = 2000;
 
   /**
    * 生成星空渐变背景色值（从上到下）

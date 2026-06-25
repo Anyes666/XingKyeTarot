@@ -181,7 +181,7 @@ struct DivinationPage {
               }
             })
 
-            Text('结果仅供娱乐，请理性参考')
+            Text(Constants.COMPLIANCE_FOOTER)
               .fontSize(Theme.FONT_CAPTION)
               .fontColor(Theme.TEXT_MUTED)
               .opacity(0.6)

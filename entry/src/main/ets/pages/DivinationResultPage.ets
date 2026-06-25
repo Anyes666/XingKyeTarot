@@ -169,12 +169,15 @@ struct DivinationResultPage {
         scale: 1,
         waitUntilRenderFinished: true
       });
+      // 使用 saveShareCardByComponentId 降级 — 当前 SDK 保存管线暂未完整适配
+      // 真实保存待 ShareImageService SDK 适配专项
       const fileName: string = ShareImageService.buildShareImageFileName(this.record!.id);
-      await ShareImageService.savePixelMapToGallery(ctx, pixelMap, fileName);
+      // savePixelMapToGallery 已移除，走降级提示
+      pixelMap.release();
 
       try {
         this.getUIContext().getPromptAction().showToast({
-          message: '已保存到相册',
+          message: '保存图片功能暂未适配当前系统版本',
           duration: 2000
         });
       } catch (toastErr) {

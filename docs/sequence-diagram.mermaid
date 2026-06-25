@@ -1,0 +1,178 @@
+sequenceDiagram
+    %% ═══════════════════════════════════
+    %% 启动流程
+    %% ═══════════════════════════════════
+    participant EA as EntryAbility
+    participant LP as LaunchPage
+    participant AS as AppStateStore
+    participant PS as PreferenceStore
+    participant PPP as PrivacyPolicyPage
+    participant UAP as UserAgreementPage
+    participant AHP as AskHeartPage
+    participant HP as HomePage
+
+    EA->>LP: loadContent('pages/LaunchPage')
+    LP->>LP: build() 渲染加载UI
+    LP->>AS: isPrivacyAccepted(context)
+    AS->>PS: getBoolean('privacy_accepted_v2')
+    PS-->>AS: false
+    AS-->>LP: false
+
+    Note over LP: 隐私未同意，显示门禁弹窗
+
+    alt 点击查看协议
+        LP->>UAP: pushUrl(隐私政策页)
+        UAP-->>LP: router.back()
+        LP->>PPP: pushUrl(用户协议页)
+        PPP-->>LP: router.back()
+    end
+
+    LP->>AS: acceptPrivacy(context, '1.0.0')
+    AS->>PS: putBoolean + putString
+    AS-->>LP: void
+
+    LP->>AS: isFirstExperienceCompleted(context)
+    AS->>PS: getBoolean('first_experience_completed')
+    PS-->>AS: false
+    AS-->>LP: false
+
+    alt 首次体验
+        LP->>AHP: replaceUrl(AskHeartPage, {entryMode: FIRST_EXPERIENCE})
+    else 已体验过
+        LP->>HP: replaceUrl(HomePage)
+    end
+
+    %% ═══════════════════════════════════
+    %% 单牌快占流程 (NORMAL_SINGLE)
+    %% ═══════════════════════════════════
+    participant CDP as CardDrawPage
+    participant RGP as ResultGoldenPage
+    participant TR as TarotCardRepository
+    participant HS as HistoryStore
+
+    HP->>AHP: pushUrl({entryMode: NORMAL_SINGLE})
+    AHP->>AHP: 选择问心选项
+    AHP->>CDP: pushUrl({entryMode, spreadType:SINGLE, ...})
+
+    CDP->>TR: drawSingleCard(emotionTag)
+    TR-->>CDP: {cardId, isReversed:false}
+    CDP->>CDP: 翻牌动画 1.8s
+    CDP->>RGP: replaceUrl({entryMode, ...})
+
+    rect rgb(40,40,80)
+        Note over RGP,HS: 自动保存历史
+        RGP->>RGP: 构造 DrawnCardRecord + DivinationHistoryRecord
+        RGP->>HS: addRecord(context, record)
+        HS->>PS: putString(JSON)
+    end
+
+    alt NORMAL_SINGLE
+        RGP->>RGP: 追问月见/分享卡/情绪星点/回首页
+    else FIRST_EXPERIENCE
+        RGP->>AS: completeFirstExperience(context)
+        AS->>PS: putBoolean(true) + putNumber(timestamp)
+        RGP->>RGP: 进入首页按钮
+    end
+
+    %% ═══════════════════════════════════
+    %% 圣三角流程
+    %% ═══════════════════════════════════
+    participant TIP as TriangleIntroPage
+    participant TDP as TriangleDrawPage
+    participant TRP as TriangleResultPage
+
+    HP->>TIP: pushUrl
+    TIP->>TIP: 输入问题+选场景
+    TIP->>TDP: pushUrl({questionText, scenarioTag})
+
+    TDP->>TR: drawUniqueCards(3)
+    TR-->>TDP: [{cardId}×3]
+    TDP->>TDP: 三牌依次翻开动画 (0.8s间隔)
+    TDP->>TRP: replaceUrl({questionText, scenarioTag, cards})
+
+    TRP->>TRP: 加载三牌解读+综合解读+行动建议
+
+    rect rgb(40,40,80)
+        Note over TRP,HS: 自动保存 (spreadType=TRIANGLE)
+        TRP->>TRP: 构造3个DrawnCardRecord(past/present/future)
+        TRP->>HS: addRecord(context, record)
+    end
+
+    TRP->>TRP: 生成分享卡/Toast已保存/回首页
+
+    %% ═══════════════════════════════════
+    %% 关系探索流程
+    %% ═══════════════════════════════════
+    participant RIP as RelationIntroPage
+    participant RDP as RelationDrawPage
+    participant RRP as RelationResultPage
+
+    HP->>RIP: pushUrl
+    RIP->>RIP: 选关系类型+输入问题
+    RIP->>RDP: pushUrl({questionText, relationType})
+
+    RDP->>TR: drawUniqueCards(3)
+    TR-->>RDP: [{cardId}×3]
+    RDP->>RDP: 三牌依次翻开动画
+    RDP->>RRP: replaceUrl({questionText, relationType, cards})
+
+    RRP->>RRP: 加载三牌解读+综合解读+边界提醒+今日行动
+
+    rect rgb(40,40,80)
+        Note over RRP,HS: 自动保存 (spreadType=RELATION)
+        RRP->>RRP: 构造3个DrawnCardRecord(self/other/trend)
+        RRP->>HS: addRecord(context, record)
+    end
+
+    RRP->>RRP: 生成分享卡/Toast已保存/回首页
+
+    %% ═══════════════════════════════════
+    %% 历史查看流程
+    %% ═══════════════════════════════════
+    participant HP2 as HistoryPage
+    participant HDP as HistoryDetailPage
+
+    HP->>HP2: pushUrl
+    HP2->>HS: getRecords(context)
+    HS->>PS: getString
+    PS-->>HS: JSON string
+    HS-->>HP2: DivinationHistoryRecord[]
+    HP2->>HP2: 渲染列表+筛选Tab
+
+    HP2->>HDP: pushUrl({recordId})
+    HDP->>HS: getRecordById(context, recordId)
+    HS-->>HDP: record | null
+
+    alt 记录存在
+        alt SINGLE
+            HDP->>HDP: 复用单牌展示结构(只读)
+        else TRIANGLE
+            HDP->>HDP: 三牌+综合解读+行动建议
+        else RELATION
+            HDP->>HDP: 三牌+综合解读+边界提醒
+        end
+        HDP->>HDP: 生成分享卡/回首页
+    else 记录不存在
+        HDP->>HDP: 显示空状态+返回首页
+    end
+
+    %% ═══════════════════════════════════
+    %% 分享卡保存流程
+    %% ═══════════════════════════════════
+    participant SCP as ShareCardPage
+    participant SIS as ShareImageService
+    participant GAL as 系统相册
+
+    HDP->>SCP: pushUrl({sourceRecordId, spreadType})
+    SCP->>HS: getRecordById(context, sourceRecordId)
+    HS-->>SCP: record
+
+    alt 三种布局
+        SCP->>SCP: SINGLE/TRIANGLE/RELATION 渲染
+    end
+
+    SCP->>SIS: savePixelMapToGallery(pixelMap, 'xingkey_share_...')
+    SIS->>GAL: photoAccessHelper.save
+    GAL-->>SIS: success
+    SIS-->>SCP: void
+    SCP->>SCP: Toast('保存成功')

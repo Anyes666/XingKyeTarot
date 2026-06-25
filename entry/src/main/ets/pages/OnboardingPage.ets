@@ -1,234 +1,216 @@
+import { router } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { display } from '@kit.ArkUI';
 import { Theme } from '../common/Theme';
 import { Routes } from '../common/Routes';
 import { Constants } from '../common/Constants';
-import { UserStateService } from '../service/UserStateService';
-import { PrimaryButton } from '../components/PrimaryButton';
-import { StarBackground } from '../components/StarBackground';
-import { AppBackButton } from '../components/AppBackButton';
-
-interface OnboardingPageData {
-  title: string;
-  description: string;
-  image: Resource;
-}
+import { AppStateStore } from '../common/AppStateStore';
 
 /**
- * 新手引导页 — 3 页滑动引导
+ * 新手引导页 — 3 页引导
+ * 完成 Onboarding 后进入 AskHeartPage(FIRST_EXPERIENCE)
  */
 @Entry
 @Component
 struct OnboardingPage {
-  @State currentPage: number = 0;
-  @StorageProp('windowWidth') windowWidth: number = 360;
-  @State isImageLoading: boolean = true;
-  @State hasImageError: boolean = false;
-  private swiperController: SwiperController = new SwiperController();
-
-  private readonly pages: OnboardingPageData[] = [
-    {
-      title: '抽一张牌\n不是预测命运',
-      description: '星钥塔罗是你自我探索的伙伴。\n每一张牌都是一面镜子，\n帮助你看见内心的不同面向。',
-      image: $r('app.media.onboarding_01_ace_wands')
-    } as OnboardingPageData,
-    {
-      title: '圣三角牌阵',
-      description: '过去 · 现在 · 未来\n\n三张牌对应三个时间维度，\n帮你理清当下的状态与可能的方向。\n请保持开放心态，享受这个过程。',
-      image: $r('app.media.onboarding_02_three_wands')
-    } as OnboardingPageData,
-    {
-      title: '每日一占',
-      description: '每天一张牌，一个关键词。\n适合作为一天的灵感提醒，\n也可以记录心情变化。\n\n结果仅供娱乐，请理性参考。',
-      image: $r('app.media.tarot_major_19_sun')
-    } as OnboardingPageData
-  ];
-
-  aboutToAppear(): void {
-    this.initWindowMetrics();
-  }
+  @State currentIndex: number = 0;
 
   build() {
-    Stack() {
-      StarBackground()
-      AppBackButton()
-
-      Column() {
-        Row() {
-          Blank()
-          Text('跳过')
-            .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.TEXT_MUTED)
-            .onClick(() => {
-              this.finishOnboarding();
-            })
-        }
-        .width('100%')
-        .padding({ right: Theme.SPACE_LG, top: Theme.SPACE_XL })
-        .margin({ top: 32 })
-
-        Swiper(this.swiperController) {
-          ForEach(this.pages, (page: OnboardingPageData, index: number) => {
-            Column() {
-              Stack() {
-                // 加载中骨架
-                if (this.isImageLoading && !this.hasImageError) {
-                  Column()
-                    .width('100%')
-                    .height('100%')
-                    .backgroundColor('rgba(23, 29, 58, 0.5)')
-                    .borderRadius(16)
-                  LoadingProgress()
-                    .width(32)
-                    .height(32)
-                    .color(Theme.GOLD_SOFT)
-                }
-
-                // 加载失败兜底
-                if (this.hasImageError) {
-                  Column() {
-                    Text('?')
-                      .fontSize(48)
-                      .fontColor(Theme.TEXT_MUTED)
-                      .fontWeight(FontWeight.Bold)
-                  }
-                  .width('100%')
-                  .height('100%')
-                  .justifyContent(FlexAlign.Center)
-                  .backgroundColor('rgba(23, 29, 58, 0.5)')
-                  .borderRadius(16)
-                }
-
-                // 牌图
-                Image(page.image)
-                  .width('100%')
-                  .height('100%')
-                  .objectFit(ImageFit.Contain)
-                  .borderRadius(16)
-                  .opacity(this.isImageLoading ? 0 : 1)
-                  .animation({ duration: 400, curve: Curve.EaseOut })
-                  .onComplete(() => {
-                    this.isImageLoading = false;
-                    this.hasImageError = false;
-                  })
-                  .onError(() => {
-                    this.isImageLoading = false;
-                    this.hasImageError = true;
-                  })
-              }
-              .width(this.getOnboardingImageWidth())
-              .height(this.getOnboardingImageHeight())
-              .clip(true)
-              .borderRadius(16)
-              .margin({ bottom: Theme.SPACE_MD })
-
-              Text(page.title)
-                .fontSize(Theme.FONT_HEADLINE)
-                .fontColor(Theme.TEXT_PRIMARY)
-                .fontWeight(FontWeight.Bold)
-                .textAlign(TextAlign.Center)
-                .lineHeight(42)
-                .margin({ bottom: Theme.SPACE_LG })
-
-              Text(page.description)
-                .fontSize(Theme.FONT_BODY)
-                .fontColor(Theme.TEXT_SECONDARY)
-                .textAlign(TextAlign.Center)
-                .lineHeight(26)
-                .padding({ left: Theme.SPACE_XL, right: Theme.SPACE_XL })
-            }
-            .width('100%')
-            .height('100%')
-            .justifyContent(FlexAlign.Center)
-          }, (page: OnboardingPageData, index: number) => `onboarding_page_${index}`)
-        }
-        .width('100%')
-        .layoutWeight(1)
-        .indicator(
-          Indicator.dot()
-            .selectedColor(Theme.GOLD)
-            .color(Theme.TEXT_MUTED)
-            .itemWidth(8)
-            .itemHeight(8)
-            .selectedItemWidth(8)
-            .selectedItemHeight(8)
-        )
-        .loop(false)
-        .onChange((index: number) => {
-          this.currentPage = index;
-        })
-
-        Column() {
-          if (this.currentPage < this.pages.length - 1) {
-            PrimaryButton({
-              buttonLabel: '下一步',
-              onTap: () => {
-                this.swiperController.showNext();
-              }
-            })
-          } else {
-            PrimaryButton({
-              buttonLabel: '开始体验',
-              onTap: () => {
-                this.finishOnboarding();
-              }
-            })
-          }
-        }
-        .width('100%')
-        .padding({ bottom: Theme.SPACE_XXL })
-        .alignItems(HorizontalAlign.Center)
-        .margin({ bottom: 16 })
+    Column() {
+      // ── 图片区（if 分支）──
+      if (this.currentIndex === 0) {
+        Image($r('app.media.onboarding_self_seeing'))
+          .width('100%')
+          .height(280)
+          .objectFit(ImageFit.Contain)
+          .borderRadius(24)
+          .border({ width: 1, color: 'rgba(202,138,4,0.25)' })
+          .margin({ bottom: 24 })
+      } else if (this.currentIndex === 1) {
+        Image($r('app.media.onboarding_daily_star_key'))
+          .width('100%')
+          .height(280)
+          .objectFit(ImageFit.Contain)
+          .borderRadius(24)
+          .border({ width: 1, color: 'rgba(202,138,4,0.25)' })
+          .margin({ bottom: 24 })
+      } else {
+        Image($r('app.media.onboarding_feature'))
+          .width('100%')
+          .height(280)
+          .objectFit(ImageFit.Contain)
+          .borderRadius(24)
+          .border({ width: 1, color: 'rgba(202,138,4,0.25)' })
+          .margin({ bottom: 24 })
       }
-      .width('100%')
-      .height('100%')
+
+      // ── 标题 ──
+      if (this.currentIndex === 0) {
+        Text('不是算命，是一次温柔的自我看见')
+          .fontSize(26)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(Theme.GOLD_LIGHT)
+          .textAlign(TextAlign.Center)
+          .width('100%')
+          .margin({ bottom: 12 })
+      } else if (this.currentIndex === 1) {
+        Text('每天一张牌，点亮一颗情绪星')
+          .fontSize(26)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(Theme.GOLD_LIGHT)
+          .textAlign(TextAlign.Center)
+          .width('100%')
+          .margin({ bottom: 12 })
+      } else {
+        Text('当心事变复杂，星澜会陪你慢慢看')
+          .fontSize(26)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(Theme.GOLD_LIGHT)
+          .textAlign(TextAlign.Center)
+          .width('100%')
+          .margin({ bottom: 12 })
+      }
+
+      // ── 副标题 ──
+      if (this.currentIndex === 0) {
+        Text('星钥塔罗用塔罗牌作为心理隐喻，帮你整理那些说不出口的心事。')
+          .fontSize(16)
+          .fontColor(Theme.TEXT_SECONDARY)
+          .textAlign(TextAlign.Center)
+          .lineHeight(24)
+          .width('100%')
+          .margin({ bottom: 16 })
+      } else if (this.currentIndex === 1) {
+        Text('选择一句最像此刻的心事，星澜会为你抽一张今日星钥。')
+          .fontSize(16)
+          .fontColor(Theme.TEXT_SECONDARY)
+          .textAlign(TextAlign.Center)
+          .lineHeight(24)
+          .width('100%')
+          .margin({ bottom: 16 })
+      } else {
+        Text('单牌快占、圣三角、关系探索，会从不同角度帮你整理情绪和选择。')
+          .fontSize(16)
+          .fontColor(Theme.TEXT_SECONDARY)
+          .textAlign(TextAlign.Center)
+          .lineHeight(24)
+          .width('100%')
+          .margin({ bottom: 16 })
+      }
+
+      // ── 额外文案 ──
+      if (this.currentIndex === 0) {
+        Text(Constants.COMPLIANCE_FOOTER)
+          .fontSize(12)
+          .fontColor('#8B7A5C')
+          .textAlign(TextAlign.Center)
+          .width('100%')
+          .margin({ bottom: 24 })
+      } else if (this.currentIndex === 1) {
+        Text('不是为了坚持打卡，\n是为了慢慢看见自己。')
+          .fontSize(15)
+          .fontColor('#C8B88A')
+          .textAlign(TextAlign.Center)
+          .lineHeight(24)
+          .width('100%')
+          .margin({ bottom: 24 })
+      } else {
+        Column() {
+          Text('单牌快占：30 秒，看见此刻心事')
+            .fontSize(14)
+            .fontColor(Theme.TEXT_SECONDARY)
+            .margin({ bottom: 6 })
+          Text('圣三角：看清一件事的过去、现在、未来')
+            .fontSize(14)
+            .fontColor(Theme.TEXT_SECONDARY)
+            .margin({ bottom: 6 })
+          Text('关系探索：整理我、对方与这段关系的走向')
+            .fontSize(14)
+            .fontColor(Theme.TEXT_SECONDARY)
+        }
+        .width('100%')
+        .alignItems(HorizontalAlign.Center)
+        .margin({ bottom: 24 })
+      }
+
+      // ── 分页点 ──
+      Row({ space: 8 }) {
+        Column()
+          .width(this.currentIndex === 0 ? 18 : 6)
+          .height(6)
+          .borderRadius(3)
+          .backgroundColor(this.currentIndex === 0 ? Theme.GOLD_AMBER : '#3A3A5A')
+        Column()
+          .width(this.currentIndex === 1 ? 18 : 6)
+          .height(6)
+          .borderRadius(3)
+          .backgroundColor(this.currentIndex === 1 ? Theme.GOLD_AMBER : '#3A3A5A')
+        Column()
+          .width(this.currentIndex === 2 ? 18 : 6)
+          .height(6)
+          .borderRadius(3)
+          .backgroundColor(this.currentIndex === 2 ? Theme.GOLD_AMBER : '#3A3A5A')
+      }
+      .margin({ bottom: 20 })
+
+      // ── 主按钮 ──
+      Button(this.currentIndex < 2 ? '下一页' : '开始我的第一次星钥')
+        .type(ButtonType.Normal)
+        .width('100%')
+        .height(52)
+        .borderRadius(26)
+        .backgroundColor(Theme.GOLD_MAIN)
+        .fontColor(Theme.BTN_DARK_TEXT)
+        .fontSize(18)
+        .fontWeight(FontWeight.Medium)
+        .onClick(() => {
+          this.handlePrimaryButtonClick();
+        })
     }
+    .width('100%')
+    .height('100%')
+    .backgroundColor(Theme.BG_DEEP_INDIGO)
+    .padding({ left: 24, right: 24, top: 48, bottom: 36 })
+    .justifyContent(FlexAlign.Center)
   }
 
-  private initWindowMetrics(): void {
-    try {
-      const displayInfo = display.getDefaultDisplaySync();
-      const screenVp: number = px2vp(displayInfo.width);
-      AppStorage.setOrCreate('windowWidth', screenVp);
-    } catch (e) {
-      AppStorage.setOrCreate('windowWidth', 360);
+  /**
+   * 主按钮点击：翻页或完成引导
+   */
+  private handlePrimaryButtonClick(): void {
+    if (this.currentIndex < 2) {
+      this.currentIndex += 1;
+    } else {
+      this.completeAndEnterFirstExperience();
     }
   }
 
   /**
-   * 根据窗口宽度计算引导页图片宽度（响应式）。
+   * 完成引导并进入首次体验
    */
-  private getOnboardingImageWidth(): number {
-    const baseWidth: number = 180;
-    if (this.windowWidth >= Theme.BREAKPOINT_LG) {
-      return baseWidth * 1.4;
-    }
-    if (this.windowWidth >= Theme.BREAKPOINT_MD) {
-      return baseWidth * 1.2;
-    }
-    // 小屏手机等比缩放
-    if (this.windowWidth < 360) {
-      return this.windowWidth * 0.45;
-    }
-    return baseWidth;
-  }
-
-  private getOnboardingImageHeight(): number {
-    return this.getOnboardingImageWidth() * Theme.TAROT_CARD_ASPECT_RATIO;
-  }
-
-  private async finishOnboarding(): Promise<void> {
+  private async completeAndEnterFirstExperience(): Promise<void> {
     try {
       const ctx: common.UIAbilityContext = this.getUIContext().getHostContext() as common.UIAbilityContext;
-      await UserStateService.completeOnboarding(ctx);
-    } catch (e) {
-      // Preference write may fail in some test contexts — still navigate
+      await AppStateStore.completeOnboarding(ctx);
+    } catch (err) {
+      hilog.error(0x0000, 'OnboardingPage', 'completeOnboarding error: %{public}s', JSON.stringify(err));
     }
     try {
-      await this.getUIContext().getRouter().replaceUrl({ url: Routes.HOME });
+      const params: AskHeartRouteParams = { entryMode: 'FIRST_EXPERIENCE' };
+      const routeOptions: router.RouterOptions = { url: Routes.ASK_HEART, params: params };
+      router.replaceUrl(routeOptions).catch((_e: Error) => {
+        hilog.error(0x0000, 'OnboardingPage', 'replaceUrl AskHeart failed');
+      });
     } catch (err) {
-      hilog.error(0x0000, 'OnboardingPage', 'Router replace error: %{public}s', JSON.stringify(err));
+      hilog.error(0x0000, 'OnboardingPage', 'replaceUrl error: %{public}s', JSON.stringify(err));
     }
   }
+}
+
+// ═══════════════════════════════════════════════════════════
+// 路由参数接口（文件级作用域，与 LaunchPage 同名不冲突）
+// ═══════════════════════════════════════════════════════════
+
+interface AskHeartRouteParams {
+  entryMode: string;
 }

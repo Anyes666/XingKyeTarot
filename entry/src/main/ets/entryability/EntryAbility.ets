@@ -60,12 +60,13 @@ export default class EntryAbility extends UIAbility {
         hilog.info(0x0000, TAG, 'DailyFortunePage loaded from cold start');
       });
     } else {
-      windowStage.loadContent('pages/Index', (err) => {
+      // P0.2：默认启动 LaunchPage（隐私门禁判断 → 首次体验分流）
+      windowStage.loadContent('pages/LaunchPage', (err) => {
         if (err.code) {
-          hilog.error(0x0000, TAG, 'Failed to load content: %{public}s', JSON.stringify(err));
+          hilog.error(0x0000, TAG, 'Failed to load LaunchPage: %{public}s', JSON.stringify(err));
           return;
         }
-        hilog.info(0x0000, TAG, 'Content loaded');
+        hilog.info(0x0000, TAG, 'LaunchPage loaded (P0.2 entry)');
       });
     }
   }

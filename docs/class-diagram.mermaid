@@ -1,0 +1,186 @@
+classDiagram
+    direction TB
+
+    %% ── 枚举 ──
+    class SpreadType {
+        <<enumeration>>
+        SINGLE
+        TRIANGLE
+        RELATION
+    }
+
+    class EntryMode {
+        <<enumeration>>
+        FIRST_EXPERIENCE
+        NORMAL_SINGLE
+    }
+
+    %% ── 数据模型 ──
+    class DrawnCardRecord {
+        +positionKey: string
+        +positionTitle: string
+        +cardId: string
+        +cardName: string
+        +isReversed: boolean
+        +keyword: string
+        +goldenSentence: string
+        +brief: string
+        +action: string
+    }
+
+    class DivinationHistoryRecord {
+        +id: string
+        +timestamp: number
+        +spreadType: SpreadType
+        +modeTitle: string
+        +questionText: string
+        +scenarioTag: string
+        +cards: DrawnCardRecord[]
+        +summaryTitle: string
+        +summaryText: string
+        +adviceText: string
+        +shareText: string
+    }
+
+    class DrawCardResult {
+        +cardId: string
+        +isReversed: boolean
+    }
+
+    class HeartOption {
+        +index: number
+        +emoji: string
+        +label: string
+        +emotionTag: EmotionTag
+    }
+
+    class TarotCard {
+        +cardId: string
+        +name: string
+        +isReversed: boolean
+        +keywords: string[]
+    }
+
+    %% ── Store / Service ──
+    class AppStateStore {
+        -PREF_KEY_PRIVACY_ACCEPTED: string
+        -PREF_KEY_PRIVACY_VERSION: string
+        -PREF_KEY_FIRST_EXPERIENCE: string
+        -PREF_KEY_FIRST_EXPERIENCE_AT: string
+        +isPrivacyAccepted(context: Context): Promise~boolean~
+        +acceptPrivacy(context: Context, version: string): Promise~void~
+        +getPrivacyVersion(context: Context): Promise~string~
+        +isFirstExperienceCompleted(context: Context): Promise~boolean~
+        +completeFirstExperience(context: Context): Promise~void~
+        +getFirstExperienceCompletedAt(context: Context): Promise~number~
+        +init(context: Context): Promise~void~
+    }
+
+    class HistoryStore {
+        -PREF_KEY: string
+        -MAX_RECORDS: number
+        +addRecord(context: Context, record: DivinationHistoryRecord): Promise~void~
+        +getRecords(context: Context): Promise~DivinationHistoryRecord[]~
+        +getRecordById(context: Context, id: string): Promise~DivinationHistoryRecord | null~
+        +getTodayLatestRecord(context: Context): Promise~DivinationHistoryRecord | null~
+        +getCount(context: Context): Promise~number~
+        +clearAllForDebug(context: Context): Promise~void~
+    }
+
+    class TarotCardRepository {
+        +drawSingleCard(emotionTag?: EmotionTag): DrawCardResult
+        +drawUniqueCards(count: number): DrawCardResult[]
+        +getCardById(cardId: string): TarotCard | undefined
+        +getCardName(cardId: string): string
+        +getCardKeyword(cardId: string): string
+        +getCardBrief(cardId: string, emotionTag?: EmotionTag): string
+        +getCardAction(cardId: string, emotionTag?: EmotionTag): string
+        +getCardImage(cardId: string): Resource
+    }
+
+    class PreferenceStore {
+        +getStore(context: Context): Promise~Preferences~
+        +putString(key: string, value: string, context: Context): Promise~void~
+        +getString(key: string, defaultVal: string, context: Context): Promise~string~
+        +putBoolean(key: string, value: boolean, context: Context): Promise~void~
+        +getBoolean(key: string, defaultVal: boolean, context: Context): Promise~boolean~
+    }
+
+    class UserStateService {
+        +isComplianceAccepted(context: Context): Promise~boolean~
+        +acceptCompliance(context: Context): Promise~void~
+        +isOnboardingDone(context: Context): Promise~boolean~
+        +completeOnboarding(context: Context): Promise~void~
+    }
+
+    class ShareImageService {
+        +savePixelMapToGallery(context: Context, pixelMap: PixelMap, fileName: string): Promise~void~
+    }
+
+    %% ── 页面路由参数 ──
+    class AskHeartRouteParams {
+        +entryMode: string
+    }
+
+    class CardDrawRouteParams {
+        +entryMode: string
+        +spreadType: string
+        +heartOptionIndex: number
+        +emotionTag: string
+        +questionText: string
+    }
+
+    class ResultGoldenRouteParams {
+        +entryMode: string
+        +recordId: string
+        +cardId: string
+        +cardName: string
+        +isReversed: boolean
+        +heartOptionIndex: number
+        +emotionTag: string
+        +goldenSentence: string
+        +questionText: string
+    }
+
+    class TriangleDrawRouteParams {
+        +questionText: string
+        +scenarioTag: string
+    }
+
+    class TriangleResultRouteParams {
+        +questionText: string
+        +scenarioTag: string
+        +cards: DrawnCardRecord[]
+    }
+
+    class RelationDrawRouteParams {
+        +questionText: string
+        +relationType: string
+    }
+
+    class RelationResultRouteParams {
+        +questionText: string
+        +relationType: string
+        +cards: DrawnCardRecord[]
+    }
+
+    class ShareCardRouteParams {
+        +sourceRecordId: string
+        +spreadType: string
+    }
+
+    class HistoryDetailRouteParams {
+        +recordId: string
+    }
+
+    %% ── 关系 ──
+    DivinationHistoryRecord "1" *-- "1..3" DrawnCardRecord
+    HistoryStore ..> DivinationHistoryRecord : stores
+    HistoryStore ..> PreferenceStore : uses
+    AppStateStore ..> PreferenceStore : uses
+    UserStateService ..> PreferenceStore : uses
+    TarotCardRepository ..> DrawCardResult : returns
+    TarotCardRepository ..> TarotCard : queries
+    TarotCardRepository ..> HeartOption : delegates
+    CardDrawRouteParams ..> EntryMode : uses
+    ResultGoldenRouteParams ..> EntryMode : uses

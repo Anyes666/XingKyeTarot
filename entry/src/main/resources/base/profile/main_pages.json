@@ -5,6 +5,24 @@
     "pages/DivinationPage",
     "pages/DivinationResultPage",
     "pages/DailyFortunePage",
-    "pages/DivinationHistoryPage"
+    "pages/DivinationHistoryPage",
+    "pages/AskHeartPage",
+    "pages/CardDrawPage",
+    "pages/ResultGoldenPage",
+    "pages/FollowUpPage",
+    "pages/ShareCardPage",
+    "pages/EmotionStarPage",
+    "pages/LaunchPage",
+    "pages/HomePage",
+    "pages/PrivacyPolicyPage",
+    "pages/UserAgreementPage",
+    "pages/TriangleIntroPage",
+    "pages/TriangleDrawPage",
+    "pages/TriangleResultPage",
+    "pages/RelationIntroPage",
+    "pages/RelationDrawPage",
+    "pages/RelationResultPage",
+    "pages/HistoryPage",
+    "pages/HistoryDetailPage"
   ]
 }
