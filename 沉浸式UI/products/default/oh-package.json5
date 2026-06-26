@@ -1,0 +1,13 @@
+{
+  "name": "default",
+  "version": "1.0.0",
+  "description": "Please describe the basic information.",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "shopping": "file:../../features/shopping",
+    "minigame": "file:../../features/minigame",
+    "commons": "file:../../commons/commons"
+  }
+}

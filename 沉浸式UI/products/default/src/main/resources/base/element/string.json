@@ -1,0 +1,48 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "沉浸式页面开发"
+    },
+    {
+      "name": "title",
+      "value": "沉浸式页面开发"
+    },
+    {
+      "name": "router_title_expand",
+      "value": "背景沉浸"
+    },
+    {
+      "name": "router_title_fullscreen",
+      "value": "全屏沉浸"
+    },
+    {
+      "name": "router_title_background",
+      "value": "组件设置背景沉浸"
+    },
+    {
+      "name": "router_title_page",
+      "value": "组件设置页面沉浸"
+    },
+    {
+      "name": "router_title_free",
+      "value": "自由窗口标题栏沉浸"
+    },
+    {
+      "name": "sample_shopping",
+      "value": "商城示例"
+    },
+    {
+      "name": "sample_game",
+      "value": "游戏示例"
+    }
+  ]
+}

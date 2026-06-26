@@ -1,0 +1,12 @@
+{
+  "color": [
+    {
+      "name": "grid_bg_color",
+      "value": "#4D0D59F7"
+    },
+    {
+      "name": "grid_border_color",
+      "value": "#327AF7"
+    }
+  ]
+}

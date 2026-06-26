@@ -1,0 +1,188 @@
+{
+  "string": [
+    {
+      "name": "tab_bar_title_1",
+      "value": "首页"
+    },
+    {
+      "name": "tab_bar_title_2",
+      "value": "分类"
+    },
+    {
+      "name": "tab_bar_title_3",
+      "value": "发现"
+    },
+    {
+      "name": "top_bar_texts1",
+      "value": "华为"
+    },
+    {
+      "name": "top_bar_texts2",
+      "value": "AITO汽车"
+    },
+    {
+      "name": "top_bar_texts3",
+      "value": "华为智选"
+    },
+    {
+      "name": "top_bar_texts4",
+      "value": "生态周边"
+    },
+    {
+      "name": "searching",
+      "value": "搜索..."
+    },
+    {
+      "name": "good_categories1",
+      "value": "智慧办公"
+    },
+    {
+      "name": "good_categories3",
+      "value": "华为手机"
+    },
+    {
+      "name": "good_categories2",
+      "value": "智慧家居"
+    },
+    {
+      "name": "good_categories4",
+      "value": "影音娱乐"
+    },
+    {
+      "name": "good_categories5",
+      "value": "运动健康"
+    },
+    {
+      "name": "good_categories6",
+      "value": "AITO汽车"
+    },
+    {
+      "name": "good_categories7",
+      "value": "华为智选"
+    },
+    {
+      "name": "good_categories8",
+      "value": "鸿蒙智联"
+    },
+    {
+      "name": "good_categories9",
+      "value": "企业商用"
+    },
+    {
+      "name": "good_categories10",
+      "value": "全屋智能"
+    },
+    {
+      "name": "home_titles1",
+      "value": "福利专区"
+    },
+    {
+      "name": "home_titles2",
+      "value": "甄选推荐"
+    },
+    {
+      "name": "home_titles3",
+      "value": "限时秒杀"
+    },
+    {
+      "name": "button_texts1",
+      "value": "立即领券"
+    },
+    {
+      "name": "button_texts2",
+      "value": "立即购买"
+    },
+    {
+      "name": "tip_texts1",
+      "value": "用券价"
+    },
+    {
+      "name": "tip_texts2",
+      "value": "更多"
+    },
+    {
+      "name": "section_products_titles1",
+      "value": "MateBook X Pro 12代"
+    },
+    {
+      "name": "section_products_titles2",
+      "value": "新品"
+    },
+    {
+      "name": "section_products_info1",
+      "value": "北斗卫星消息 | 低电量应急模式"
+    },
+    {
+      "name": "section_products_info2",
+      "value": "144Hz高割全面屏"
+    },
+    {
+      "name": "section_products_info3",
+      "value": "32GB大内存 | 13代酷睿处理器 | 超级终端"
+    },
+    {
+      "name": "section_products_features1",
+      "value": "V1-V5优惠400元/12期免息"
+    },
+    {
+      "name": "section_products_features2",
+      "value": "新一代直屏旗舰机"
+    },
+    {
+      "name": "section_products_features3",
+      "value": "最高省100"
+    },
+    {
+      "name": "section_products_features4",
+      "value": "限时直降300"
+    },
+    {
+      "name": "section_products_features5",
+      "value": "最高省300"
+    },
+    {
+      "name": "home_review",
+      "value": "2571人评论 95%好评"
+    },
+    {
+      "name": "Hot_Seller",
+      "value": "热品爆款"
+    },
+    {
+      "name": "New_Launch",
+      "value": "新品上市"
+    },
+    {
+      "name": "section_products_info4",
+      "value": "前置6000万超广角镜头"
+    },
+    {
+      "name": "section_products_info5",
+      "value": "2.5K高刷护眼屏 | 轻薄长续航"
+    },
+    {
+      "name": "section_products_info6",
+      "value": "超轻薄｜超平整｜超可靠"
+    },
+    {
+      "name": "flash_sale_product_features1",
+      "value": "新一代直屏旗舰机"
+    },
+    {
+      "name": "flash_sale_product_features2",
+      "value": "赠积分"
+    },
+    {
+      "name": "flash_sale_product_features3",
+      "value": "限时享6期免息"
+    },
+    {
+      "name": "flash_sale_product_features4",
+      "value": "V1-V5优惠100 | 赠经典耳机"
+    },
+    {
+      "name": "flash_sale_product_features5",
+      "value": "性能版新品预定立省200"
+    }
+  ]
+}

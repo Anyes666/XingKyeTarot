@@ -1,0 +1,188 @@
+{
+  "string": [
+    {
+      "name": "tab_bar_title_1",
+      "value": "Home"
+    },
+    {
+      "name": "tab_bar_title_2",
+      "value": "Categories"
+    },
+    {
+      "name": "tab_bar_title_3",
+      "value": "Discover"
+    },
+    {
+      "name": "top_bar_texts1",
+      "value": "Huawei"
+    },
+    {
+      "name": "top_bar_texts2",
+      "value": "AITO Car"
+    },
+    {
+      "name": "top_bar_texts3",
+      "value": "Huawei Premium"
+    },
+    {
+      "name": "top_bar_texts4",
+      "value": "Ecological Surroundings"
+    },
+    {
+      "name": "searching",
+      "value": "Search..."
+    },
+    {
+      "name": "good_categories1",
+      "value": "Office"
+    },
+    {
+      "name": "good_categories3",
+      "value": "Phone"
+    },
+    {
+      "name": "good_categories2",
+      "value": "Household"
+    },
+    {
+      "name": "good_categories4",
+      "value": "Audio"
+    },
+    {
+      "name": "good_categories5",
+      "value": "Sports"
+    },
+    {
+      "name": "good_categories6",
+      "value": "AITO Cars"
+    },
+    {
+      "name": "good_categories7",
+      "value": "Select"
+    },
+    {
+      "name": "good_categories8",
+      "value": "Connect"
+    },
+    {
+      "name": "good_categories9",
+      "value": "Business"
+    },
+    {
+      "name": "good_categories10",
+      "value": "Solutions"
+    },
+    {
+      "name": "home_titles1",
+      "value": "Welfare Zone"
+    },
+    {
+      "name": "home_titles2",
+      "value": "Recommendation"
+    },
+    {
+      "name": "home_titles3",
+      "value": "Time-Limited Discounts"
+    },
+    {
+      "name": "button_texts2",
+      "value": "Buy"
+    },
+    {
+      "name": "button_texts1",
+      "value": "Coupon"
+    },
+    {
+      "name": "tip_texts1",
+      "value": "Disc."
+    },
+    {
+      "name": "tip_texts2",
+      "value": "More"
+    },
+    {
+      "name": "section_products_titles1",
+      "value": "MateBook X Pro 12"
+    },
+    {
+      "name": "section_products_titles2",
+      "value": "New"
+    },
+    {
+      "name": "section_products_info1",
+      "value": "Beidou Msg | Low Batt Emergency"
+    },
+    {
+      "name": "section_products_info2",
+      "value": "144Hz Full-Screen Display"
+    },
+    {
+      "name": "section_products_info3",
+      "value": "32GB Mem | 13th Gen Core | Super Term"
+    },
+    {
+      "name": "section_products_features1",
+      "value": "V1-V5: ¥400 Off / 12M Int-Free"
+    },
+    {
+      "name": "section_products_features2",
+      "value": "Next-Gen Straight-Screen Flagship"
+    },
+    {
+      "name": "section_products_features3",
+      "value": "Up to ¥100 Off"
+    },
+    {
+      "name": "section_products_features4",
+      "value": "Ltd Time ¥300 Off"
+    },
+    {
+      "name": "section_products_features5",
+      "value": "Max ¥300 Off"
+    },
+    {
+      "name": "home_review",
+      "value": "2.57K Reviews, 95% Positive"
+    },
+    {
+      "name": "Hot_Seller",
+      "value": "Hot Seller"
+    },
+    {
+      "name": "New_Launch",
+      "value": "New Launch"
+    },
+    {
+      "name": "section_products_info4",
+      "value": "New Front 60MP Ultra-Wide Lens"
+    },
+    {
+      "name": "section_products_info5",
+      "value": "2.5K HR Screen | Lt, Thin, Long Batt Life"
+    },
+    {
+      "name": "section_products_info6",
+      "value": "Thin, Flat, Reliable"
+    },
+    {
+      "name": "flash_sale_product_features1",
+      "value": "Next-Gen Straight Flagship"
+    },
+    {
+      "name": "flash_sale_product_features2",
+      "value": "Points"
+    },
+    {
+      "name": "flash_sale_product_features3",
+      "value": "Ltd Time: 6M Int-Free"
+    },
+    {
+      "name": "flash_sale_product_features4",
+      "value": "V1-V5: ¥100 Off | Free Classic Headphones"
+    },
+    {
+      "name": "flash_sale_product_features5",
+      "value": "Pre-order Perf. Ed., Save ¥200"
+    }
+  ]
+}

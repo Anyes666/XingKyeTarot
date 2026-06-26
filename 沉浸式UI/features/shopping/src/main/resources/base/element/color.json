@@ -1,0 +1,52 @@
+{
+  "color": [
+    {
+      "name": "home_header_text_color",
+      "value": "#99000000"
+    },
+    {
+      "name": "normal_font_color",
+      "value": "#182431"
+    },
+    {
+      "name": "back_icon_bg",
+      "value": "#05000000"
+    },
+    {
+      "name": "back_icon_color",
+      "value": "#66000000"
+    },
+    {
+      "name": "categories_divider_color_selected",
+      "value": "#1A000000"
+    },
+    {
+      "name": "categories_divider_color",
+      "value": "#D0092D"
+    },
+    {
+      "name": "welfare_tip_background",
+      "value": "#0D000000"
+    },
+    {
+      "name": "button_color",
+      "value": "#E64566"
+    },
+    {
+      "name": "section_tip_background",
+      "value": "#EA1559"
+    },
+    {
+      "name": "section_text",
+      "value": "#D0092D"
+    },
+    {
+      "name": "original_price_color",
+      "value": "#66000000"
+    },
+    {
+      "name": "section_feature_border_color",
+      "value": "#66D0092D"
+    }
+  ]
+}

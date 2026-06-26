@@ -1,0 +1,12 @@
+{
+  "float": [
+    {
+      "name": "footer_btn_width",
+      "value": "100"
+    },
+    {
+      "name": "mini_game_page_padding",
+      "value": "10"
+    }
+  ]
+}

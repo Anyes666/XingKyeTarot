@@ -1,0 +1,20 @@
+{
+  "float": [
+    {
+      "name": "props_width",
+      "value": "80vp"
+    },
+    {
+      "name": "pause_width",
+      "value": "48vp"
+    },
+    {
+      "name": "footer_btn_width",
+      "value": "100vp"
+    },
+    {
+      "name": "game_common_padding",
+      "value": "4vp"
+    }
+  ]
+}

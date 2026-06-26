@@ -1,0 +1,48 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "module description"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "description"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "Immersive"
+    },
+    {
+      "name": "title",
+      "value": "Developing an Immersive Page"
+    },
+    {
+      "name": "router_title_expand",
+      "value": "Extend component security area"
+    },
+    {
+      "name": "router_title_fullscreen",
+      "value": "Use full-screen window"
+    },
+    {
+      "name": "router_title_background",
+      "value": "Set the component's background to immersive"
+    },
+    {
+      "name": "router_title_page",
+      "value": "Set the component's page to immersive mode"
+    },
+    {
+      "name": "router_title_free",
+      "value": "Set the title bar to invisible in Freeform window mode"
+    },
+    {
+      "name": "sample_shopping",
+      "value": "Shopping sample"
+    },
+    {
+      "name": "sample_game",
+      "value": "Mini game sample"
+    }
+  ]
+}
