@@ -26,12 +26,12 @@ struct TriangleIntroPage {
 
   build() {
     Column() {
-      // ── P0.3 整改：左上角统一返回按钮 ──
+      // ── P0.3 整改：左上角统一返回按钮（左边距压缩到 4vp，靠边但不贴屏）──
       Row() {
         AppBackButton({ fallbackUrl: Routes.HOME })
       }
       .width('100%')
-      .padding({ top: 20 })
+      .padding({ top: 44, left: 4 })
 
       // ── 标题区 ──
       Column() {

@@ -150,12 +150,12 @@ struct RelationDrawPage {
 
   build() {
     Column() {
+      // ── TopBar 标题区（layoutWeight 14，安全区）──
       Column() {
         Text('正在展开关系探索')
           .fontSize(Theme.FONT_HEADLINE)
           .fontColor(Theme.TEXT_PRIMARY_LIGHT)
           .fontWeight(FontWeight.Bold)
-          .margin({ top: 60 })
 
         Text('我 · 对方 · 走向')
           .fontSize(Theme.FONT_BODY)
@@ -163,7 +163,12 @@ struct RelationDrawPage {
           .margin({ top: Theme.SPACE_SM })
       }
       .width('100%')
+      .layoutWeight(14)
+      .justifyContent(FlexAlign.Center)
+      .alignItems(HorizontalAlign.Center)
+      .padding({ top: Theme.SAFE_TOP })
 
+      // ── CardStage 三张牌舞台区（layoutWeight 60，主体）──
       Row({ space: Theme.SPACE_SM }) {
         ForEach(this.cardSlots, (slot: RelationCardSlotInfo, index: number) => {
           Column() {
@@ -176,12 +181,13 @@ struct RelationDrawPage {
             Image(this.revealedSlots[index]
               ? (MVP8_CARD_IMAGES[slot.cardId] ?? $r('app.media.tarot_major_18_moon'))
               : $r('app.media.card_back'))
-              .width(100)
-              .height(160)
+              .width('100%')
+              .height('100%')
               .objectFit(ImageFit.Contain)
               .borderRadius(Theme.RADIUS_SM)
               .border({ width: 1, color: 'rgba(202, 138, 4, 0.2)' })
               .opacity(this.revealedSlots[index] ? 1.0 : 0.6)
+              .constraintSize({ maxWidth: 130, maxHeight: 210 })
 
             if (this.revealedSlots[index]) {
               Text(slot.cardName)
@@ -192,30 +198,38 @@ struct RelationDrawPage {
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
             }
           }
-          .width('30%')
+          .layoutWeight(1)
+          .height('100%')
           .alignItems(HorizontalAlign.Center)
+          .justifyContent(FlexAlign.Center)
         }, (slot: RelationCardSlotInfo) => slot.positionKey)
       }
       .width('100%')
+      .layoutWeight(60)
       .justifyContent(FlexAlign.SpaceEvenly)
-      .margin({ top: Theme.SPACE_XXL })
+      .alignItems(VerticalAlign.Center)
+      .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD })
 
-      Blank()
+      // ── Prompt + Action 区（layoutWeight 26，底部安全区）──
+      Column() {
+        Text('星澜正在解读...')
+          .fontSize(Theme.FONT_BODY)
+          .fontColor(Theme.MOON_MUTED)
+          .margin({ bottom: Theme.SPACE_MD })
 
-      Text('星澜正在解读...')
-        .fontSize(Theme.FONT_BODY)
-        .fontColor(Theme.MOON_MUTED)
-        .margin({ bottom: 40 })
-
-      LoadingProgress()
-        .width(40)
-        .height(40)
-        .color(Theme.GOLD_AMBER)
-        .margin({ bottom: 60 })
+        LoadingProgress()
+          .width(40)
+          .height(40)
+          .color(Theme.GOLD_AMBER)
+      }
+      .width('100%')
+      .layoutWeight(26)
+      .justifyContent(FlexAlign.Center)
+      .alignItems(HorizontalAlign.Center)
+      .padding({ bottom: Theme.SAFE_BOTTOM })
     }
     .width('100%')
     .height('100%')
     .backgroundColor(Theme.BG_DEEP_INDIGO)
-    .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD })
   }
 }

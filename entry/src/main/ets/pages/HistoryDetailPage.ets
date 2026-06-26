@@ -177,7 +177,7 @@ struct HistoryDetailPage {
                 .fontColor(Color.Transparent)
             }
             .width('100%')
-            .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, top: 48, bottom: Theme.SPACE_SM })
+            .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, top: Theme.SAFE_TOP, bottom: Theme.SPACE_SM })
 
             // ── 基本信息区 ──
             Column() {

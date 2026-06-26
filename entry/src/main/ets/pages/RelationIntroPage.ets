@@ -24,12 +24,12 @@ struct RelationIntroPage {
 
   build() {
     Column() {
-      // ── P0.3 整改：左上角统一返回按钮 ──
+      // ── P0.3 整改：左上角统一返回按钮（左边距压缩到 4vp，靠边但不贴屏）──
       Row() {
         AppBackButton({ fallbackUrl: Routes.HOME })
       }
       .width('100%')
-      .padding({ top: 20 })
+      .padding({ top: Theme.SAFE_TOP, left: 4 })
 
       // ── 标题区 ──
       Column() {
@@ -74,7 +74,7 @@ struct RelationIntroPage {
       .border({ width: 1, color: 'rgba(202, 138, 4, 0.15)' })
       .margin({ bottom: Theme.SPACE_XL })
 
-      // ── 关系类型选择 ──
+      // ── 关系类型选择（Flex 自动换行，防止横向溢出）──
       Column() {
         Text('你们是什么关系？')
           .fontSize(Theme.FONT_BODY)
@@ -82,13 +82,14 @@ struct RelationIntroPage {
           .width('100%')
           .margin({ bottom: Theme.SPACE_MD })
 
-        Row({ space: Theme.SPACE_SM }) {
+        Flex({ wrap: FlexWrap.Wrap }) {
           ForEach(this.relationTypes, (rtype: string) => {
             Text(rtype)
               .fontSize(Theme.FONT_CAPTION)
               .fontColor(this.relationType === rtype ? Theme.BG_DEEP_INDIGO : Theme.GOLD_AMBER)
               .fontWeight(FontWeight.Medium)
               .padding({ left: 14, right: 14, top: 8, bottom: 8 })
+              .margin({ right: 10, bottom: 10 })
               .backgroundColor(this.relationType === rtype ? Theme.GOLD_AMBER : 'rgba(202, 138, 4, 0.1)')
               .borderRadius(Theme.RADIUS_FULL)
               .border({ width: 1, color: 'rgba(202, 138, 4, 0.25)' })
@@ -158,6 +159,6 @@ struct RelationIntroPage {
     .width('100%')
     .height('100%')
     .backgroundColor(Theme.BG_DEEP_INDIGO)
-    .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD })
+    .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: Theme.SAFE_BOTTOM })
   }
 }

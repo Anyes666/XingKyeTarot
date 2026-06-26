@@ -195,12 +195,12 @@ struct ResultGoldenPage {
   build() {
     Scroll() {
       Column() {
-        // ── P0.3 整改：左上角统一返回按钮 ──
+        // ── P0.3 整改：左上角统一返回按钮（安全区修复）──
         Row() {
           AppBackButton({ fallbackUrl: Routes.HOME })
         }
         .width('100%')
-        .padding({ top: 48, bottom: 0 })
+        .padding({ top: Theme.SAFE_TOP, bottom: 0 })
 
         // ═══════════ 顶部：牌面 + 牌名 + 正位标签 ═══════════
         this.buildHeader()
@@ -250,7 +250,7 @@ struct ResultGoldenPage {
         Blank().height(40)
       }
       .width('100%')
-      .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD })
+      .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: Theme.SAFE_BOTTOM })
     }
     .width('100%')
     .height('100%')

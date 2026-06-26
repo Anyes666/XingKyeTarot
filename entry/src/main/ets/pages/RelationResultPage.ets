@@ -137,12 +137,12 @@ struct RelationResultPage {
   build() {
     Scroll() {
       Column({ space: Theme.SPACE_LG }) {
-        // ── P0.3 整改：左上角统一返回按钮 ──
+        // ── P0.3 整改：左上角统一返回按钮（安全区修复）──
         Row() {
           AppBackButton({ fallbackUrl: Routes.HOME })
         }
         .width('100%')
-        .padding({ top: 48 })
+        .padding({ top: Theme.SAFE_TOP })
 
         Column() {
           Text('💞 关系探索结果')
@@ -187,11 +187,9 @@ struct RelationResultPage {
         this.buildActionButtons()
 
         ComplianceFooter({ fontSize: Theme.FONT_CAPTION, textColor: Theme.MOON_MUTED, showDivider: true })
-
-        Blank().height(40)
       }
       .width('100%')
-      .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD })
+      .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: Theme.SAFE_BOTTOM })
     }
     .width('100%')
     .height('100%')

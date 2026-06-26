@@ -94,6 +94,11 @@ export class Theme {
   static readonly BREAKPOINT_MD: number = 600;
   static readonly BREAKPOINT_LG: number = 840;
 
+  // ── 响应式安全区（第二批新增）──
+  static readonly SAFE_TOP: number = 44;       // 顶部状态栏安全距离
+  static readonly SAFE_BOTTOM: number = 28;    // 底部手势安全距离
+  static readonly BTN_HEIGHT: number = 52;     // 主按钮标准高度
+
   // ── MVP 动画 Token ──
   static readonly ANIM_DRAW_DURATION: number = 1500;
   static readonly ANIM_FLIP_DURATION: number = 600;

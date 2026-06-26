@@ -76,12 +76,12 @@ struct AskHeartPage {
 
   build() {
     Column() {
-      // ── P0.3 整改：左上角统一返回按钮 ──
+      // ── P0.3 整改：左上角统一返回按钮（安全区修复）──
       Row() {
         AppBackButton({ fallbackUrl: Routes.HOME })
       }
       .width('100%')
-      .padding({ top: 4 })
+      .padding({ top: Theme.SAFE_TOP })
 
       // ── 标题区 ──
       Column() {
@@ -100,7 +100,7 @@ struct AskHeartPage {
           .margin({ top: Theme.SPACE_SM })
       }
       .width('100%')
-      .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_LG })
+      .margin({ top: Theme.SPACE_SM, bottom: Theme.SPACE_MD })
 
       // ── 6 个问心选项 ──
       Scroll() {
@@ -151,7 +151,7 @@ struct AskHeartPage {
     }
     .width('100%')
     .height('100%')
-    .padding({ top: 36, bottom: 28 })
+    .padding({ top: 0, bottom: Theme.SAFE_BOTTOM })
     .background(Theme.BG_DEEP_INDIGO)
   }
 

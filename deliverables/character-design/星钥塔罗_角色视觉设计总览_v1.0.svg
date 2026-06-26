@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 680 1080" width="100%" role="img" xmlns="http://www.w3.org/2000/svg">
+  <title>星钥塔罗角色视觉设计总览</title>
+  <desc>星澜与星衡两位陪伴者的配色、识别元素、姿态方案与差异化定位对比</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <symbol id="moon" viewBox="0 0 24 24">
+      <path d="M16 4 a8 8 0 1 0 4 10 a6 6 0 0 1 -4 -10 z" fill="currentColor"/>
+    </symbol>
+    <symbol id="key" viewBox="0 0 24 24">
+      <circle cx="8" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.5"/>
+      <path d="M12 12 L20 12 M17 12 L17 15 M20 12 L20 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="star" viewBox="0 0 24 24">
+      <path d="M12 3 L14 10 L21 10 L15.5 14 L17.5 21 L12 17 L6.5 21 L8.5 14 L3 10 L10 10 Z" fill="currentColor"/>
+    </symbol>
+    <symbol id="astrolabe" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="0.8"/>
+      <path d="M12 3 L12 21 M3 12 L21 12 M6 6 L18 18 M6 18 L18 6" stroke="currentColor" stroke-width="0.6"/>
+      <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+    </symbol>
+    <symbol id="lantern" viewBox="0 0 24 24">
+      <path d="M9 4 L15 4 L15 7 L17 9 L17 18 L15 20 L9 20 L7 18 L7 9 L9 7 Z" fill="none" stroke="currentColor" stroke-width="1.2"/>
+      <circle cx="12" cy="13" r="2.5" fill="currentColor"/>
+    </symbol>
+  </defs>
+
+  <rect width="680" height="1080" fill="#F8F7F2"/>
+
+  <g font-family="ui-sans-serif, system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif" text-rendering="geometricPrecision">
+
+    <text x="340" y="44" font-size="18" font-weight="500" fill="#1A1A1A" text-anchor="middle">星钥塔罗 · 陪伴者视觉设计总览</text>
+    <text x="340" y="66" font-size="11" fill="#666" text-anchor="middle">character design specification · v1.0</text>
+    <line x1="40" y1="82" x2="640" y2="82" stroke="#1A1A1A" stroke-width="0.5"/>
+
+    <g transform="translate(40, 100)">
+      <rect width="290" height="430" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="0.5" rx="2"/>
+      <rect x="0" y="0" width="6" height="430" fill="#1F2A4D"/>
+      <text x="22" y="34" font-size="16" font-weight="500" fill="#1F2A4D">星澜</text>
+      <text x="22" y="54" font-size="11" fill="#666">Xing Lan · 月光下的倾听者</text>
+      <text x="22" y="76" font-size="10" fill="#888">情绪陪伴 / 接住 / 共情</text>
+      <text x="22" y="108" font-size="10" font-weight="500" fill="#1A1A1A">配色比例</text>
+      <g transform="translate(22, 118)">
+        <rect x="0" y="0" width="150" height="14" fill="#1F2A4D"/>
+        <rect x="150" y="0" width="75" height="14" fill="#F0ECD8"/>
+        <rect x="225" y="0" width="25" height="14" fill="#C9A85A"/>
+        <text x="0" y="30" font-size="9" fill="#1F2A4D">深蓝黑 60%</text>
+        <text x="150" y="30" font-size="9" fill="#666">月白 30%</text>
+        <text x="225" y="30" font-size="9" fill="#8A6D2A">浅金 10%</text>
+      </g>
+      <text x="22" y="180" font-size="10" font-weight="500" fill="#1A1A1A">标志识别元素</text>
+      <g transform="translate(22, 192)">
+        <g transform="translate(8, 8)" color="#C9A85A"><use href="#moon" width="16" height="16"/></g>
+        <text x="32" y="20" font-size="10" fill="#1A1A1A">月牙发饰 · 金色，精致克制</text>
+        <g transform="translate(8, 32)" color="#C9A85A"><use href="#key" width="16" height="16"/></g>
+        <text x="32" y="44" font-size="10" fill="#1A1A1A">小金钥匙 · 微光，握于手中</text>
+        <g transform="translate(8, 56)" color="#C9A85A"><use href="#star" width="16" height="16"/></g>
+        <text x="32" y="68" font-size="10" fill="#1A1A1A">星尘 · 少量，衣摆微光</text>
+      </g>
+      <text x="22" y="284" font-size="10" font-weight="500" fill="#1A1A1A">气质关键词</text>
+      <g font-size="9" fill="#1F2A4D">
+        <text x="22" y="302">温柔 · 安静 · 接纳 · 克制</text>
+        <text x="22" y="316">不审判 · 会倾听 · 月光感</text>
+      </g>
+      <text x="22" y="344" font-size="10" font-weight="500" fill="#1A1A1A">推荐姿态</text>
+      <g font-size="9" fill="#1A1A1A">
+        <text x="22" y="360">▸ 微低头持钥（品牌主视觉）</text>
+        <text x="22" y="374">▸ 侧身递钥（邀请·尊重）</text>
+        <text x="22" y="388">▸ 手托星光（安抚·希望）</text>
+        <text x="22" y="402">▸ 月下静立（陪伴者感）</text>
+      </g>
+      <line x1="22" y1="412" x2="268" y2="412" stroke="#E5E2D6" stroke-width="0.5"/>
+      <text x="22" y="426" font-size="9" fill="#888">适合：今日星钥 · 关系探索 · 情绪星点</text>
+    </g>
+
+    <g transform="translate(350, 100)">
+      <rect width="290" height="430" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="0.5" rx="2"/>
+      <rect x="0" y="0" width="6" height="430" fill="#0A0E23"/>
+      <text x="22" y="34" font-size="16" font-weight="500" fill="#0A0E23">星衡</text>
+      <text x="22" y="54" font-size="11" fill="#666">Xing Heng · 夜里的星盘</text>
+      <text x="22" y="76" font-size="10" fill="#888">理性整理 / 拆解 / 看清</text>
+      <text x="22" y="108" font-size="10" font-weight="500" fill="#1A1A1A">配色比例</text>
+      <g transform="translate(22, 118)">
+        <rect x="0" y="0" width="175" height="14" fill="#0A0E23"/>
+        <rect x="175" y="0" width="50" height="14" fill="#D8D5C8"/>
+        <rect x="225" y="0" width="25" height="14" fill="#8A6D2A"/>
+        <text x="0" y="30" font-size="9" fill="#0A0E23">深蓝黑 70%</text>
+        <text x="175" y="30" font-size="9" fill="#666">灰白 20%</text>
+        <text x="225" y="30" font-size="9" fill="#8A6D2A">暗金 10%</text>
+      </g>
+      <text x="22" y="180" font-size="10" font-weight="500" fill="#1A1A1A">标志识别元素</text>
+      <g transform="translate(22, 192)">
+        <g transform="translate(8, 8)" color="#8A6D2A"><use href="#astrolabe" width="16" height="16"/></g>
+        <text x="32" y="20" font-size="10" fill="#1A1A1A">星盘发扣 · 暗金，秩序感</text>
+        <g transform="translate(8, 32)" color="#8A6D2A"><use href="#lantern" width="16" height="16"/></g>
+        <text x="32" y="44" font-size="10" fill="#1A1A1A">微光星灯 · 内含星光非火焰</text>
+        <g transform="translate(8, 56)" color="#8A6D2A"><use href="#key" width="16" height="16"/></g>
+        <text x="32" y="68" font-size="10" fill="#1A1A1A">暗金钥匙 · 不发光，腰间</text>
+      </g>
+      <text x="22" y="284" font-size="10" font-weight="500" fill="#1A1A1A">气质关键词</text>
+      <g font-size="9" fill="#0A0E23">
+        <text x="22" y="302">清醒 · 稳定 · 克制 · 有分寸</text>
+        <text x="22" y="316">不评判 · 会拆解 · 星盘感</text>
+      </g>
+      <text x="22" y="344" font-size="10" font-weight="500" fill="#1A1A1A">推荐姿态</text>
+      <g font-size="9" fill="#1A1A1A">
+        <text x="22" y="360">▸ 持灯侧身（品牌主视觉）</text>
+        <text x="22" y="374">▸ 手托星盘（理清·判断）</text>
+        <text x="22" y="388">▸ 递出小钥匙（自主·尊重）</text>
+        <text x="22" y="402">▸ 夜色书案（整理者）</text>
+      </g>
+      <line x1="22" y1="412" x2="268" y2="412" stroke="#E5E2D6" stroke-width="0.5"/>
+      <text x="22" y="426" font-size="9" fill="#888">适合：圣三角 · 选择纠结 · 行动建议</text>
+    </g>
+
+    <g transform="translate(40, 550)">
+      <rect width="600" height="180" fill="#1F2A4D" rx="2"/>
+      <text x="20" y="30" font-size="13" font-weight="500" fill="#F0ECD8">共性视觉规范 · 两人必须共享</text>
+      <line x1="20" y1="42" x2="580" y2="42" stroke="#C9A85A" stroke-width="0.4" opacity="0.5"/>
+      <g font-size="10" fill="#F0ECD8">
+        <g transform="translate(20, 60)">
+          <text font-weight="500" fill="#C9A85A">背景</text>
+          <text y="16">深蓝黑夜空 · 少量星点</text>
+          <text y="30">无神殿 / 无法阵 / 无水晶球</text>
+          <text y="44">无塔罗牌边框</text>
+        </g>
+        <g transform="translate(180, 60)">
+          <text font-weight="500" fill="#C9A85A">服装</text>
+          <text y="16">新中式幻想风长袍</text>
+          <text y="30">深蓝黑外袍 + 月白内衫</text>
+          <text y="44">线条干净，非仙侠</text>
+        </g>
+        <g transform="translate(340, 60)">
+          <text font-weight="500" fill="#C9A85A">品牌符号</text>
+          <text y="16">小钥匙（两人共有）</text>
+          <text y="30">星钥 = 通往自己的门</text>
+          <text y="44">不是法器，不是权杖</text>
+        </g>
+        <g transform="translate(500, 60)">
+          <text font-weight="500" fill="#C9A85A">气质</text>
+          <text y="16">陪伴感 ≠ 暧昧感</text>
+          <text y="30">品牌角色 ≠ 塔罗牌主角</text>
+          <text y="44">夜色陪伴者 ≠ 占卜师</text>
+        </g>
+      </g>
+      <text x="20" y="148" font-size="9" fill="#888" font-style="italic">注：两位陪伴者不卖 CP，不卖恋爱，是星钥塔罗的两种陪伴方式</text>
+      <text x="20" y="164" font-size="9" fill="#888" font-style="italic">星澜先接住你 · 星衡再陪你看清楚</text>
+    </g>
+
+    <g transform="translate(40, 750)">
+      <text x="0" y="16" font-size="13" font-weight="500" fill="#1A1A1A">差异化定位矩阵</text>
+      <line x1="0" y1="24" x2="600" y2="24" stroke="#1A1A1A" stroke-width="0.5"/>
+      <g transform="translate(0, 40)">
+        <rect width="290" height="120" fill="#FFFFFF" stroke="#C9A85A" stroke-width="0.6" rx="2"/>
+        <text x="14" y="22" font-size="11" font-weight="500" fill="#1F2A4D">星澜 · 月光 / 水面</text>
+        <text x="14" y="44" font-size="10" fill="#1A1A1A">隐喻：先接住情绪</text>
+        <text x="14" y="62" font-size="9" fill="#666">"你不必想明白，先让自己缓一缓"</text>
+        <g transform="translate(14, 76)">
+          <rect width="60" height="14" fill="#F0ECD8" stroke="#C9A85A" stroke-width="0.3" rx="7"/>
+          <text x="30" y="10" font-size="8" fill="#8A6D2A" text-anchor="middle">柔软</text>
+          <rect x="68" width="60" height="14" fill="#F0ECD8" stroke="#C9A85A" stroke-width="0.3" rx="7"/>
+          <text x="98" y="10" font-size="8" fill="#8A6D2A" text-anchor="middle">流动</text>
+          <rect x="136" width="60" height="14" fill="#F0ECD8" stroke="#C9A85A" stroke-width="0.3" rx="7"/>
+          <text x="166" y="10" font-size="8" fill="#8A6D2A" text-anchor="middle">接纳</text>
+          <rect x="204" width="60" height="14" fill="#F0ECD8" stroke="#C9A85A" stroke-width="0.3" rx="7"/>
+          <text x="234" y="10" font-size="8" fill="#8A6D2A" text-anchor="middle">月光</text>
+        </g>
+        <text x="14" y="110" font-size="9" fill="#888">视觉锚：月牙发饰 + 微光钥匙</text>
+      </g>
+      <g transform="translate(310, 40)">
+        <rect width="290" height="120" fill="#FFFFFF" stroke="#8A6D2A" stroke-width="0.6" rx="2"/>
+        <text x="14" y="22" font-size="11" font-weight="500" fill="#0A0E23">星衡 · 星盘 / 小灯</text>
+        <text x="14" y="44" font-size="10" fill="#1A1A1A">隐喻：理清方向</text>
+        <text x="14" y="62" font-size="9" fill="#666">"先停一下，把这件事看清楚"</text>
+        <g transform="translate(14, 76)">
+          <rect width="60" height="14" fill="#D8D5C8" stroke="#8A6D2A" stroke-width="0.3" rx="7"/>
+          <text x="30" y="10" font-size="8" fill="#8A6D2A" text-anchor="middle">秩序</text>
+          <rect x="68" width="60" height="14" fill="#D8D5C8" stroke="#8A6D2A" stroke-width="0.3" rx="7"/>
+          <text x="98" y="10" font-size="8" fill="#8A6D2A" text-anchor="middle">利落</text>
+          <rect x="136" width="60" height="14" fill="#D8D5C8" stroke="#8A6D2A" stroke-width="0.3" rx="7"/>
+          <text x="166" y="10" font-size="8" fill="#8A6D2A" text-anchor="middle">分寸</text>
+          <rect x="204" width="60" height="14" fill="#D8D5C8" stroke="#8A6D2A" stroke-width="0.3" rx="7"/>
+          <text x="234" y="10" font-size="8" fill="#8A6D2A" text-anchor="middle">星盘</text>
+        </g>
+        <text x="14" y="110" font-size="9" fill="#888">视觉锚：星盘发扣 + 微光星灯</text>
+      </g>
+    </g>
+
+    <g transform="translate(40, 930)">
+      <rect width="600" height="120" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="0.4" rx="2"/>
+      <text x="14" y="22" font-size="11" font-weight="500" fill="#1A1A1A">绝对禁忌清单 · AI 生图必读</text>
+      <line x1="14" y1="30" x2="586" y2="30" stroke="#E5E2D6" stroke-width="0.5"/>
+      <g font-size="9" fill="#1A1A1A">
+        <text x="14" y="48">✗ 女祭司/男祭司感</text>
+        <text x="14" y="64">✗ 神婆 / 占卜师 / 预言者气质</text>
+        <text x="14" y="80">✗ 施法动作 / 复杂法阵 / 水晶球</text>
+        <text x="14" y="96">✗ 神殿 / 塔楼 / 祭坛背景</text>
+        <text x="14" y="112">✗ 巨大头冠 / 复杂头饰 / 王冠</text>
+        <text x="200" y="48">✗ 恋爱游戏女主 / 霸总男主感</text>
+        <text x="200" y="64">✗ 妖艳 / 邪魅 / 高傲俯视</text>
+        <text x="200" y="80">✗ 大面积金甲 / 华丽珠宝堆叠</text>
+        <text x="200" y="96">✗ 赛博风 / 现代时装 / 西装</text>
+        <text x="200" y="112">✗ 明显 AI 堆料感 / 满屏闪光</text>
+        <text x="400" y="48">✗ 大笑 / 冷笑 / 过度悲伤</text>
+        <text x="400" y="64">✗ 过度裸露 / 夸张婚纱感</text>
+        <text x="400" y="80">✗ 动物陪衬（猫头鹰/黑猫等）</text>
+        <text x="400" y="96">✗ 巨大月亮压迫感</text>
+        <text x="400" y="112">✗ 完整塔罗牌插画主角感</text>
+      </g>
+    </g>
+
+    <text x="340" y="1070" font-size="9" fill="#888" text-anchor="middle">星钥塔罗 · 角色视觉设计总览 · 2026.06 · 仅供星钥塔罗项目内部使用</text>
+  </g>
+</svg>

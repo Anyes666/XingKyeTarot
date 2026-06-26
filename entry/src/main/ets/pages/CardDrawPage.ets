@@ -186,19 +186,31 @@ struct CardDrawPage {
         .justifyContent(FlexAlign.Center)
       }
 
-      // ── 卡片展示区 ──
+      // ── 卡片展示区（响应式比例：TopBar 14% / CardStage 60% / Prompt+Action 26%）──
       Column() {
-        // 牌面图片
-        if (this.cardId) {
-          Column() {
-            // 牌背 / 正面切换（用 flipAngle 控制 rotateY）
+        // ── TopBar 标题区（layoutWeight 14，安全区）──
+        Column() {
+          Text('星澜正在为你抽一张牌')
+            .fontSize(Theme.FONT_SUBTITLE)
+            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+            .fontWeight(FontWeight.Bold)
+            .textAlign(TextAlign.Center)
+        }
+        .width('100%')
+        .layoutWeight(14)
+        .justifyContent(FlexAlign.End)
+        .padding({ top: Theme.SAFE_TOP, bottom: Theme.SPACE_SM })
+
+        // ── CardStage 牌面舞台区（layoutWeight 60，主体）──
+        Column() {
+          if (this.cardId) {
             Image(
               this.animPhase === 'revealed' || this.animPhase === 'particles' || this.animPhase === 'done'
                 ? (MVP8_CARD_IMAGES[this.cardId] ?? $r('app.media.tarot_major_18_moon'))
                 : $r('app.media.card_back')
             )
-              .width(160)
-              .height(256)
+              .width('46%')
+              .height('100%')
               .objectFit(ImageFit.Contain)
               .borderRadius(Theme.RADIUS_MD)
               .rotate({
@@ -210,23 +222,38 @@ struct CardDrawPage {
                 duration: Theme.ANIM_FLIP_DURATION,
                 curve: Curve.EaseInOut,
               })
-
-            // 加载文字
-            if (this.animPhase !== 'particles' && this.animPhase !== 'done' && this.cardId) {
-              Text('星澜正在解读你的心事...')
-                .fontSize(Theme.FONT_BODY)
-                .fontColor(Theme.MOON_MUTED)
-                .margin({ top: Theme.SPACE_XL })
-                .opacity(this.cardOpacity)
-            }
+              .constraintSize({ maxWidth: 200, maxHeight: 320 })
           }
-          .width('100%')
-          .alignItems(HorizontalAlign.Center)
         }
+        .width('100%')
+        .layoutWeight(60)
+        .justifyContent(FlexAlign.Center)
+        .alignItems(HorizontalAlign.Center)
+
+        // ── Prompt 提示区 + Action 操作区（layoutWeight 26，底部安全区）──
+        Column() {
+          if (this.animPhase !== 'particles' && this.animPhase !== 'done' && this.cardId) {
+            Text('星澜正在解读你的心事...')
+              .fontSize(Theme.FONT_BODY)
+              .fontColor(Theme.MOON_MUTED)
+              .margin({ top: Theme.SPACE_MD })
+              .opacity(this.cardOpacity)
+          }
+
+          LoadingProgress()
+            .width(40)
+            .height(40)
+            .color(Theme.GOLD_LIGHT)
+            .margin({ top: Theme.SPACE_MD })
+        }
+        .width('100%')
+        .layoutWeight(26)
+        .justifyContent(FlexAlign.Center)
+        .alignItems(HorizontalAlign.Center)
+        .padding({ bottom: Theme.SAFE_BOTTOM })
       }
       .width('100%')
       .height('100%')
-      .justifyContent(FlexAlign.Center)
     }
     .width('100%')
     .height('100%')
