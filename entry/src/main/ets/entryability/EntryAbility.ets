@@ -47,12 +47,13 @@ export default class EntryAbility extends UIAbility {
     // 推送数据到桌面卡片
     await this.refreshWidgetData(userId, context);
 
-    // 设置窗口背景色为深蓝黑，避免状态栏/手势条区域白边
+    // 获取主窗口并首次设置系统栏深色样式
+    let mainWindow: window.Window | null = null;
     try {
-      const win: window.Window = await windowStage.getMainWindow();
-      win.setWindowBackgroundColor('#0F0F23');
+      mainWindow = await windowStage.getMainWindow();
+      await this.applyDarkSystemBars(mainWindow);
     } catch (err) {
-      hilog.warn(0x0000, TAG, 'setWindowBackgroundColor failed: %{public}s', JSON.stringify(err));
+      hilog.warn(0x0000, TAG, 'Initial window setup failed: %{public}s', JSON.stringify(err));
     }
 
     // 隐私门禁守卫：未同意用户协议与隐私政策时，所有入口（含服务卡片）一律进入 LaunchPage
@@ -71,6 +72,11 @@ export default class EntryAbility extends UIAbility {
           return;
         }
         hilog.info(0x0000, TAG, 'LaunchPage loaded (privacy gate active)');
+        if (mainWindow) {
+          this.applyDarkSystemBars(mainWindow).catch((_e: Error) => {
+            hilog.warn(0x0000, TAG, 'applyDarkSystemBars after loadContent (privacy gate) failed');
+          });
+        }
       });
       return;
     }
@@ -88,6 +94,11 @@ export default class EntryAbility extends UIAbility {
           return;
         }
         hilog.info(0x0000, TAG, 'DailyFortunePage loaded from cold start');
+        if (mainWindow) {
+          this.applyDarkSystemBars(mainWindow).catch((_e: Error) => {
+            hilog.warn(0x0000, TAG, 'applyDarkSystemBars after loadContent (dailyFortune) failed');
+          });
+        }
       });
     } else {
       // P0.2：默认启动 LaunchPage（隐私门禁判断 → 首次体验分流）
@@ -97,6 +108,11 @@ export default class EntryAbility extends UIAbility {
           return;
         }
         hilog.info(0x0000, TAG, 'LaunchPage loaded (P0.2 entry)');
+        if (mainWindow) {
+          this.applyDarkSystemBars(mainWindow).catch((_e: Error) => {
+            hilog.warn(0x0000, TAG, 'applyDarkSystemBars after loadContent (P0.2) failed');
+          });
+        }
       });
     }
   }
@@ -192,6 +208,26 @@ export default class EntryAbility extends UIAbility {
       hilog.info(0x0000, TAG, 'Widget refresh complete: %{public}s', fortune.card.nameZh);
     } catch (err) {
       hilog.error(0x0000, TAG, 'Failed to refresh widget: %{public}s', JSON.stringify(err));
+    }
+  }
+
+  /**
+   * 设置窗口全屏布局扩展 + 背景色 + 系统栏深色样式
+   * 在 loadContent 前后各调用一次，确保系统栏属性不被覆盖
+   */
+  private async applyDarkSystemBars(mainWindow: window.Window): Promise<void> {
+    try {
+      await mainWindow.setWindowLayoutFullScreen(true);
+      mainWindow.setWindowBackgroundColor('#0F0F23');
+      const barProperties: window.SystemBarProperties = {
+        statusBarColor: '#0F0F23',
+        navigationBarColor: '#0F0F23',
+        statusBarContentColor: '#FFFFFF',
+        navigationBarContentColor: '#FFFFFF'
+      };
+      await mainWindow.setWindowSystemBarProperties(barProperties);
+    } catch (err) {
+      hilog.warn(0x0000, TAG, 'applyDarkSystemBars failed: %{public}s', JSON.stringify(err));
     }
   }
 

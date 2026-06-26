@@ -142,7 +142,7 @@ struct Index {
             .margin({ top: Theme.SPACE_XS })
         }
         .alignItems(HorizontalAlign.Center)
-        .margin({ top: 60, bottom: Theme.SPACE_XL })
+        .margin({ top: 24, bottom: Theme.SPACE_XL })
 
         Column() {
           Row() {
@@ -224,6 +224,7 @@ struct Index {
       }
       .width('100%')
       .height('100%')
+      .padding({ top: 36, bottom: 28 })
 
       if (this.showDisclaimer) {
         this.LegalAgreementDialog()
@@ -233,6 +234,9 @@ struct Index {
         this.LegalDetailCover()
       }
     }
+    .width('100%')
+    .height('100%')
+    .background(Theme.BG_DEEP_INDIGO)
   }
 
   @Builder

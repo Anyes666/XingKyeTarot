@@ -86,7 +86,7 @@ struct HomePage {
             .fontColor(Theme.GOLD_LIGHT)
             .fontWeight(FontWeight.Bold)
             .textAlign(TextAlign.Center)
-            .margin({ top: 60 })
+            .margin({ top: 24 })
 
           Text('探索内心，点亮星光')
             .fontSize(Theme.FONT_BODY)
@@ -117,11 +117,11 @@ struct HomePage {
         Blank().height(40)
       }
       .width('100%')
-      .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD })
+      .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, top: 36, bottom: 28 })
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(Theme.BG_DEEP_INDIGO)
+    .background(Theme.BG_DEEP_INDIGO)
     .scrollBar(BarState.Off)
   }
 

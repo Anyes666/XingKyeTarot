@@ -81,7 +81,7 @@ struct AskHeartPage {
         AppBackButton({ fallbackUrl: Routes.HOME })
       }
       .width('100%')
-      .padding({ top: 20 })
+      .padding({ top: 4 })
 
       // ── 标题区 ──
       Column() {
@@ -151,7 +151,8 @@ struct AskHeartPage {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(Theme.BG_DEEP_INDIGO)
+    .padding({ top: 36, bottom: 28 })
+    .background(Theme.BG_DEEP_INDIGO)
   }
 
   /**

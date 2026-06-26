@@ -221,7 +221,7 @@ struct HistoryPage {
           })
       }
       .width('100%')
-      .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, top: 48, bottom: Theme.SPACE_SM })
+      .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, top: 12, bottom: Theme.SPACE_SM })
       .backgroundColor(Theme.BG_DEEP_INDIGO)
 
       Text('回看最近的星钥记录，看看那些反复出现的心事')
@@ -288,7 +288,8 @@ struct HistoryPage {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(Theme.BG_DEEP_INDIGO)
+    .padding({ top: 36, bottom: 28 })
+    .background(Theme.BG_DEEP_INDIGO)
   }
 
   /**

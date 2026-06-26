@@ -14,13 +14,13 @@
         "name": "release",
         "type": "HarmonyOS",
         "material": {
-          "storeFile": "D:/XingKeyTarot/signing/xingkey-release.p12",
-          "storePassword": "0000001BA2B31AF94A3058D98EB4998E459DCC6AA1F6E9BF7E7A6612EA2AC50CEE4C1FA3288560BD277BDB",
+          "storeFile": "D:/XingKeyTarot/signing/xingkeyCSR.p12",
+          "storePassword": "0000001BE26B9F78D0B74419AFC2B700FE57DDB43610D89AFD6F4D3BF53B241D73A1D2E6494A02999BD4DC",
           "keyAlias": "xingkey",
-          "keyPassword": "0000001B6F4B560631E165719EEBBB80EE31D8176A20CCC7E79DAF523FF3FB30E9F1E1A72EF7B0926F57A7",
+          "keyPassword": "0000001BD8EFF1CCD39494779B8E61A61489331C65889E7A8E0C912AFE70801649B76D5DFDFFFA7565E230",
           "signAlg": "SHA256withECDSA",
-          "profile": "D:/XingKeyTarot/signing/xingkey-releaseRelease.p7b",
-          "certpath": "D:/XingKeyTarot/signing/xingkey-release.cer"
+          "profile": "D:/XingKeyTarot/signing/xingkeyRelease.p7b",
+          "certpath": "D:/XingKeyTarot/signing/xingkey.cer"
         }
       }
     ]
