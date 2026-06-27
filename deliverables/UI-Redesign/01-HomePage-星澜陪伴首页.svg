@@ -1,0 +1,297 @@
+<svg viewBox="0 0 680 812" xmlns="http://www.w3.org/2000/svg" font-family="'PingFang SC','HarmonyOS Sans','SF Pro',sans-serif">
+  <defs>
+    <!-- 背景渐变：极深靛蓝→主蓝紫→极深靛蓝 -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0F0F23"/>
+      <stop offset="50%" stop-color="#10172F"/>
+      <stop offset="100%" stop-color="#0F0F23"/>
+    </linearGradient>
+    <!-- 星澜人物光晕 -->
+    <radialGradient id="xinglanGlow" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#8B7EC8" stop-opacity="0.32"/>
+      <stop offset="55%" stop-color="#5ED7D2" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#0F0F23" stop-opacity="0"/>
+    </radialGradient>
+    <!-- 金色按钮渐变 -->
+    <linearGradient id="goldBtn" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5D77A"/>
+      <stop offset="55%" stop-color="#E5A50A"/>
+      <stop offset="100%" stop-color="#D99A00"/>
+    </linearGradient>
+    <!-- 顶部渐隐遮罩 -->
+    <linearGradient id="topMask" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0F0F23" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#0F0F23" stop-opacity="0"/>
+    </linearGradient>
+    <!-- 底部渐隐遮罩 -->
+    <linearGradient id="bottomMask" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0F0F23" stop-opacity="0"/>
+      <stop offset="60%" stop-color="#0F0F23" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#0F0F23" stop-opacity="1"/>
+    </linearGradient>
+    <!-- 中央星澜按钮金边 -->
+    <radialGradient id="xinglanBtn" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#F5D77A"/>
+      <stop offset="70%" stop-color="#D99A00"/>
+      <stop offset="100%" stop-color="#8B7340"/>
+    </radialGradient>
+    <!-- 按钮金色阴影 -->
+    <filter id="goldGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feFlood flood-color="#D99A00" flood-opacity="0.5"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- ═══════ 设计稿主体 0-375 ═══════ -->
+  <rect x="0" y="0" width="375" height="812" fill="url(#bgGrad)"/>
+
+  <!-- 星澜光晕（人物剪影替代） -->
+  <ellipse cx="187" cy="340" rx="170" ry="240" fill="url(#xinglanGlow)"/>
+  <!-- 星澜抽象剪影（极简人形） -->
+  <g opacity="0.18">
+    <circle cx="187" cy="290" r="36" fill="#C4BDF0"/>
+    <path d="M 130 410 Q 187 340 244 410 L 244 520 Q 187 540 130 520 Z" fill="#8B7EC8"/>
+  </g>
+
+  <!-- 星点（散布） -->
+  <g fill="#F8FAFC">
+    <circle cx="50" cy="100" r="1" opacity="0.85"/>
+    <circle cx="105" cy="180" r="0.8" opacity="0.5"/>
+    <circle cx="320" cy="140" r="1.2" opacity="0.7"/>
+    <circle cx="280" cy="220" r="0.7" opacity="0.45"/>
+    <circle cx="40" cy="260" r="0.9" opacity="0.6"/>
+    <circle cx="345" cy="320" r="1" opacity="0.7"/>
+    <circle cx="25" cy="380" r="0.8" opacity="0.5"/>
+    <circle cx="355" cy="450" r="1" opacity="0.6"/>
+    <circle cx="60" cy="510" r="0.7" opacity="0.4"/>
+    <circle cx="330" cy="560" r="0.9" opacity="0.55"/>
+    <circle cx="90" cy="600" r="0.8" opacity="0.5"/>
+    <circle cx="305" cy="640" r="1" opacity="0.6"/>
+  </g>
+
+  <!-- 顶部渐隐遮罩 -->
+  <rect x="0" y="0" width="375" height="160" fill="url(#topMask)"/>
+
+  <!-- 状态栏 -->
+  <text x="30" y="28" fill="#F8FAFC" font-size="14" font-weight="600">9:41</text>
+  <g fill="#F8FAFC">
+    <rect x="305" y="20" width="3" height="10" rx="0.5"/>
+    <rect x="311" y="18" width="3" height="12" rx="0.5"/>
+    <rect x="317" y="16" width="3" height="14" rx="0.5"/>
+    <rect x="323" y="14" width="3" height="16" rx="0.5"/>
+    <rect x="333" y="18" width="22" height="10" rx="2" stroke="#F8FAFC" stroke-width="0.8" fill="none"/>
+    <rect x="335" y="20" width="16" height="6" rx="1"/>
+  </g>
+
+  <!-- ═════ Header 品牌区 (44-160) ═════ -->
+  <text x="187" y="100" text-anchor="middle" fill="#E5A50A" font-size="32" font-weight="700" letter-spacing="3">星钥塔罗</text>
+  <line x1="155" y1="112" x2="219" y2="112" stroke="#D99A00" stroke-width="0.6" opacity="0.6"/>
+  <text x="187" y="138" text-anchor="middle" fill="#94A3B8" font-size="14" letter-spacing="2">探索内心 · 点亮星光</text>
+
+  <!-- ═════ 对话流区 (160-630) ═════ -->
+  <!-- 气泡 1 - 旧 -->
+  <g>
+    <rect x="24" y="220" width="252" height="62" rx="16" fill="#1B1B30" fill-opacity="0.68"/>
+    <text x="38" y="244" fill="#F8FAFC" font-size="14" opacity="0.78">今天，也给自己留一张星钥吧。</text>
+    <text x="38" y="266" fill="#F8FAFC" font-size="14" opacity="0.78">不问未来，只看看此刻的你。</text>
+  </g>
+
+  <!-- 气泡 2 -->
+  <g>
+    <rect x="24" y="298" width="200" height="38" rx="16" fill="#1B1B30" fill-opacity="0.68"/>
+    <text x="38" y="322" fill="#F8FAFC" font-size="14" opacity="0.82">我听见了，慢慢说也没关系。</text>
+  </g>
+
+  <!-- 气泡 3 - 最新，金色边框+稍亮背景 -->
+  <g>
+    <rect x="24" y="352" width="268" height="62" rx="16" fill="#1B1B30" fill-opacity="0.82" stroke="#E5A50A" stroke-width="1.2"/>
+    <circle cx="38" cy="376" r="3" fill="#E5A50A"/>
+    <text x="50" y="380" fill="#F8FAFC" font-size="14" font-weight="500">你不是想太多，</text>
+    <text x="38" y="402" fill="#F8FAFC" font-size="14" font-weight="500">只是很认真地在感受。</text>
+  </g>
+
+  <!-- 气泡 4 -->
+  <g>
+    <rect x="24" y="430" width="232" height="38" rx="16" fill="#1B1B30" fill-opacity="0.68"/>
+    <text x="38" y="454" fill="#F8FAFC" font-size="14" opacity="0.78">这一次，我们不预测未来。</text>
+  </g>
+
+  <!-- 顶部对话流渐隐 -->
+  <rect x="0" y="160" width="375" height="50" fill="url(#topMask)" opacity="0.5"/>
+
+  <!-- ═════ 操作区 (630-770) ═════ -->
+  <rect x="0" y="600" width="375" height="170" fill="url(#bottomMask)"/>
+
+  <text x="187" y="640" text-anchor="middle" fill="#94A3B8" font-size="12" letter-spacing="1">星澜会先接住你的情绪</text>
+
+  <!-- CTA 按钮 - 金色渐变+阴影 -->
+  <rect x="45" y="660" width="285" height="54" rx="27" fill="url(#goldBtn)" filter="url(#goldGlow)"/>
+  <text x="187" y="693" text-anchor="middle" fill="#0F0F23" font-size="18" font-weight="700" letter-spacing="2">开始今日一占</text>
+
+  <!-- 次要操作 -->
+  <text x="187" y="735" text-anchor="middle" fill="#94A3B8" font-size="14">查看最近记录 ›</text>
+
+  <!-- 免责声明 -->
+  <text x="187" y="760" text-anchor="middle" fill="#6B6380" font-size="10">结果仅供娱乐与自我探索参考，不构成任何专业建议</text>
+
+  <!-- ═════ 底部导航 (770-812) ═════ -->
+  <rect x="0" y="770" width="375" height="42" fill="#0F0F23" fill-opacity="0.85"/>
+  <!-- Tab 1: 首页（选中） -->
+  <g transform="translate(56, 786)">
+    <circle cx="0" cy="0" r="14" fill="#E5A50A" fill-opacity="0.18"/>
+    <path d="M -6 2 L 0 -5 L 6 2 L 6 6 L -6 6 Z" fill="#E5A50A"/>
+    <text x="0" y="22" text-anchor="middle" fill="#E5A50A" font-size="9" font-weight="600">首页</text>
+  </g>
+  <!-- Tab 2: 历史 -->
+  <g transform="translate(125, 786)" opacity="0.55">
+    <circle cx="0" cy="0" r="13" fill="none" stroke="#94A3B8" stroke-width="1"/>
+    <path d="M -5 -4 L 5 -4 L 5 4 L -5 4 Z M -5 -1 L 5 -1" stroke="#94A3B8" stroke-width="1" fill="none"/>
+    <text x="0" y="22" text-anchor="middle" fill="#94A3B8" font-size="9">历史</text>
+  </g>
+  <!-- Tab 3: 中央星澜按钮（凸起） -->
+  <g transform="translate(187, 780)">
+    <circle cx="0" cy="0" r="22" fill="#0F0F23" stroke="#E5A50A" stroke-width="1.5"/>
+    <circle cx="0" cy="0" r="18" fill="url(#xinglanBtn)"/>
+    <text x="0" y="3" text-anchor="middle" fill="#0F0F23" font-size="14" font-weight="700">星</text>
+  </g>
+  <!-- Tab 4: 星图 -->
+  <g transform="translate(250, 786)" opacity="0.55">
+    <path d="M 0 -7 L 2 -2 L 7 -2 L 3 1 L 4 6 L 0 3 L -4 6 L -3 1 L -7 -2 L -2 -2 Z" fill="#94A3B8"/>
+    <text x="0" y="22" text-anchor="middle" fill="#94A3B8" font-size="9">星图</text>
+  </g>
+  <!-- Tab 5: 我的 -->
+  <g transform="translate(319, 786)" opacity="0.55">
+    <circle cx="0" cy="-3" r="3.5" fill="#94A3B8"/>
+    <path d="M -6 7 Q 0 1 6 7 Z" fill="#94A3B8"/>
+    <text x="0" y="22" text-anchor="middle" fill="#94A3B8" font-size="9">我的</text>
+  </g>
+
+  <!-- 手机外框 -->
+  <rect x="0" y="0" width="375" height="812" fill="none" stroke="#2A2A4A" stroke-width="0.5"/>
+
+  <!-- ═══════ 标注区 395-680 ═══════ -->
+  <g font-family="'SF Pro','Inter',sans-serif">
+
+    <!-- 标题 -->
+    <text x="395" y="40" fill="#E5A50A" font-size="18" font-weight="700">星钥塔罗 · 首页</text>
+    <text x="395" y="62" fill="#94A3B8" font-size="11">HomePage · 视觉焕新 v1</text>
+    <line x1="395" y1="76" x2="670" y2="76" stroke="#2A2A4A" stroke-width="0.5"/>
+
+    <!-- 尺寸标注：状态栏 -->
+    <g>
+      <line x1="378" y1="0" x2="378" y2="44" stroke="#5ED7D2" stroke-width="0.6"/>
+      <line x1="375" y1="44" x2="381" y2="44" stroke="#5ED7D2" stroke-width="0.6"/>
+      <text x="388" y="26" fill="#5ED7D2" font-size="9">44 状态栏</text>
+    </g>
+
+    <!-- Header 区 -->
+    <g>
+      <line x1="378" y1="44" x2="378" y2="160" stroke="#5ED7D2" stroke-width="0.6"/>
+      <line x1="375" y1="160" x2="381" y2="160" stroke="#5ED7D2" stroke-width="0.6"/>
+      <text x="388" y="105" fill="#5ED7D2" font-size="9">116 Header</text>
+      <text x="388" y="118" fill="#6B6380" font-size="8">14% layoutWeight</text>
+    </g>
+
+    <!-- 对话流区 -->
+    <g>
+      <line x1="378" y1="160" x2="378" y2="630" stroke="#5ED7D2" stroke-width="0.6"/>
+      <line x1="375" y1="630" x2="381" y2="630" stroke="#5ED7D2" stroke-width="0.6"/>
+      <text x="388" y="390" fill="#5ED7D2" font-size="9">470 对话流</text>
+      <text x="388" y="403" fill="#6B6380" font-size="8">59% layoutWeight</text>
+    </g>
+
+    <!-- 操作区 -->
+    <g>
+      <line x1="378" y1="630" x2="378" y2="770" stroke="#5ED7D2" stroke-width="0.6"/>
+      <line x1="375" y1="770" x2="381" y2="770" stroke="#5ED7D2" stroke-width="0.6"/>
+      <text x="388" y="695" fill="#5ED7D2" font-size="9">140 操作区</text>
+      <text x="388" y="708" fill="#6B6380" font-size="8">16% layoutWeight</text>
+    </g>
+
+    <!-- 底部导航 -->
+    <g>
+      <line x1="378" y1="770" x2="378" y2="812" stroke="#5ED7D2" stroke-width="0.6"/>
+      <text x="388" y="794" fill="#5ED7D2" font-size="9">42 底部导航</text>
+      <text x="388" y="807" fill="#6B6380" font-size="8">11% layoutWeight</text>
+    </g>
+
+    <!-- 设计要点说明 -->
+    <g transform="translate(395, 130)">
+      <text x="0" y="0" fill="#F8FAFC" font-size="11" font-weight="700">◆ 视觉升级要点</text>
+
+      <text x="0" y="22" fill="#E5A50A" font-size="9" font-weight="600">① 星空背景层</text>
+      <text x="0" y="35" fill="#B8B0C8" font-size="9">深蓝紫渐变 #0F0F23→#10172F</text>
+      <text x="0" y="47" fill="#B8B0C8" font-size="9">+ 12 颗星点（不同亮度）</text>
+      <text x="0" y="59" fill="#B8B0C8" font-size="9">+ 星澜人物光晕 radial</text>
+
+      <text x="0" y="84" fill="#E5A50A" font-size="9" font-weight="600">② 毛玻璃对话气泡</text>
+      <text x="0" y="97" fill="#B8B0C8" font-size="9">fill: #1B1B30 / opacity 0.68</text>
+      <text x="0" y="109" fill="#B8B0C8" font-size="9">radius: 16 / padding: 14·12</text>
+      <text x="0" y="121" fill="#B8B0C8" font-size="9">最新条目金边 #E5A50A 1.2px</text>
+      <text x="0" y="133" fill="#6B6380" font-size="8">→ backdropBlur(15) 实现</text>
+
+      <text x="0" y="158" fill="#E5A50A" font-size="9" font-weight="600">③ 金色主 CTA</text>
+      <text x="0" y="171" fill="#B8B0C8" font-size="9">285×54 / radius 27</text>
+      <text x="0" y="183" fill="#B8B0C8" font-size="9">线性渐变 #F5D77A→#D99A00</text>
+      <text x="0" y="195" fill="#B8B0C8" font-size="9">drop-shadow #D99A00 50% 6px</text>
+      <text x="0" y="207" fill="#6B6380" font-size="8">→ pressed scale 0.95</text>
+
+      <text x="0" y="232" fill="#E5A50A" font-size="9" font-weight="600">④ 底部导航</text>
+      <text x="0" y="245" fill="#B8B0C8" font-size="9">5 Tab + 中央星澜凸起按钮</text>
+      <text x="0" y="257" fill="#B8B0C8" font-size="9">选中: 金色填充+半透光晕</text>
+      <text x="0" y="269" fill="#B8B0C8" font-size="9">未选: 月白 #94A3B8 55%</text>
+      <text x="0" y="281" fill="#6B6380" font-size="8">→ 中央按钮 r22 金色渐变</text>
+
+      <text x="0" y="306" fill="#E5A50A" font-size="9" font-weight="600">⑤ 字体层级</text>
+      <text x="0" y="319" fill="#B8B0C8" font-size="9">App 名 32 / Bold / 金色</text>
+      <text x="0" y="331" fill="#B8B0C8" font-size="9">副标 14 / 月白 / 字距 2</text>
+      <text x="0" y="343" fill="#B8B0C8" font-size="9">气泡 14 / 月白 / 行高 22</text>
+      <text x="0" y="355" fill="#B8B0C8" font-size="9">CTA 18 / Bold / 深色字</text>
+
+      <text x="0" y="380" fill="#E5A50A" font-size="9" font-weight="600">⑥ 安全区</text>
+      <text x="0" y="393" fill="#B8B0C8" font-size="9">顶部 44 / 底部 28</text>
+      <text x="0" y="405" fill="#6B6380" font-size="8">→ SAFE_TOP / SAFE_BOTTOM</text>
+
+      <text x="0" y="430" fill="#E5A50A" font-size="9" font-weight="600">⑦ 免责声明</text>
+      <text x="0" y="443" fill="#B8B0C8" font-size="9">底部 10px #6B6380</text>
+      <text x="0" y="455" fill="#6B6380" font-size="8">→ 铁律：保留免责声明</text>
+    </g>
+
+    <!-- 色板 -->
+    <g transform="translate(395, 620)">
+      <text x="0" y="0" fill="#F8FAFC" font-size="11" font-weight="700">◆ 色板</text>
+      <g transform="translate(0, 12)">
+        <rect x="0" y="0" width="22" height="22" rx="4" fill="#0F0F23"/>
+        <text x="28" y="9" fill="#B8B0C8" font-size="8">BG_DEEP_INDIGO</text>
+        <text x="28" y="20" fill="#6B6380" font-size="8">#0F0F23</text>
+      </g>
+      <g transform="translate(140, 12)">
+        <rect x="0" y="0" width="22" height="22" rx="4" fill="#10172F"/>
+        <text x="28" y="9" fill="#B8B0C8" font-size="8">BG_PRIMARY</text>
+        <text x="28" y="20" fill="#6B6380" font-size="8">#10172F</text>
+      </g>
+      <g transform="translate(0, 42)">
+        <rect x="0" y="0" width="22" height="22" rx="4" fill="url(#goldBtn)"/>
+        <text x="28" y="9" fill="#B8B0C8" font-size="8">GOLD_AMBER</text>
+        <text x="28" y="20" fill="#6B6380" font-size="8">#D99A00</text>
+      </g>
+      <g transform="translate(140, 42)">
+        <rect x="0" y="0" width="22" height="22" rx="4" fill="#5ED7D2"/>
+        <text x="28" y="9" fill="#B8B0C8" font-size="8">AURORA</text>
+        <text x="28" y="20" fill="#6B6380" font-size="8">#5ED7D2</text>
+      </g>
+      <g transform="translate(0, 72)">
+        <rect x="0" y="0" width="22" height="22" rx="4" fill="#F8FAFC"/>
+        <text x="28" y="9" fill="#B8B0C8" font-size="8">TEXT_PRIMARY</text>
+        <text x="28" y="20" fill="#6B6380" font-size="8">#F8FAFC</text>
+      </g>
+      <g transform="translate(140, 72)">
+        <rect x="0" y="0" width="22" height="22" rx="4" fill="#94A3B8"/>
+        <text x="28" y="9" fill="#B8B0C8" font-size="8">MOON_MUTED</text>
+        <text x="28" y="20" fill="#6B6380" font-size="8">#94A3B8</text>
+      </g>
+    </g>
+  </g>
+</svg>

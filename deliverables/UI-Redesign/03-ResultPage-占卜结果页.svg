@@ -1,0 +1,253 @@
+<svg viewBox="0 0 680 812" xmlns="http://www.w3.org/2000/svg" font-family="'PingFang SC','HarmonyOS Sans','SF Pro',sans-serif">
+  <defs>
+    <linearGradient id="bgGrad3" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0F0F23"/>
+      <stop offset="45%" stop-color="#10172F"/>
+      <stop offset="100%" stop-color="#0F0F23"/>
+    </linearGradient>
+    <linearGradient id="goldBtn3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5D77A"/>
+      <stop offset="55%" stop-color="#E5A50A"/>
+      <stop offset="100%" stop-color="#D99A00"/>
+    </linearGradient>
+    <linearGradient id="cardGlow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#E5A50A" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#D99A00" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="chipGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5ED7D2" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#5ED7D2" stop-opacity="0.06"/>
+    </linearGradient>
+    <linearGradient id="panelTop" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#161630"/>
+      <stop offset="100%" stop-color="#141428"/>
+    </linearGradient>
+    <filter id="goldGlow3" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feFlood flood-color="#D99A00" flood-opacity="0.45"/>
+      <feComposite in2="blur" operator="in"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <radialGradient id="starBg" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#8B7EC8" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#0F0F23" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- ═══════ 设计稿主体 0-375 ═══════ -->
+  <rect x="0" y="0" width="375" height="812" fill="url(#bgGrad3)"/>
+  <ellipse cx="187" cy="250" rx="180" ry="280" fill="url(#starBg)"/>
+
+  <!-- 星点 -->
+  <g fill="#F8FAFC">
+    <circle cx="35" cy="80" r="0.8" opacity="0.5"/>
+    <circle cx="340" cy="110" r="1" opacity="0.6"/>
+    <circle cx="50" cy="600" r="0.7" opacity="0.4"/>
+    <circle cx="330" cy="700" r="0.9" opacity="0.5"/>
+    <circle cx="25" cy="350" r="0.8" opacity="0.45"/>
+    <circle cx="350" cy="450" r="0.7" opacity="0.5"/>
+  </g>
+
+  <!-- ═════ 状态栏 ═════ -->
+  <text x="30" y="28" fill="#F8FAFC" font-size="14" font-weight="600">9:41</text>
+  <g fill="#F8FAFC">
+    <rect x="305" y="20" width="3" height="10" rx="0.5"/>
+    <rect x="311" y="18" width="3" height="12" rx="0.5"/>
+    <rect x="317" y="16" width="3" height="14" rx="0.5"/>
+    <rect x="323" y="14" width="3" height="16" rx="0.5"/>
+    <rect x="333" y="18" width="22" height="10" rx="2" stroke="#F8FAFC" stroke-width="0.8" fill="none"/>
+    <rect x="335" y="20" width="16" height="6" rx="1"/>
+  </g>
+
+  <!-- ═════ 返回按钮 ═════ -->
+  <g transform="translate(20, 56)">
+    <circle cx="0" cy="0" r="16" fill="#1B1B30" fill-opacity="0.7"/>
+    <path d="M -3 0 L 0 -3 L 0 -0.5 L 3 -0.5 L 3 0.5 L 0 0.5 L 0 3 Z" fill="#F8FAFC" transform="rotate(-45)"/>
+  </g>
+
+  <!-- ═════ 顶栏：标题+标签 (56-130) ═════ -->
+  <text x="187" y="80" text-anchor="middle" fill="#F8FAFC" font-size="18" font-weight="700" letter-spacing="1">单牌快占 · 指引</text>
+
+  <!-- 主题 Chip -->
+  <g transform="translate(125, 96)">
+    <rect x="0" y="0" width="125" height="28" rx="14" fill="url(#chipGrad)" stroke="#5ED7D2" stroke-width="1" stroke-opacity="0.5"/>
+    <circle cx="14" cy="14" r="2.5" fill="#5ED7D2"/>
+    <text x="24" y="19" fill="#5ED7D2" font-size="12" font-weight="500">自我成长</text>
+  </g>
+
+  <!-- ═════ 牌面展示区 (140-430) ═════ -->
+  <!-- 金色光晕 -->
+  <ellipse cx="187" cy="290" rx="100" ry="140" fill="url(#cardGlow)"/>
+
+  <!-- 塔罗牌（抽象高塔牌） -->
+  <g transform="translate(132, 186)">
+    <!-- 牌底 -->
+    <rect x="0" y="0" width="110" height="176" rx="10" fill="#1A1A35" stroke="#E5A50A" stroke-width="1.8"/>
+    <!-- 牌面内容 — 高塔抽象化 -->
+    <rect x="40" y="20" width="30" height="70" rx="2" fill="#2A2040" stroke="#8B7EC8" stroke-width="0.8"/>
+    <!-- 塔顶崩裂 -->
+    <g transform="translate(55, 20)">
+      <line x1="-8" y1="-8" x2="0" y2="0" stroke="#E5A50A" stroke-width="1.5"/>
+      <line x1="8" y1="-10" x2="3" y2="2" stroke="#E5A50A" stroke-width="1.5"/>
+      <line x1="-4" y1="-14" x2="-2" y2="-2" stroke="#E5A50A" stroke-width="1.2"/>
+      <circle cx="-8" cy="-8" r="1.5" fill="#F5D77A"/>
+      <circle cx="9" cy="-10" r="1" fill="#F5D77A"/>
+      <circle cx="-5" cy="-14" r="0.8" fill="#F5D77A"/>
+    </g>
+    <!-- 塔窗 -->
+    <rect x="46" y="35" width="8" height="10" rx="1" fill="#5ED7D2" fill-opacity="0.4"/>
+    <rect x="46" y="55" width="8" height="10" rx="1" fill="#5ED7D2" fill-opacity="0.3"/>
+    <rect x="46" y="75" width="8" height="10" rx="1" fill="#5ED7D2" fill-opacity="0.2"/>
+    <!-- 塔底人影 -->
+    <g transform="translate(50, 120)" opacity="0.6">
+      <circle cx="5" cy="0" r="4" fill="#F8FAFC"/>
+      <path d="M 1 4 L 0 12 L 10 12 L 9 4" fill="#F8FAFC"/>
+    </g>
+    <!-- 闪电 -->
+    <path d="M 75 30 L 66 52 L 72 52 L 62 74" stroke="#F5D77A" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    <!-- 逆位标识 -->
+    <g transform="translate(55, 160)">
+      <rect x="-16" y="0" width="32" height="14" rx="7" fill="#ef4444" fill-opacity="0.25"/>
+      <text x="0" y="10" text-anchor="middle" fill="#ef4444" font-size="8" font-weight="600">逆位</text>
+    </g>
+  </g>
+
+  <!-- 牌名 -->
+  <text x="187" y="382" text-anchor="middle" fill="#E5A50A" font-size="15" font-weight="700" letter-spacing="1">高塔 · 逆位</text>
+  <text x="187" y="400" text-anchor="middle" fill="#94A3B8" font-size="11">The Tower · Reversed</text>
+
+  <!-- 定位标签 -->
+  <g transform="translate(158, 414)">
+    <rect x="0" y="0" width="60" height="18" rx="9" fill="#1B1B30" stroke="#E5A50A" stroke-width="0.7"/>
+    <text x="30" y="13" text-anchor="middle" fill="#E5A50A" font-size="9" font-weight="500">指引牌</text>
+  </g>
+
+  <!-- ═════ 金句区 (440-510) ═════ -->
+  <g transform="translate(24, 444)">
+    <rect x="0" y="0" width="327" height="56" rx="14" fill="#1B1B30" fill-opacity="0.72" stroke="#E5A50A" stroke-width="0.8" stroke-opacity="0.6"/>
+    <text x="163" y="26" text-anchor="middle" fill="#F5D77A" font-size="14" font-weight="500">⚡</text>
+    <text x="163" y="44" text-anchor="middle" fill="#F8FAFC" font-size="13" letter-spacing="0.5">有些崩塌，是为了让光照进来。</text>
+  </g>
+
+  <!-- ═════ 情绪关键词 (515-570) ═════ -->
+  <g transform="translate(24, 516)">
+    <text x="0" y="0" fill="#94A3B8" font-size="11">你的情绪关键词</text>
+    <g transform="translate(0, 14)">
+      <g transform="translate(0,0)"><rect x="0" y="0" width="58" height="26" rx="13" fill="#5ED7D2" fill-opacity="0.12" stroke="#5ED7D2" stroke-width="0.7"/><text x="29" y="18" text-anchor="middle" fill="#5ED7D2" font-size="10">释然</text></g>
+      <g transform="translate(66,0)"><rect x="0" y="0" width="58" height="26" rx="13" fill="#5ED7D2" fill-opacity="0.12" stroke="#5ED7D2" stroke-width="0.7"/><text x="29" y="18" text-anchor="middle" fill="#5ED7D2" font-size="10">接纳</text></g>
+      <g transform="translate(132,0)"><rect x="0" y="0" width="58" height="26" rx="13" fill="#5ED7D2" fill-opacity="0.12" stroke="#5ED7D2" stroke-width="0.7"/><text x="29" y="18" text-anchor="middle" fill="#5ED7D2" font-size="10">重塑</text></g>
+    </g>
+  </g>
+
+  <!-- ═════ 今日行动建议 (575-635) ═════ -->
+  <g transform="translate(24, 576)">
+    <text x="0" y="0" fill="#E5A50A" font-size="11" font-weight="600">✦ 今日行动建议</text>
+    <rect x="0" y="10" width="327" height="40" rx="12" fill="url(#panelTop)"/>
+    <text x="14" y="33" fill="#F8FAFC" font-size="12" line-height="18">今天允许自己放掉一件不再滋养你的事。</text>
+  </g>
+
+  <!-- ═════ 深度解读面板 (640-720) ═════ -->
+  <g transform="translate(24, 640)">
+    <rect x="0" y="0" width="327" height="72" rx="14" fill="url(#panelTop)" stroke="#2A2A4A" stroke-width="0.8"/>
+    <!-- 展开/折叠 -->
+    <text x="14" y="20" fill="#E5A50A" font-size="12" font-weight="600">🔮 深度解读</text>
+    <text x="14" y="42" fill="#94A3B8" font-size="11" opacity="0.9">逆位高塔提醒我们：抗拒改变是</text>
+    <text x="14" y="57" fill="#94A3B8" font-size="11" opacity="0.9">最大的消耗。你不需要推倒一切，</text>
+    <text x="14" y="72" fill="#6B6380" font-size="11">只需松开握紧的拳头。</text>
+  </g>
+
+  <!-- ═════ 底部 CTA 区 (730-812) ═════ -->
+  <!-- CTA 按钮 -->
+  <rect x="24" y="738" width="327" height="48" rx="24" fill="url(#goldBtn3)" filter="url(#goldGlow3)"/>
+  <text x="187" y="767" text-anchor="middle" fill="#0F0F23" font-size="15" font-weight="700" letter-spacing="1">保存分享图片</text>
+
+  <!-- 免责声明 -->
+  <text x="187" y="804" text-anchor="middle" fill="#6B6380" font-size="9">结果仅供娱乐与自我探索参考，不构成任何专业建议</text>
+
+  <!-- 底部安全区间距 -->
+  <rect x="0" y="812" width="375" height="20" fill="#0F0F23"/>
+
+  <!-- 手机外框 -->
+  <rect x="0" y="-2" width="375" height="834" fill="none" stroke="#2A2A4A" stroke-width="0.5"/>
+
+  <!-- ═══════ 标注区 395-680 ═══════ -->
+  <g font-family="'SF Pro','Inter',sans-serif">
+    <text x="395" y="40" fill="#E5A50A" font-size="18" font-weight="700">星钥塔罗 · 占卜结果</text>
+    <text x="395" y="62" fill="#94A3B8" font-size="11">ResultPage · 单牌解读</text>
+    <line x1="395" y1="76" x2="670" y2="76" stroke="#2A2A4A" stroke-width="0.5"/>
+
+    <!-- 尺寸标注 -->
+    <g>
+      <line x1="378" y1="44" x2="378" y2="130" stroke="#5ED7D2" stroke-width="0.6"/>
+      <text x="388" y="88" fill="#5ED7D2" font-size="9">顶栏 86</text>
+      <text x="388" y="101" fill="#6B6380" font-size="8">返回+标题+Chip</text>
+    </g>
+    <g>
+      <line x1="378" y1="130" x2="378" y2="436" stroke="#5ED7D2" stroke-width="0.6"/>
+      <text x="388" y="280" fill="#5ED7D2" font-size="9">牌面区 306</text>
+      <text x="388" y="293" fill="#6B6380" font-size="8">110×176 牌面</text>
+      <text x="388" y="306" fill="#6B6380" font-size="8">+ 金色光晕 shadow</text>
+    </g>
+    <g>
+      <line x1="378" y1="436" x2="378" y2="636" stroke="#5ED7D2" stroke-width="0.6"/>
+      <text x="388" y="536" fill="#5ED7D2" font-size="9">解读区 200</text>
+      <text x="388" y="549" fill="#6B6380" font-size="8">金句 + 关键词 + 行动建议</text>
+    </g>
+    <g>
+      <line x1="378" y1="636" x2="378" y2="730" stroke="#5ED7D2" stroke-width="0.6"/>
+      <text x="388" y="684" fill="#5ED7D2" font-size="9">深度解读 94</text>
+    </g>
+    <g>
+      <line x1="378" y1="730" x2="378" y2="814" stroke="#5ED7D2" stroke-width="0.6"/>
+      <text x="388" y="774" fill="#5ED7D2" font-size="9">CTA 区 84</text>
+    </g>
+
+    <!-- 设计要点 -->
+    <g transform="translate(395, 130)">
+      <text x="0" y="0" fill="#F8FAFC" font-size="11" font-weight="700">◆ 视觉升级要点</text>
+
+      <text x="0" y="22" fill="#E5A50A" font-size="9" font-weight="600">① 牌面视觉中心</text>
+      <text x="0" y="35" fill="#B8B0C8" font-size="9">110×176 牌面，radius 10</text>
+      <text x="0" y="47" fill="#B8B0C8" font-size="9">金色 1.8px 边框 #E5A50A</text>
+      <text x="0" y="59" fill="#B8B0C8" font-size="9">底部金色径向光晕 25%</text>
+      <text x="0" y="71" fill="#6B6380" font-size="8">→ 入场 3D rotateY 翻牌动画 0.6s</text>
+
+      <text x="0" y="96" fill="#E5A50A" font-size="9" font-weight="600">② 逆位标识</text>
+      <text x="0" y="109" fill="#B8B0C8" font-size="9">牌底红色胶囊标签 "逆位"</text>
+      <text x="0" y="121" fill="#B8B0C8" font-size="9">bg: #ef4444 25% / text: #ef4444</text>
+      <text x="0" y="133" fill="#6B6380" font-size="8">→ 正位时替换为绿色 #10b981</text>
+
+      <text x="0" y="158" fill="#E5A50A" font-size="9" font-weight="600">③ 金句卡片</text>
+      <text x="0" y="171" fill="#B8B0C8" font-size="9">327×56 / radius 14</text>
+      <text x="0" y="183" fill="#B8B0C8" font-size="9">半透背景 #1B1B30 72%</text>
+      <text x="0" y="195" fill="#B8B0C8" font-size="9">金色 0.8px 边框 60%</text>
+      <text x="0" y="207" fill="#6B6380" font-size="8">→ 文案 13px Bold / 金色引号</text>
+
+      <text x="0" y="232" fill="#E5A50A" font-size="9" font-weight="600">④ 关键词标签组</text>
+      <text x="0" y="245" fill="#B8B0C8" font-size="9">极光色 #5ED7D2 描边胶囊</text>
+      <text x="0" y="257" fill="#B8B0C8" font-size="9">26px 高 / radius 13</text>
+      <text x="0" y="269" fill="#B8B0C8" font-size="9">水平排列 gap 8</text>
+      <text x="0" y="281" fill="#6B6380" font-size="8">→ 动态生成，最多 4 个</text>
+
+      <text x="0" y="306" fill="#E5A50A" font-size="9" font-weight="600">⑤ 深度解读面板</text>
+      <text x="0" y="319" fill="#B8B0C8" font-size="9">深色面板 #161630 / radius 14</text>
+      <text x="0" y="331" fill="#B8B0C8" font-size="9">可展开/折叠，默认折叠 72px</text>
+      <text x="0" y="343" fill="#B8B0C8" font-size="9">展开后显示完整解读文字</text>
+      <text x="0" y="355" fill="#6B6380" font-size="8">→ 点击展开 300ms EaseOut</text>
+
+      <text x="0" y="380" fill="#E5A50A" font-size="9" font-weight="600">⑥ 操作区</text>
+      <text x="0" y="393" fill="#B8B0C8" font-size="9">主按钮 327×48 / radius 24</text>
+      <text x="0" y="405" fill="#B8B0C8" font-size="9">"保存分享图片" 金色渐变</text>
+      <text x="0" y="417" fill="#B8B0C8" font-size="9">免责声明 9px / 底部</text>
+      <text x="0" y="429" fill="#6B6380" font-size="8">→ 可追加"追问星澜"次要按钮</text>
+
+      <text x="0" y="456" fill="#E5A50A" font-size="9" font-weight="600">⑦ 整体底色 + 层次</text>
+      <text x="0" y="469" fill="#B8B0C8" font-size="9">极深靛蓝 #0F0F23 → #10172F</text>
+      <text x="0" y="481" fill="#B8B0C8" font-size="9">顶栏浮层 56-130</text>
+      <text x="0" y="493" fill="#B8B0C8" font-size="9">牌面视觉中心 186-400</text>
+      <text x="0" y="505" fill="#B8B0C8" font-size="9">解读卡片从上到下密度递增</text>
+      <text x="0" y="517" fill="#B8B0C8" font-size="9">底部 CTA + 免责收尾</text>
+      <text x="0" y="529" fill="#6B6380" font-size="8">→ 视觉重心：牌 → 金句 → CTA</text>
+    </g>
+  </g>
+</svg>
