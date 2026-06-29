@@ -6,7 +6,8 @@ import { Routes } from '../common/Routes';
 import { HistoryStore } from '../common/HistoryStore';
 import { PreferenceStore } from '../data/PreferenceStore';
 import { DivinationHistoryRecord } from '../model/DivinationHistoryRecord';
-import { CompanionBottomNav } from '../components/CompanionBottomNav';
+// CompanionBottomNav 已迁移至 MainFramePage 统一管理，HomePage 不再独立承载底部导航
+
 
 /**
  * AskHeart 页面路由参数
@@ -1262,8 +1263,9 @@ struct HomePage {
         .hitTestBehavior(HitTestMode.Transparent)
 
       // ═══════════════════════════════════════════
-      // Layer 3: 主内容 Column（比例布局 14/59/16/11）
+      // Layer 3: 主内容 Column（比例布局 14/59/27）
       // 点击星澜背景追加文案
+      // 底部导航已由 MainFramePage 统一管理，不再在此页面渲染
       // ═══════════════════════════════════════════
       Column() {
         // ── Header 品牌区 (14%, minHeight 108 / maxHeight 138) ──
@@ -1354,7 +1356,8 @@ struct HomePage {
         .constraintSize({ minHeight: 360 })
         .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD })
 
-        // ── ActionArea 底部操作区 (16%, minHeight 132 / maxHeight 172) ──
+        // ── ActionArea 底部操作区 (27%, minHeight 132 / maxHeight 240)
+        //    原比例 16% + 底部导航 11%，底部导航已移除 ──
         Column() {
           Text('星澜会先接住你的情绪。')
             .fontSize(12)
@@ -1388,13 +1391,13 @@ struct HomePage {
             .textAlign(TextAlign.Center)
             .lineHeight(16)
             .width('100%')
-            .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD })
+            .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: 12 })
         }
         .width('100%')
-        .layoutWeight(16)
+        .layoutWeight(27)
         .alignItems(HorizontalAlign.Center)
         .justifyContent(FlexAlign.End)
-        .constraintSize({ minHeight: 132, maxHeight: 172 })
+        .constraintSize({ minHeight: 132, maxHeight: 240 })
         .padding({ bottom: 4 })
         .linearGradient({
           direction: GradientDirection.Bottom,
@@ -1405,15 +1408,6 @@ struct HomePage {
             [Theme.BG_DEEP_INDIGO, 1.0]
           ]
         })
-
-        // ── BottomNav 底部导航区 (11%, minHeight 78 / maxHeight 96) ──
-        Column() {
-          CompanionBottomNav({ onXinglanClick: () => { this.addNextXinglanQuote(); } })
-        }
-        .width('100%')
-        .layoutWeight(11)
-        .constraintSize({ minHeight: 78, maxHeight: 96 })
-        .justifyContent(FlexAlign.End)
       }
       .width('100%')
       .height('100%')

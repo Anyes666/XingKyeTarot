@@ -383,7 +383,7 @@ struct RelationResultPage {
         .border({ width: 1, color: Theme.DEEP_STARRY })
         .onClick(() => {
           try {
-            router.replaceUrl({ url: Routes.NEW_HOME });
+            router.replaceUrl({ url: Routes.MAIN_FRAME });
           } catch (_err) {
             // ignore
           }

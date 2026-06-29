@@ -44,48 +44,31 @@ struct LaunchPage {
 
   /**
    * 隐私同意后的路由分流
+   * 新用户直接进入 MainFramePage（星澜主页），跳过 Onboarding 和 AskHeartPage
    */
   private async routeAfterPrivacy(): Promise<void> {
     try {
-      // 1. 先判断 Onboarding 是否完成（必须在 firstExperience 之前）
+      // 1. Onboarding：如果未完成，直接标记为已完成，不再跳转引导页
       const onboardingDone: boolean = await AppStateStore.hasCompletedOnboarding(getContext(this));
       if (!onboardingDone) {
-        // 未完成引导 → OnboardingPage
-        const routeOptions: router.RouterOptions = {
-          url: Routes.ONBOARDING,
-        };
-        router.replaceUrl(routeOptions).catch((_err: Error) => {
-          // fallback
-        });
-        return;
+        await AppStateStore.completeOnboarding(getContext(this));
       }
-      // 2. 再判断首次体验是否完成
+      // 2. 首次体验标记：如果未完成，标记为已完成
       const isFirstDone: boolean = await AppStateStore.isFirstExperienceCompleted(getContext(this));
       if (!isFirstDone) {
-        // 首次体验 → AskHeartPage(FIRST_EXPERIENCE)
-        const askParams: AskHeartRouteParams = {
-          entryMode: 'FIRST_EXPERIENCE',
-        };
-        const routeOptions: router.RouterOptions = {
-          url: Routes.ASK_HEART,
-          params: askParams,
-        };
-        router.replaceUrl(routeOptions).catch((_err: Error) => {
-          // fallback
-        });
-      } else {
-        // 已完成首次体验 → HomePage
-        const routeOptions: router.RouterOptions = {
-          url: Routes.NEW_HOME,
-        };
-        router.replaceUrl(routeOptions).catch((_err: Error) => {
-          // fallback
-        });
+        await AppStateStore.completeFirstExperience(getContext(this));
       }
-    } catch (_err) {
-      // 异常默认进入首页
+      // 统一进入 MainFramePage（默认 tab=2 星澜语录/主页）
       const routeOptions: router.RouterOptions = {
-        url: Routes.NEW_HOME,
+        url: Routes.MAIN_FRAME,
+      };
+      router.replaceUrl(routeOptions).catch((_err: Error) => {
+        // fallback
+      });
+    } catch (_err) {
+      // 异常默认进入主框架
+      const routeOptions: router.RouterOptions = {
+        url: Routes.MAIN_FRAME,
       };
       router.replaceUrl(routeOptions).catch((_err2: Error) => {
         // fallback
@@ -281,12 +264,4 @@ struct LaunchPage {
     .height('100%')
     .background(Theme.BG_DEEP_INDIGO)
   }
-}
-
-// ═══════════════════════════════════════════════════════════
-// 路由参数接口（跨文件共用声明）
-// ═══════════════════════════════════════════════════════════
-
-interface AskHeartRouteParams {
-  entryMode: string;
 }

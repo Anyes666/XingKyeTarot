@@ -10,24 +10,28 @@ import { Theme } from '../common/Theme';
  *   AppBackButton({ fallbackUrl: Routes.HOME })
  *
  * 放页面顶部，padding-top 由页面自行控制避开状态栏。
+ * P0.9 修复：添加 hitTestBehavior(Block) 防止被手势层拦截；支持 zIndex。
  */
 @Component
 export struct AppBackButton {
   @Prop fallbackUrl: string = '';
+  @Prop btnZIndex: number = 10;
 
   build() {
     Row() {
       Text('←')
         .fontSize(24)
         .fontColor('rgba(232,184,61,0.82)')
-        .onClick(() => {
-          this.handleBack();
-        })
     }
     .width(48)
     .height(48)
     .justifyContent(FlexAlign.Center)
     .alignItems(VerticalAlign.Center)
+    .hitTestBehavior(HitTestMode.Block)
+    .onClick(() => {
+      this.handleBack();
+    })
+    .zIndex(this.btnZIndex)
   }
 
   /**

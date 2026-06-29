@@ -44,7 +44,7 @@ struct DailyFortunePage {
       Column() {
         // ── 顶部返回按钮 ──
         Row() {
-          AppBackButton({ fallbackUrl: Routes.NEW_HOME })
+          AppBackButton({ fallbackUrl: Routes.MAIN_FRAME })
         }
         .width('100%')
         .padding({ top: 20, left: Theme.SPACE_MD, right: Theme.SPACE_MD })
@@ -137,7 +137,7 @@ struct DailyFortunePage {
                 buttonLabel: '返回首页',
                 onTap: () => {
                   try {
-                    const routeOptions: router.RouterOptions = { url: Routes.NEW_HOME };
+                    const routeOptions: router.RouterOptions = { url: Routes.MAIN_FRAME };
                     this.getUIContext().getRouter().replaceUrl(routeOptions);
                   } catch (err) {
                     hilog.error(0x0000, 'DailyFortunePage', 'Router replace error: %{public}s', JSON.stringify(err));

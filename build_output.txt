@@ -1,16 +1,16 @@
-﻿> hvigor [32mFinished :entry:default@PreBuild... after 158 ms [39m
-> hvigor [32mFinished :entry:default@CreateModuleInfo... after 1 ms [39m
+﻿> hvigor [32mFinished :entry:default@PreBuild... after 217 ms [39m
+> hvigor [32mFinished :entry:default@CreateModuleInfo... after 2 ms [39m
 > hvigor [32mUP-TO-DATE :entry:default@GenerateMetadata...  [39m
 > hvigor [32mFinished :entry:default@ConfigureCmake... after 1 ms [39m
 > hvigor [32mUP-TO-DATE :entry:default@MergeProfile...  [39m
 > hvigor [32mUP-TO-DATE :entry:default@CreateBuildProfile...  [39m
 > hvigor [32mFinished :entry:default@PreCheckSyscap... after 1 ms [39m
-> hvigor [32mFinished :entry:default@GeneratePkgContextInfo... after 7 ms [39m
+> hvigor [32mFinished :entry:default@GeneratePkgContextInfo... after 8 ms [39m
 > hvigor [32mUP-TO-DATE :entry:default@GeneratePkgSdkInfo...  [39m
 > hvigor [32mFinished :entry:default@ProcessIntegratedHsp... after 1 ms [39m
 > hvigor [32mFinished :entry:default@BuildNativeWithCmake... after 1 ms [39m
 > hvigor [32mUP-TO-DATE :entry:default@MakePackInfo...  [39m
-> hvigor [32mFinished :entry:default@SyscapTransform... after 12 ms [39m
+> hvigor [32mFinished :entry:default@SyscapTransform... after 16 ms [39m
 > hvigor [32mUP-TO-DATE :entry:default@ProcessProfile...  [39m
 > hvigor [32mUP-TO-DATE :entry:default@ProcessRouterMap...  [39m
 > hvigor [32mUP-TO-DATE :entry:default@ProcessShareConfig...  [39m
@@ -23,10 +23,10 @@
 > hvigor [32mUP-TO-DATE :entry:default@DoNativeStrip...  [39m
 > hvigor [32mFinished :entry:default@BuildJS... after 5 ms [39m
 > hvigor [32mUP-TO-DATE :entry:default@CacheNativeLibs...  [39m
-hvigorw.bat : > hvigor [33mWARN: [33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/Splash
-Page.ets:42:14
-所在位置 行:1 字符: 235
-+ ... ngKeyTarot; & "D:\HarmonyOS\DevEco Studio\tools\hvigor\bin\hvigorw.ba ...
+node : > hvigor [33mWARN: [33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/SplashPage.et
+s:42:14
+所在位置 行:1 字符: 345
++ ...  $env:PATH; node "D:\HarmonyOS\DevEco Studio\tools\hvigor\bin\hvigorw ...
 +                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     + CategoryInfo          : NotSpecified: (> hvigor [33mW...hPage.ets:42:14:String) [], RemoteException
     + FullyQualifiedErrorId : NativeCommandError
@@ -39,10 +39,10 @@ Page.ets:42:14
 [33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/OnboardingPage.ets:201:14
  'replaceUrl' has been deprecated.
 [39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/components/AppBackButton.ets:38:14
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/components/AppBackButton.ets:42:14
  'back' has been deprecated.
 [39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/components/AppBackButton.ets:44:18
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/components/AppBackButton.ets:48:18
  'replaceUrl' has been deprecated.
 [39m[39m
 [33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/AskHeartPage.ets:57:50
@@ -132,70 +132,58 @@ Page.ets:42:14
 [33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:31:71
  'getContext' has been deprecated.
 [39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:51:82
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:52:82
  'getContext' has been deprecated.
 [39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:57:16
- 'replaceUrl' has been deprecated.
-[39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:63:83
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:54:48
  'getContext' has been deprecated.
 [39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:73:16
- 'replaceUrl' has been deprecated.
-[39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:81:16
- 'replaceUrl' has been deprecated.
-[39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:90:14
- 'replaceUrl' has been deprecated.
-[39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:105:41
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:57:83
  'getContext' has been deprecated.
 [39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:122:14
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:59:53
+ 'getContext' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:65:14
+ 'replaceUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:73:14
+ 'replaceUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:88:41
+ 'getContext' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:105:14
  'back' has been deprecated.
 [39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:133:14
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:116:14
  'pushUrl' has been deprecated.
 [39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:144:14
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/LaunchPage.ets:127:14
  'pushUrl' has been deprecated.
 [39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/components/CompanionBottomNav.ets:51:14
- 'pushUrl' has been deprecated.
-[39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/components/CompanionBottomNav.ets:60:14
- 'pushUrl' has been deprecated.
-[39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/components/CompanionBottomNav.ets:69:14
- 'pushUrl' has been deprecated.
-[39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/components/CompanionBottomNav.ets:78:14
- 'pushUrl' has been deprecated.
-[39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/HomePage.ets:1094:66
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/HomePage.ets:1095:66
  'getContext' has been deprecated.
 [39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/HomePage.ets:1095:55
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/HomePage.ets:1096:55
  'getContext' has been deprecated.
 [39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/HomePage.ets:1108:92
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/HomePage.ets:1109:92
  'getContext' has been deprecated.
 [39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/HomePage.ets:1132:66
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/HomePage.ets:1133:66
  'getContext' has been deprecated.
 [39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/HomePage.ets:1207:14
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/HomePage.ets:1208:14
  'pushUrl' has been deprecated.
 [39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/HomePage.ets:1216:14
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/HomePage.ets:1217:14
  'pushUrl' has been deprecated.
 [39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/HomePage.ets:1299:24
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/HomePage.ets:1301:24
  'pushUrl' has been deprecated.
 [39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/TriangleIntroPage.ets:151:22
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/TriangleIntroPage.ets:144:24
  'pushUrl' has been deprecated.
 [39m[39m
 [33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/TriangleDrawPage.ets:67:50
@@ -219,7 +207,7 @@ Page.ets:42:14
 [33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/TriangleResultPage.ets:379:20
  'replaceUrl' has been deprecated.
 [39m[39m
-[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/RelationIntroPage.ets:150:22
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/RelationIntroPage.ets:143:24
  'pushUrl' has been deprecated.
 [39m[39m
 [33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/RelationDrawPage.ets:65:50
@@ -249,7 +237,6 @@ Page.ets:42:14
 [33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/HistoryPage.ets:50:70
  'getContext' has been deprecated.
 [39m[39m
-> hvigor [32mFinished :entry:default@CompileArkTS... after 6 s 575 ms [39m
 [33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/HistoryPage.ets:60:76
  'getContext' has been deprecated.
 [39m[39m
@@ -307,6 +294,79 @@ Page.ets:42:14
 [33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/SettingsPage.ets:166:22
  'pushUrl' has been deprecated.
 [39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/MainFramePage.ets:35:52
+ 'getParams' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/MainFramePage.ets:59:16
+ 'pushUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/MainFramePage.ets:205:20
+ 'pushUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/MainFramePage.ets:218:20
+ 'pushUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/MainFramePage.ets:231:20
+ 'pushUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/MainFramePage.ets:244:20
+ 'pushUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/MainFramePage.ets:257:20
+ 'pushUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/MainFramePage.ets:428:20
+ 'pushUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/MainFramePage.ets:677:14
+ 'pushUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/MainFramePage.ets:887:58
+ 'getContext' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/MainFramePage.ets:974:20
+ 'pushUrl' has been deprecated.
+> hvigor [32mFinished :entry:default@CompileArkTS... after 8 s 913 ms [39m
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/DivinationCenterPage.ets:41:20
+ 'pushUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/DivinationCenterPage.ets:54:20
+ 'pushUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/DivinationCenterPage.ets:67:20
+ 'pushUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/DivinationCenterPage.ets:80:20
+ 'pushUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/DivinationCenterPage.ets:93:20
+ 'pushUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/TarotCardsPage.ets:62:14
+ 'pushUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/TarotCardDetailPage.ets:49:29
+ 'getParams' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/AboutPage.ets:48:14
+ 'pushUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/CardWheelModePage.ets:165:14
+ 'pushUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/CardWheelDrawPage.ets:151:50
+ 'getParams' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/CardWheelDrawPage.ets:353:5
+ 'animateTo' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/CardWheelDrawPage.ets:504:14
+ 'replaceUrl' has been deprecated.
+[39m[39m
+[33mWARN: [33m[33mArkTS:WARN File: D:/XingKeyTarot/entry/src/main/ets/pages/CardWheelDrawPage.ets:543:14
+ 'replaceUrl' has been deprecated.
+[39m[39m
 [39m
 > hvigor [32mUP-TO-DATE :entry:default@GeneratePkgModuleJson...  [39m
 > hvigor [32mFinished :entry:default@ProcessCompiledResources... after 1 ms [39m
@@ -316,9 +376,9 @@ vEco%20Studio/sdk/default/openharmony/toolchains/lib/app_packing_tool.jar)
 WARNING: Please consider reporting this to the maintainers of class com.alibaba.fastjson2.util.JDKUtils
 WARNING: sun.misc.Unsafe::arrayBaseOffset will be removed in a future release
 [39m
-> hvigor [32mFinished :entry:default@PackageHap... after 900 ms [39m
-> hvigor [32mFinished :entry:default@PackingCheck... after 16 ms [39m
-> hvigor [32mFinished :entry:default@SignHap... after 2 s 776 ms [39m
+> hvigor [32mFinished :entry:default@PackageHap... after 928 ms [39m
+> hvigor [32mFinished :entry:default@PackingCheck... after 11 ms [39m
+> hvigor [32mFinished :entry:default@SignHap... after 2 s 729 ms [39m
 > hvigor [32mFinished :entry:default@CollectDebugSymbol... after 2 ms [39m
 > hvigor [32mFinished :entry:assembleHap... after 1 ms [39m
-> hvigor [32mBUILD SUCCESSFUL in 16 s 212 ms [39m
+> hvigor [32mBUILD SUCCESSFUL in 19 s 692 ms [39m

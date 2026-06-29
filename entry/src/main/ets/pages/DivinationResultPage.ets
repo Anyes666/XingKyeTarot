@@ -42,7 +42,7 @@ struct DivinationResultPage {
   build() {
     Stack() {
       StarBackground()
-      AppBackButton()
+      AppBackButton({ btnZIndex: 50 })
 
       if (!this.record) {
         Column() {

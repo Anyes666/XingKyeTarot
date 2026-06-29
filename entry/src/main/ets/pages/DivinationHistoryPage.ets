@@ -28,7 +28,7 @@ struct DivinationHistoryPage {
   build() {
     Stack() {
       StarBackground()
-      AppBackButton()
+      AppBackButton({ btnZIndex: 50 })
 
       Column() {
         Row() {

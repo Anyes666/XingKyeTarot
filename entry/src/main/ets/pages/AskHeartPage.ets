@@ -295,7 +295,7 @@ struct AskHeartPage {
     // 写入成功后 replaceUrl 到 HomePage
     try {
       const routeOptions: router.RouterOptions = {
-        url: Routes.NEW_HOME,
+        url: Routes.MAIN_FRAME,
       };
       router.replaceUrl(routeOptions).catch((_err: Error) => {
         try {

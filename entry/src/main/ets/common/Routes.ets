@@ -1,7 +1,7 @@
 export class Routes {
   static readonly SPLASH: string = 'pages/SplashPage';
   static readonly ONBOARDING: string = 'pages/OnboardingPage';
-  static readonly HOME: string = 'pages/Index';
+  static readonly HOME: string = 'pages/MainFramePage';
   static readonly DIVINATION: string = 'pages/DivinationPage';
   static readonly RESULT: string = 'pages/DivinationResultPage';
   static readonly DAILY_FORTUNE: string = 'pages/DailyFortunePage';
@@ -34,4 +34,17 @@ export class Routes {
 
   // ── 星澜聊天 MVP ──
   static readonly XINGLAN_CHAT: string = 'pages/XinglanChatPage';
+
+  // ── Phase 6: 底部导航重构 + 设置关于 ──
+  static readonly MAIN_FRAME: string = 'pages/MainFramePage';
+  static readonly DIVINATION_CENTER: string = 'pages/DivinationCenterPage';
+  static readonly TAROT_CARDS: string = 'pages/TarotCardsPage';
+  static readonly TAROT_CARD_DETAIL: string = 'pages/TarotCardDetailPage';
+  static readonly ABOUT: string = 'pages/AboutPage';
+  static readonly VERSION_INFO: string = 'pages/VersionInfoPage';
+  static readonly MATERIALS_LICENSE: string = 'pages/MaterialsLicensePage';
+
+  // ── 旋转牌轮抽牌 ──
+  static readonly CARD_WHEEL_MODE: string = 'pages/CardWheelModePage';
+  static readonly CARD_WHEEL_DRAW: string = 'pages/CardWheelDrawPage';
 }

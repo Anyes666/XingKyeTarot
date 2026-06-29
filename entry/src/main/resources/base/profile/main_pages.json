@@ -26,6 +26,15 @@
     "pages/HistoryPage",
     "pages/HistoryDetailPage",
     "pages/SettingsPage",
-    "pages/XinglanChatPage"
+    "pages/XinglanChatPage",
+    "pages/MainFramePage",
+    "pages/DivinationCenterPage",
+    "pages/TarotCardsPage",
+    "pages/TarotCardDetailPage",
+    "pages/AboutPage",
+    "pages/VersionInfoPage",
+    "pages/MaterialsLicensePage",
+    "pages/CardWheelModePage",
+    "pages/CardWheelDrawPage"
   ]
 }

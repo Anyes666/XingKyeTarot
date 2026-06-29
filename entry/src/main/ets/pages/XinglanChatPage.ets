@@ -736,7 +736,7 @@ struct XinglanChatPage {
       Column() {
         // ═══ 顶部栏 ═══
         Row() {
-          AppBackButton({ fallbackUrl: Routes.NEW_HOME })
+          AppBackButton({ fallbackUrl: Routes.MAIN_FRAME })
           Blank()
         }
         .width('100%')

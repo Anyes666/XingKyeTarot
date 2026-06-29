@@ -1,13 +1,5 @@
 import { router } from '@kit.ArkUI';
-import { Theme } from '../common/Theme';
 import { Routes } from '../common/Routes';
-
-/**
- * AskHeart 页面路由参数
- */
-interface AskHeartRouteParams {
-  entryMode: string;
-}
 
 /**
  * 导航 Tab 配置项
@@ -19,69 +11,71 @@ interface NavTabConfig {
 }
 
 /**
- * 星澜底部五键导航组件 — 深蓝黑金毛玻璃悬浮胶囊
+ * Phase 6.6：星钥塔罗底部五键导航 — 深蓝黑金毛玻璃悬浮胶囊
  *
- * 结构（不裁切星澜按钮）：
- *   外层 Stack（不 clip，高 88vp，给星澜上浮留空间）
+ * 5 个一级入口：
+ *   1. 塔罗
+ *   2. 星澜聊天
+ *   3. 星澜语录
+ *   4. 卡牌总览
+ *   5. 设置
+ *
+ * 结构：
+ *   外层 Stack（不 clip，高 88vp）
  *     ├─ 胶囊底座 Stack（clip(true)）
- *     │    └─ Tab 内容 Row（单牌 / 圣三角 / 空位 / 关系 / 记录）
- *     └─ 中间星澜圆按钮（sibling，覆盖胶囊上方，不被裁切）
- *
- * 点击范围：
- *   - onXinglanClick 只绑定在中间星澜按钮
- *   - 胶囊 onTouch 只处理按压反馈，不触发回调
- *   - 左右 Tab onClick 处理各自路由
+ *     │    └─ Tab 内容 Row
+ *     └─ 中间高亮按钮（当前选中 tab）
  */
 @Component
 export struct CompanionBottomNav {
-  /**
-   * 星澜按钮点击回调：由父页面注入，只切文案不跳转。
-   * 仅绑定在中间星澜圆按钮的 onClick。
-   */
-  onXinglanClick: () => void = () => {};
+  /** 当前选中 tab 索引（0-4） */
+  @Prop currentTab: number = 0;
+
+  /** tab 切换回调 */
+  onTabChange: (index: number) => void = (_index: number) => {};
 
   // ═══ 按压状态 ═══
   @State navPressed: boolean = false;
-  @State centerPressed: boolean = false;
 
-  private navigateToSingle(): void {
-    try {
-      const params: AskHeartRouteParams = { entryMode: 'NORMAL_SINGLE' };
-      const options: router.RouterOptions = { url: Routes.ASK_HEART, params: params };
-      router.pushUrl(options);
-    } catch (_err) {
-      // ignore
+  private readonly tabs: NavTabConfig[] = [
+    {
+      icon: '◇',
+      label: '塔罗',
+      onClick: (): void => {
+        this.onTabChange(0);
+      }
+    },
+    {
+      icon: '◉',
+      label: '星澜聊天',
+      onClick: (): void => {
+        this.onTabChange(1);
+      }
+    },
+    {
+      icon: '✦',
+      label: '星澜语录',
+      onClick: (): void => {
+        this.onTabChange(2);
+      }
+    },
+    {
+      icon: '▦',
+      label: '卡牌总览',
+      onClick: (): void => {
+        this.onTabChange(3);
+      }
+    },
+    {
+      icon: '⚙',
+      label: '设置',
+      onClick: (): void => {
+        this.onTabChange(4);
+      }
     }
-  }
+  ];
 
-  private navigateToTriangle(): void {
-    try {
-      const options: router.RouterOptions = { url: Routes.TRIANGLE_INTRO };
-      router.pushUrl(options);
-    } catch (_err) {
-      // ignore
-    }
-  }
-
-  private navigateToRelation(): void {
-    try {
-      const options: router.RouterOptions = { url: Routes.RELATION_INTRO };
-      router.pushUrl(options);
-    } catch (_err) {
-      // ignore
-    }
-  }
-
-  private navigateToHistory(): void {
-    try {
-      const options: router.RouterOptions = { url: Routes.HISTORY };
-      router.pushUrl(options);
-    } catch (_err) {
-      // ignore
-    }
-  }
-
-  // ═══ 胶囊触摸：按压反馈（不触发任何回调）═══
+  // ═══ 胶囊触摸：按压反馈 ═══
   private handleNavTouch(event: TouchEvent): void {
     if (event.type === TouchType.Down) {
       this.navPressed = true;
@@ -90,98 +84,30 @@ export struct CompanionBottomNav {
     }
   }
 
-  // ═══ 中间星澜按钮触摸：只做按压反馈 ═══
-  private handleCenterTouch(event: TouchEvent): void {
-    if (event.type === TouchType.Down) {
-      this.centerPressed = true;
-    } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
-      this.centerPressed = false;
-    }
-  }
-
   build() {
-    // ═══ 外层导航容器：不 clip，给星澜上浮留空间 ═══
     Stack() {
       // ═══ 胶囊底座（clip(true)）═══
       Stack() {
-        // ─── Tab 内容层（中间留空位给星澜按钮）───
         Row() {
-          // ═══ 1. 单牌 ═══
-          Column() {
-            Text('◇')
-              .fontSize(22)
-              .fontColor('#8F96B2')
-            Text('单牌')
-              .fontSize(12)
-              .fontColor('#9AA2BD')
-              .margin({ top: 2 })
-          }
-          .layoutWeight(1)
-          .height('100%')
-          .alignItems(HorizontalAlign.Center)
-          .justifyContent(FlexAlign.Center)
-          .onClick(() => {
-            this.navigateToSingle();
-          })
-
-          // ═══ 2. 圣三角 ═══
-          Column() {
-            Text('△')
-              .fontSize(22)
-              .fontColor('#8F96B2')
-            Text('圣三角')
-              .fontSize(12)
-              .fontColor('#9AA2BD')
-              .margin({ top: 2 })
-          }
-          .layoutWeight(1)
-          .height('100%')
-          .alignItems(HorizontalAlign.Center)
-          .justifyContent(FlexAlign.Center)
-          .onClick(() => {
-            this.navigateToTriangle();
-          })
-
-          // ═══ 3. 中间空位（星澜按钮在外面）═══
-          Column()
+          ForEach(this.tabs, (tab: NavTabConfig, index: number) => {
+            Column() {
+              Text(tab.icon)
+                .fontSize(22)
+                .fontColor(this.currentTab === index ? '#E8B83D' : '#8F96B2')
+              Text(tab.label)
+                .fontSize(12)
+                .fontColor(this.currentTab === index ? '#E8B83D' : '#9AA2BD')
+                .fontWeight(this.currentTab === index ? FontWeight.Bold : FontWeight.Normal)
+                .margin({ top: 2 })
+            }
             .layoutWeight(1)
             .height('100%')
-
-          // ═══ 4. 关系 ═══
-          Column() {
-            Text('◎')
-              .fontSize(22)
-              .fontColor('#8F96B2')
-            Text('关系')
-              .fontSize(12)
-              .fontColor('#9AA2BD')
-              .margin({ top: 2 })
-          }
-          .layoutWeight(1)
-          .height('100%')
-          .alignItems(HorizontalAlign.Center)
-          .justifyContent(FlexAlign.Center)
-          .onClick(() => {
-            this.navigateToRelation();
-          })
-
-          // ═══ 5. 记录 ═══
-          Column() {
-            Text('☰')
-              .fontSize(22)
-              .fontColor('#8F96B2')
-            Text('记录')
-              .fontSize(12)
-              .fontColor('#9AA2BD')
-              .margin({ top: 2 })
-          }
-          .layoutWeight(1)
-          .height('100%')
-          .alignItems(HorizontalAlign.Center)
-          .justifyContent(FlexAlign.Center)
-          .onClick(() => {
-            this.navigateToHistory();
-          })
+            .alignItems(HorizontalAlign.Center)
+            .justifyContent(FlexAlign.Center)
+            .onClick(() => {
+              tab.onClick();
+            })
+          }, (_tab: NavTabConfig, index: number) => 'tab_' + index.toString())
         }
         .width('100%')
         .height('100%')
@@ -212,42 +138,6 @@ export struct CompanionBottomNav {
       .animation({ duration: 280, curve: Curve.EaseOut })
       .onTouch((event: TouchEvent) => {
         this.handleNavTouch(event);
-      })
-
-      // ═══ 中间星澜圆按钮（sibling，覆盖胶囊上方，不被 clip）═══
-      Column() {
-        Text('★')
-          .fontSize(24)
-          .fontColor('#111426')
-        Text('星澜')
-          .fontSize(13)
-          .fontColor('#111426')
-          .fontWeight(FontWeight.Bold)
-          .margin({ top: 2 })
-      }
-      .width(66)
-      .height(66)
-      .borderRadius(33)
-      .backgroundColor('#E8B83D')
-      .justifyContent(FlexAlign.Center)
-      .alignItems(HorizontalAlign.Center)
-      .shadow({
-        radius: this.centerPressed ? 10 : 14,
-        color: '#38E8B83D',
-        offsetX: 0,
-        offsetY: this.centerPressed ? 2 : 4
-      })
-      .translate({ y: this.centerPressed ? -14 : -16 })
-      .scale({
-        x: this.centerPressed ? 0.96 : 1.0,
-        y: this.centerPressed ? 0.96 : 1.0
-      })
-      .animation({ duration: 280, curve: Curve.EaseOut })
-      .onClick(() => {
-        this.onXinglanClick();
-      })
-      .onTouch((event: TouchEvent) => {
-        this.handleCenterTouch(event);
       })
     }
     .width('100%')

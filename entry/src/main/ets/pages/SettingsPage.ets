@@ -58,7 +58,7 @@ struct SettingsPage {
           value: '回到首页',
           action: () => {
             try {
-              router.replaceUrl({ url: Routes.NEW_HOME });
+              router.replaceUrl({ url: Routes.MAIN_FRAME });
             } catch (_err) {
               // ignore
             }
@@ -87,7 +87,7 @@ struct SettingsPage {
 
   private navigateBack(): void {
     try {
-      router.replaceUrl({ url: Routes.NEW_HOME });
+      router.replaceUrl({ url: Routes.MAIN_FRAME });
     } catch (_err) {
       // ignore
     }
@@ -105,7 +105,7 @@ struct SettingsPage {
       Column() {
         // 顶部安全区 + 返回按钮
         Row() {
-          AppBackButton({ fallbackUrl: Routes.NEW_HOME })
+          AppBackButton({ fallbackUrl: Routes.MAIN_FRAME })
         }
         .width('100%')
         .height(56)

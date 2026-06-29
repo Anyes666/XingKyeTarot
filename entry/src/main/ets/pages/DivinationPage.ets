@@ -75,7 +75,7 @@ struct DivinationPage {
   build() {
     Stack() {
       StarBackground()
-      AppBackButton()
+      AppBackButton({ btnZIndex: 50 })
 
       Column() {
         Column() {
