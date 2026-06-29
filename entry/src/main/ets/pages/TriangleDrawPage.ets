@@ -1,6 +1,7 @@
 import { router } from '@kit.ArkUI';
 import { Theme } from '../common/Theme';
 import { Routes } from '../common/Routes';
+import { AppBackButton } from '../components/AppBackButton';
 import { TarotCardRepository, DrawCardResult } from '../data/TarotCardRepository';
 import { MVP8_CARD_IMAGES, MVP8_CARD_NAMES, getMVP8CardData, getScenarioContent } from '../data/MVP8CardsData';
 import { EmotionTag } from '../model/TarotCard';
@@ -197,7 +198,14 @@ struct TriangleDrawPage {
 
   build() {
     Column() {
-      // ── TopBar 标题区（layoutWeight 14，安全区）──
+      // ── 返回按钮（固定高度，不参与比例分配）──
+        Row() {
+          AppBackButton({ fallbackUrl: Routes.HOME })
+        }
+        .width('100%')
+        .padding({ top: Theme.SAFE_TOP, left: Theme.SPACE_SCREEN_PAD })
+
+        // ── TopBar 标题区（layoutWeight 14）──
       Column() {
         Text('正在展开圣三角')
           .fontSize(Theme.FONT_HEADLINE)
@@ -213,7 +221,6 @@ struct TriangleDrawPage {
       .layoutWeight(14)
       .justifyContent(FlexAlign.Center)
       .alignItems(HorizontalAlign.Center)
-      .padding({ top: Theme.SAFE_TOP })
 
       // ── CardStage 三张牌舞台区（layoutWeight 60，主体）──
       Row({ space: Theme.SPACE_SM }) {

@@ -1,5 +1,6 @@
 {
   "src": [
+    "pages/SplashPage",
     "pages/Index",
     "pages/OnboardingPage",
     "pages/DivinationPage",
@@ -23,6 +24,8 @@
     "pages/RelationDrawPage",
     "pages/RelationResultPage",
     "pages/HistoryPage",
-    "pages/HistoryDetailPage"
+    "pages/HistoryDetailPage",
+    "pages/SettingsPage",
+    "pages/XinglanChatPage"
   ]
 }

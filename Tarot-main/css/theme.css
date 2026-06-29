@@ -1,0 +1,45 @@
+:root[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-2: #f9f9f9;
+  --surface: #ffffff;
+  --surface-2: #f4f4f4;
+  --text: #000000;
+  --text-2: #555555;
+  --muted: #a0a0a0;
+  --line: #eeeeee;
+  --line-2: #dddddd;
+  --accent: #000000;
+  --invert: #ffffff;
+  --hint-violet: #c8b8e8;
+  --hint-blue: #b8d0e8;
+  --hint-violet-soft: #f3eefb;
+  --hint-blue-soft: #eef4fb;
+  --shadow-sm: 0 4px 20px rgba(0,0,0,0.03);
+  --shadow-md: 0 12px 40px rgba(0,0,0,0.08);
+}
+
+:root[data-theme="dark"] {
+  --bg: #050505;
+  --bg-2: #0f0f0f;
+  --surface: #0a0a0a;
+  --surface-2: #1a1a1a;
+  --text: #ffffff;
+  --text-2: #a0a0a0;
+  --muted: #555555;
+  --line: #222222;
+  --line-2: #333333;
+  --accent: #ffffff;
+  --invert: #000000;
+  --hint-violet: #8678a8;
+  --hint-blue: #7890a8;
+  --hint-violet-soft: #1a1525;
+  --hint-blue-soft: #14181f;
+  --shadow-sm: 0 4px 20px rgba(0,0,0,0.4);
+  --shadow-md: 0 12px 40px rgba(0,0,0,0.7);
+}
+
+.theme-toggle .ico-moon { display: none; }
+:root[data-theme="dark"] .theme-toggle .ico-sun { display: none; }
+:root[data-theme="dark"] .theme-toggle .ico-moon { display: block; }
+
+* { transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease; }

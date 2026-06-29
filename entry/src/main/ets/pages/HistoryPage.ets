@@ -5,6 +5,8 @@ import { ComplianceFooter } from '../components/ComplianceFooter';
 import { AppBackButton } from '../components/AppBackButton';
 import { HistoryStore } from '../common/HistoryStore';
 import { DivinationHistoryRecord, SpreadType } from '../model/DivinationHistoryRecord';
+import { hilog } from '@kit.PerformanceAnalysisKit';
+import { PreferenceStore } from '../data/PreferenceStore';
 
 /**
  * 历史详情路由参数
@@ -12,6 +14,11 @@ import { DivinationHistoryRecord, SpreadType } from '../model/DivinationHistoryR
 interface HistoryDetailRouteParams {
   recordId: string;
 }
+
+/**
+ * 阶段5：记录页首次引导文案
+ */
+const HISTORY_FIRST_GUIDE: string = '这里留着之前的自己。想看就看，不想看也没关系。';
 
 /**
  * 历史查询页面（P0.3 整改：单条删除 + 全部清除 + 空状态优化）
@@ -23,9 +30,28 @@ struct HistoryPage {
   @State filterType: string = '全部';
   @State isLoading: boolean = true;
   @State filterOptions: string[] = ['全部', '单牌', '圣三角', '关系'];
+  @State showFirstGuide: boolean = false;
 
-  async aboutToAppear(): Promise<void> {
+  aboutToAppear(): void {
+    this.prepareFirstGuide();
+  }
+
+  /**
+   * 阶段5：首次进入记录页引导
+   * - 先加载记录（保留原逻辑）
+   * - 读 hasSeenRecordGuide，若 false 则显示引导并标记 true
+   */
+  private async prepareFirstGuide(): Promise<void> {
     await this.loadRecords();
+    try {
+      const hasSeen: boolean = await PreferenceStore.getBoolean('hasSeenRecordGuide', false, getContext(this));
+      this.showFirstGuide = !hasSeen;
+      if (!hasSeen) {
+        await PreferenceStore.putBoolean('hasSeenRecordGuide', true, getContext(this));
+      }
+    } catch (err) {
+      hilog.error(0x0000, 'HistoryPage', 'prepareFirstGuide error: %{public}s', JSON.stringify(err));
+    }
   }
 
   private async loadRecords(): Promise<void> {
@@ -196,14 +222,15 @@ struct HistoryPage {
   }
 
   build() {
-    Column() {
+    Stack() {
+      Column() {
       // ── 标题行：返回 + 标题 + 清空 ──
       Row() {
         AppBackButton({ fallbackUrl: Routes.HOME })
 
         Blank()
 
-        Text('📋 历史查询')
+        Text('历史查询')
           .fontSize(Theme.FONT_SUBTITLE)
           .fontColor(Theme.TEXT_PRIMARY_LIGHT)
           .fontWeight(FontWeight.Bold)
@@ -212,7 +239,7 @@ struct HistoryPage {
 
         Text('清空')
           .fontSize(Theme.FONT_BODY)
-          .fontColor('#EF4444')
+          .fontColor('#FF6B70')
           .opacity(this.records.length > 0 ? 1.0 : 0.3)
           .onClick(() => {
             if (this.records.length > 0) {
@@ -221,8 +248,7 @@ struct HistoryPage {
           })
       }
       .width('100%')
-      .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, top: 12, bottom: Theme.SPACE_SM })
-      .backgroundColor(Theme.BG_DEEP_INDIGO)
+      .padding({ left: 14, right: Theme.SPACE_MD, top: Theme.SAFE_TOP, bottom: Theme.SPACE_SM })
 
       Text('回看最近的星钥记录，看看那些反复出现的心事')
         .fontSize(Theme.FONT_CAPTION)
@@ -230,7 +256,16 @@ struct HistoryPage {
         .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, bottom: Theme.SPACE_MD })
         .width('100%')
 
-      Divider().strokeWidth(0.5).color(Theme.DEEP_STARRY)
+      // ── 阶段5：首次进入记录页引导（仅首次显示）──
+      if (this.showFirstGuide) {
+        Text(HISTORY_FIRST_GUIDE)
+          .fontSize(Theme.FONT_CAPTION)
+          .fontColor(Theme.TEXT_SECONDARY)
+          .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, bottom: Theme.SPACE_SM })
+          .width('100%')
+      }
+
+      Divider().strokeWidth(0.3).color('rgba(255,255,255,0.06)')
 
       // ── 筛选 Tab ──
       Scroll() {
@@ -240,7 +275,9 @@ struct HistoryPage {
               .fontSize(Theme.FONT_CAPTION)
               .fontColor(this.filterType === opt ? Theme.BG_DEEP_INDIGO : Theme.GOLD_AMBER)
               .fontWeight(FontWeight.Medium)
-              .padding({ left: 14, right: 14, top: 8, bottom: 8 })
+              .height(44)
+              .padding({ left: 14, right: 14, top: 0, bottom: 0 })
+              .textAlign(TextAlign.Center)
               .backgroundColor(this.filterType === opt ? Theme.GOLD_AMBER : 'rgba(202, 138, 4, 0.1)')
               .borderRadius(Theme.RADIUS_FULL)
               .border({ width: 1, color: 'rgba(202, 138, 4, 0.25)' })
@@ -255,7 +292,7 @@ struct HistoryPage {
       .scrollBar(BarState.Off)
       .width('100%')
 
-      Divider().strokeWidth(0.5).color(Theme.DEEP_STARRY)
+      Divider().strokeWidth(0.3).color('rgba(255,255,255,0.06)')
 
       if (this.isLoading) {
         Column() {
@@ -281,15 +318,29 @@ struct HistoryPage {
           }
           .width('100%')
           .layoutWeight(1)
-          .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, top: Theme.SPACE_MD })
+          .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, top: Theme.SPACE_MD, bottom: Theme.SAFE_BOTTOM + 24 })
           .scrollBar(BarState.Off)
         }
       }
     }
     .width('100%')
     .height('100%')
-    .padding({ top: 36, bottom: 28 })
+    .padding({ top: 0, bottom: Theme.SAFE_BOTTOM })
     .background(Theme.BG_DEEP_INDIGO)
+
+      // 顶部渐变遮罩（消除状态栏硬边）
+      Column()
+        .width('100%')
+        .height(Theme.SAFE_TOP + 64)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [['#0A0E1C', 0], ['rgba(15,15,35,0)', 1]]
+        })
+        .hitTestBehavior(HitTestMode.Transparent)
+        .position({ x: 0, y: 0 })
+    }
+    .width('100%')
+    .height('100%')
   }
 
   /**
@@ -298,15 +349,15 @@ struct HistoryPage {
   @Builder
   buildEmptyState(): void {
     Column({ space: Theme.SPACE_MD }) {
-      Text('📭')
-        .fontSize(48)
+      Text('')
+        .fontSize(0)
 
       Text('还没有占卜记录')
         .fontSize(Theme.FONT_BODY)
         .fontColor(Theme.TEXT_PRIMARY_LIGHT)
         .fontWeight(FontWeight.Medium)
 
-      Text('先抽一张牌，让星澜为你留下第一颗星。')
+      Text('还没有记录。等你愿意的时候，再从一张星钥开始。')
         .fontSize(Theme.FONT_CAPTION)
         .fontColor(Theme.MOON_MUTED)
 

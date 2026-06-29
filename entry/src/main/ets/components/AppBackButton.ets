@@ -17,15 +17,16 @@ export struct AppBackButton {
 
   build() {
     Row() {
-      Text('← 返回')
-        .fontSize(16)
-        .fontColor('#CA8A04')
-        .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+      Text('←')
+        .fontSize(24)
+        .fontColor('rgba(232,184,61,0.82)')
         .onClick(() => {
           this.handleBack();
         })
     }
-    .height(44)
+    .width(48)
+    .height(48)
+    .justifyContent(FlexAlign.Center)
     .alignItems(VerticalAlign.Center)
   }
 

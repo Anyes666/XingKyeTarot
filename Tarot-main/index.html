@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Tarot · milk</title>
+<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body ontouchstart="" style="overscroll-behavior: none;">
+
+<main class="stage">
+
+  <div class="screens">
+
+<section id="screen-home" class="screen screen-home is-active">
+      <header class="home-top">
+        <div class="home-hello">
+          <div class="home-greeting" id="home-greeting">欢迎光临</div>
+          <div class="home-sub">亲爱的女巫</div>
+        </div>
+        <button class="theme-toggle" id="theme-toggle" aria-label="切换主题">
+          <svg class="ico-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v1M12 20v1M5 5l.7.7M18.3 18.3l.7.7M3 12h1M20 12h1M5 19l.7-.7M18.3 5.7l.7-.7"/></svg>
+          <svg class="ico-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </header>
+
+      <div class="home-brand">
+        <div class="brand-art">
+          <svg viewBox="0 0 120 120" width="80" height="80" fill="none" stroke="currentColor" stroke-width="0.5">
+            <circle cx="60" cy="60" r="58" stroke-dasharray="2 4"/>
+            <circle cx="60" cy="60" r="42"/>
+            <path d="M60 2 L60 118 M2 60 L118 60"/>
+            <path d="M19 19 L101 101 M19 101 L101 19" stroke-opacity="0.3"/>
+            <circle cx="60" cy="18" r="3" fill="currentColor"/>
+          </svg>
+        </div>
+        <div class="home-brand-name" id="home-brand-name" contenteditable="true" title="点击即可直接修改文字">⌯>ᴗ<⌯</div>
+<div class="home-brand-tag" id="home-brand-tag" contenteditable="true" title="点击即可直接修改文字">The entire cosmos,right in my palm</div>
+      </div>
+
+      <nav class="app-grid">
+        <button class="app-tile" data-app="cards" style="--d:0">
+          <span class="app-icon">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="2" width="16" height="20" rx="1"/>
+              <path d="M4 7h16M8 12h8M8 16h6"/>
+            </svg>
+          </span>
+          <span class="app-name">牌库</span>
+          <span class="app-tag">Library</span>
+        </button>
+        <button class="app-tile" data-app="exam" style="--d:1">
+          <span class="app-icon">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </span>
+          <span class="app-name">练习</span>
+          <span class="app-tag">Practice</span>
+        </button>
+        <button class="app-tile" data-app="reading" style="--d:2">
+          <span class="app-icon">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 2v20M2 12h20"/>
+              <circle cx="12" cy="12" r="4"/>
+            </svg>
+          </span>
+          <span class="app-name">占卜</span>
+          <span class="app-tag">Reading</span>
+        </button>
+        <button class="app-tile" data-app="notes" style="--d:3">
+          <span class="app-icon">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </span>
+          <span class="app-name">笔记</span>
+          <span class="app-tag">Notes</span>
+        </button>
+      </nav>
+    </section>
+    <section id="screen-cards" class="screen screen-app"></section>
+    <section id="screen-exam" class="screen screen-app"></section>
+    <section id="screen-reading" class="screen screen-app"></section>
+    <section id="screen-notes" class="screen screen-app"></section>
+  </div>
+</main>
+
+<div id="card-modal" class="card-modal"></div>
+
+<script src="js/data.js"></script>
+<script src="js/core.js"></script>
+<script src="js/app-cards.js"></script>
+<script src="js/app-exam.js"></script>
+<script src="js/app-reading.js"></script>
+<script src="js/app-notes.js"></script>
+<script>
+  Core.init();
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const nameEl = document.getElementById('home-brand-name');
+    const tagEl = document.getElementById('home-brand-tag');
+
+    if (!nameEl || !tagEl) return;
+
+    const defaultName = "⌯>ᴗ<⌯";
+    const defaultTag = "The entire cosmos,right in my palm";
+
+    const savedName = localStorage.getItem('custom_brand_name');
+    const savedTag = localStorage.getItem('custom_brand_tag');
+
+    if (savedName) nameEl.innerText = savedName;
+    if (savedTag) tagEl.innerText = savedTag;
+
+    nameEl.addEventListener('blur', () => {
+      const val = nameEl.innerText.trim();
+      localStorage.setItem('custom_brand_name', val || defaultName);
+      if (!val) nameEl.innerText = defaultName;
+    });
+
+    tagEl.addEventListener('blur', () => {
+      const val = tagEl.innerText.trim();
+      localStorage.setItem('custom_brand_tag', val || defaultTag);
+      if (!val) tagEl.innerText = defaultTag;
+    });
+
+    const disableEnter = (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        e.target.blur();
+      }
+    };
+    nameEl.addEventListener('keydown', disableEnter);
+    tagEl.addEventListener('keydown', disableEnter);
+  });
+</script>
+
+</body>
+</html>

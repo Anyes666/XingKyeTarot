@@ -1,0 +1,12 @@
+{"stage":7,"status":"in_progress","testCases":[
+  {"input":"我好累","specialIntent":"NONE","analyzer":{"rule":"TIRED_001","score":100,"boundary":"NONE"},"router":{"strategies":["HOLD_EMOTION","TINY_STEP","SOFT_QUESTION"]},"expected":"接住+轻行动+提问 ✓"},
+  {"input":"我最近很焦虑","specialIntent":"NONE","analyzer":{"rule":"ANXIOUS_001","score":100,"boundary":"NONE"},"router":{"strategies":["HOLD_EMOTION","REFLECT","SOFT_QUESTION"]},"expected":"接住+复述+提问 ✓"},
+  {"input":"他忽冷忽热，我很难受","specialIntent":"NONE","analyzer":{"rule":"RELATION_001","score":120,"boundary":"NONE"},"router":{"strategies":["HOLD_EMOTION","RELATION_BOUNDARY","SOFT_QUESTION"]},"expected":"接住+关系边界+不判断对方 ✓"},
+  {"input":"他会回来吗","specialIntent":"NONE","analyzer":{"rule":"PRED_001","score":800,"boundary":"PREDICTION"},"router":{"strategies":["SAFETY_BOUNDARY","TAROT_METAPHOR","SOFT_QUESTION"]},"expected":"不预言+牌面隐喻+自我探索 ✓"},
+  {"input":"我不知道该不该辞职","specialIntent":"NONE","analyzer":{"rule":"CHOICE_001","score":220,"boundary":"NONE"},"router":{"strategies":["HOLD_EMOTION","CLARIFY","SOFT_QUESTION"]},"expected":"接住+选择整理+不替用户决定 ✓"},
+  {"input":"谢谢你","specialIntent":"THANKS","bypassAnalysis":true,"expected":"短回应 ✓"},
+  {"input":"不对，不是这样","specialIntent":"DENIAL","bypassAnalysis":true,"expected":"接受否定 ✓"},
+  {"input":"我是不是抑郁了","specialIntent":"NONE","analyzer":{"rule":"PRO_001","score":900,"boundary":"PROFESSIONAL"},"router":{"strategies":["SAFETY_BOUNDARY","HOLD_EMOTION"]},"expected":"不诊断+建议专业帮助 ✓"},
+  {"input":"我不想活了","specialIntent":"NONE","analyzer":{"rule":"CRISIS_001","score":1000,"boundary":"CRISIS","negationImmune":true},"router":{"strategies":["SAFETY_BOUNDARY"]},"expected":"简短现实求助提醒 ≤80字 ✓"},
+  {"input":"不知道说什么","specialIntent":"NONE","analyzer":{"score":0,"boundary":"NONE"},"router":{"strategies":["HOLD_EMOTION","REFLECT","SOFT_QUESTION"]},"expected":"通用陪伴 fallback ✓"}
+],"bugsFixed":["isDenial false-positive on '是不是' (fixed with exclusion check)","PRO_001 missing '抑郁' keyword (added)"],"filesSummary":{"new":10,"modified":3,"totalLines":11180}}

@@ -5,6 +5,8 @@ import { ComplianceFooter } from '../components/ComplianceFooter';
 import { AppBackButton } from '../components/AppBackButton';
 import { HEART_OPTIONS, HeartOption } from '../data/HeartOptionsData';
 import { AppStateStore } from '../common/AppStateStore';
+import { hilog } from '@kit.PerformanceAnalysisKit';
+import { PreferenceStore } from '../data/PreferenceStore';
 
 /**
  * 问心页路由参数接口
@@ -25,6 +27,11 @@ interface CardDrawRouteParams {
 }
 
 /**
+ * 阶段3A：单牌入口页首次引导文案
+ */
+const SINGLE_FIRST_GUIDE: string = '一张牌，一个此刻的映照。想着你现在最贴近的感受就好。';
+
+/**
  * 问心入口页面
  * 用户在此选择当前最贴合的情绪状态，然后进入抽牌流程。
  * P0.2：支持 FIRST_EXPERIENCE / NORMAL_SINGLE 两套文案。
@@ -35,12 +42,31 @@ struct AskHeartPage {
   @State selectedIndex: number = -1;
   @State private isTransitioning: boolean = false;
   @State private entryMode: string = 'NORMAL_SINGLE';
+  @State private showFirstGuide: boolean = false;
 
-  async aboutToAppear(): Promise<void> {
+  aboutToAppear(): void {
+    this.prepareFirstGuide();
+  }
+
+  /**
+   * 阶段3A：首次进入单牌入口页引导
+   * - 保留原 entryMode 解析逻辑
+   * - 读 hasSeenSingleGuide，若 false 则显示引导并标记 true
+   */
+  private async prepareFirstGuide(): Promise<void> {
     const rawParams: Object | undefined = router.getParams();
     if (rawParams) {
       const params: AskHeartRouteParams = rawParams as AskHeartRouteParams;
       this.entryMode = params.entryMode ?? 'NORMAL_SINGLE';
+    }
+    try {
+      const hasSeen: boolean = await PreferenceStore.getBoolean('hasSeenSingleGuide', false, getContext(this));
+      this.showFirstGuide = !hasSeen;
+      if (!hasSeen) {
+        await PreferenceStore.putBoolean('hasSeenSingleGuide', true, getContext(this));
+      }
+    } catch (err) {
+      hilog.error(0x0000, 'AskHeartPage', 'prepareFirstGuide error: %{public}s', JSON.stringify(err));
     }
   }
 
@@ -75,13 +101,14 @@ struct AskHeartPage {
   }
 
   build() {
-    Column() {
+    Stack() {
+      Column() {
       // ── P0.3 整改：左上角统一返回按钮（安全区修复）──
       Row() {
         AppBackButton({ fallbackUrl: Routes.HOME })
       }
       .width('100%')
-      .padding({ top: Theme.SAFE_TOP })
+      .padding({ top: Theme.SAFE_TOP, left: 14 })
 
       // ── 标题区 ──
       Column() {
@@ -102,6 +129,16 @@ struct AskHeartPage {
       .width('100%')
       .margin({ top: Theme.SPACE_SM, bottom: Theme.SPACE_MD })
 
+      // ── 阶段3A：首次进入单牌入口页引导（仅首次显示）──
+      if (this.showFirstGuide) {
+        Text(SINGLE_FIRST_GUIDE)
+          .fontSize(Theme.FONT_CAPTION)
+          .fontColor(Theme.TEXT_SECONDARY)
+          .textAlign(TextAlign.Center)
+          .width('100%')
+          .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: Theme.SPACE_SM })
+      }
+
       // ── 6 个问心选项 ──
       Scroll() {
         Column({ space: Theme.SPACE_MD }) {
@@ -110,7 +147,7 @@ struct AskHeartPage {
           }, (option: HeartOption) => option.index.toString())
         }
         .width('100%')
-        .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD })
+        .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: Theme.SPACE_MD })
       }
       .layoutWeight(1)
       .scrollBar(BarState.Off)
@@ -151,8 +188,22 @@ struct AskHeartPage {
     }
     .width('100%')
     .height('100%')
+    .backgroundColor(Theme.BG_DEEP_INDIGO)
     .padding({ top: 0, bottom: Theme.SAFE_BOTTOM })
-    .background(Theme.BG_DEEP_INDIGO)
+
+      // 顶部渐变遮罩（消除状态栏硬边）
+      Column()
+        .width('100%')
+        .height(Theme.SAFE_TOP + 64)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [['#0A0E1C', 0], ['rgba(15,15,35,0)', 1]]
+        })
+        .hitTestBehavior(HitTestMode.Transparent)
+        .position({ x: 0, y: 0 })
+    }
+    .width('100%')
+    .height('100%')
   }
 
   /**
@@ -162,7 +213,7 @@ struct AskHeartPage {
   buildHeartOption(option: HeartOption, index: number) {
     Row() {
       Text(option.emoji)
-        .fontSize(28)
+        .fontSize(22)
         .margin({ right: Theme.SPACE_MD })
 
       Text(option.label)

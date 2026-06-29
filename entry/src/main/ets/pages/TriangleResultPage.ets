@@ -12,6 +12,7 @@ import {
   DivinationHistoryRecord,
   generateHistoryRecordId,
 } from '../model/DivinationHistoryRecord';
+import { COMPANION_RESULT_LINES } from '../data/CompanionResultLines';
 
 /**
  * 圣三角结果页路由参数
@@ -55,6 +56,8 @@ struct TriangleResultPage {
   @State cards: CardResultSlotInfo[] = [];
   @State historyRecordId: string = '';
   @State isSummaryExpanded: boolean = false;
+  @State private hasHeardCompanionResult: boolean = false;
+  @State private companionResultLine: string = '';
 
   async aboutToAppear(): Promise<void> {
     const rawParams: Object | undefined = router.getParams();
@@ -140,6 +143,18 @@ struct TriangleResultPage {
       }
     }
     return '接下来三天，试着留意生活中的小细节，答案会慢慢浮现。';
+  }
+
+  /**
+   * 阶段4A/4B/4C：再听星澜说一句 — 随机抽取 1 条补充文案，每页限 1 次
+   */
+  private onHearCompanionAgain(): void {
+    if (this.hasHeardCompanionResult) {
+      return;
+    }
+    const idx: number = Math.floor(Math.random() * COMPANION_RESULT_LINES.length);
+    this.companionResultLine = COMPANION_RESULT_LINES[idx];
+    this.hasHeardCompanionResult = true;
   }
 
   build() {
@@ -366,6 +381,27 @@ struct TriangleResultPage {
             // ignore
           }
         })
+
+      // ── 阶段4B：星澜补充文案区（点击"再听一句"后显示）──
+      if (this.companionResultLine.length > 0) {
+        Text(this.companionResultLine)
+          .fontSize(14)
+          .fontColor(Theme.TEXT_MUTED)
+          .textAlign(TextAlign.Center)
+          .lineHeight(22)
+          .padding({ left: 24, right: 24, top: 12, bottom: 12 })
+      }
+
+      // ── 阶段4B："再听星澜说一句"入口（轻文字风格，弱于主操作）──
+      Text('再听星澜说一句')
+        .fontSize(14)
+        .fontColor(this.hasHeardCompanionResult ? Theme.TEXT_MUTED : Theme.TEXT_SECONDARY)
+        .opacity(this.hasHeardCompanionResult ? 0.35 : 0.85)
+        .textAlign(TextAlign.Center)
+        .width('100%')
+        .constraintSize({ minHeight: 44 })
+        .padding({ top: 12, bottom: 12 })
+        .onClick(() => { this.onHearCompanionAgain(); })
     }
     .width('100%')
   }

@@ -99,5 +99,11 @@
 - `entry/src/main/ets/data/` — 数据仓库
 - `entry/src/main/ets/service/` — 服务层
 
+## 首页背景图适配（2025-06-28）
+- HomePage.ets: 背景图 `.translate({ y: -80 })` 将星澜人物上移 80vp
+- Layer 2 渐变顶部: `rgba(6,10,28,0.92)` 纯净深蓝黑消除红紫脏色
+- Layer 2 中下部透明区延至 65%，底部暗区推迟至 85%
+- ActionArea 渐变前 15% 完全透明保留湖景，50%处才到 0.55
+
 ## 核心原则
 **宁可少做一点，也必须稳定可编译。**

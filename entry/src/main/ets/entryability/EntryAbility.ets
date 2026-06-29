@@ -56,7 +56,8 @@ export default class EntryAbility extends UIAbility {
       hilog.warn(0x0000, TAG, 'Initial window setup failed: %{public}s', JSON.stringify(err));
     }
 
-    // 隐私门禁守卫：未同意用户协议与隐私政策时，所有入口（含服务卡片）一律进入 LaunchPage
+    // ── SplashPage：先显示启动图，再由 SplashPage 自动跳转到 LaunchPage ──
+    // 隐私门禁守卫：未同意用户协议与隐私政策时，所有入口（含服务卡片）一律经过 SplashPage → LaunchPage
     let privacyAccepted: boolean = false;
     try {
       privacyAccepted = await AppStateStore.isPrivacyAccepted(context);
@@ -64,57 +65,43 @@ export default class EntryAbility extends UIAbility {
       hilog.warn(0x0000, TAG, 'isPrivacyAccepted failed: %{public}s', JSON.stringify(err));
     }
 
-    if (!privacyAccepted) {
-      // 未同意协议：忽略卡片 targetPage，强制进入 LaunchPage 协议门禁
-      windowStage.loadContent('pages/LaunchPage', (err) => {
+    // 检查是否从Widget冷启动跳转（onNewWant在冷启动时不会被调用）
+    const startParams: Record<string, string> | undefined =
+      this.savedLaunchWant?.parameters as Record<string, string> | undefined;
+    const targetPage: string = startParams?.['targetPage'] ?? '';
+
+    if (!privacyAccepted || targetPage !== 'dailyFortune') {
+      // 默认路径：SplashPage → LaunchPage（隐私门禁判断 → 首次体验分流）
+      AppStorage.setOrCreate('splashTargetPage', Routes.LAUNCH);
+      windowStage.loadContent('pages/SplashPage', (err) => {
         if (err.code) {
-          hilog.error(0x0000, TAG, 'Failed to load LaunchPage (privacy gate): %{public}s', JSON.stringify(err));
+          hilog.error(0x0000, TAG, 'Failed to load SplashPage: %{public}s', JSON.stringify(err));
           return;
         }
-        hilog.info(0x0000, TAG, 'LaunchPage loaded (privacy gate active)');
+        hilog.info(0x0000, TAG, 'SplashPage loaded');
         if (mainWindow) {
           this.applyDarkSystemBars(mainWindow).catch((_e: Error) => {
-            hilog.warn(0x0000, TAG, 'applyDarkSystemBars after loadContent (privacy gate) failed');
+            hilog.warn(0x0000, TAG, 'applyDarkSystemBars after loadContent (splash) failed');
           });
         }
       });
       return;
     }
 
-    // 已同意协议后，按 targetPage 分发
-    // 检查是否从Widget冷启动跳转（onNewWant在冷启动时不会被调用）
-    const startParams: Record<string, string> | undefined =
-      this.savedLaunchWant?.parameters as Record<string, string> | undefined;
-    const targetPage: string = startParams?.['targetPage'] ?? '';
-
-    if (targetPage === 'dailyFortune') {
-      windowStage.loadContent('pages/DailyFortunePage', (err) => {
-        if (err.code) {
-          hilog.error(0x0000, TAG, 'Failed to load DailyFortunePage (cold start): %{public}s', JSON.stringify(err));
-          return;
-        }
-        hilog.info(0x0000, TAG, 'DailyFortunePage loaded from cold start');
-        if (mainWindow) {
-          this.applyDarkSystemBars(mainWindow).catch((_e: Error) => {
-            hilog.warn(0x0000, TAG, 'applyDarkSystemBars after loadContent (dailyFortune) failed');
-          });
-        }
-      });
-    } else {
-      // P0.2：默认启动 LaunchPage（隐私门禁判断 → 首次体验分流）
-      windowStage.loadContent('pages/LaunchPage', (err) => {
-        if (err.code) {
-          hilog.error(0x0000, TAG, 'Failed to load LaunchPage: %{public}s', JSON.stringify(err));
-          return;
-        }
-        hilog.info(0x0000, TAG, 'LaunchPage loaded (P0.2 entry)');
-        if (mainWindow) {
-          this.applyDarkSystemBars(mainWindow).catch((_e: Error) => {
-            hilog.warn(0x0000, TAG, 'applyDarkSystemBars after loadContent (P0.2) failed');
-          });
-        }
-      });
-    }
+    // Widget 冷启动直达：SplashPage → DailyFortunePage
+    AppStorage.setOrCreate('splashTargetPage', 'pages/DailyFortunePage');
+    windowStage.loadContent('pages/SplashPage', (err) => {
+      if (err.code) {
+        hilog.error(0x0000, TAG, 'Failed to load SplashPage (daily fortune): %{public}s', JSON.stringify(err));
+        return;
+      }
+      hilog.info(0x0000, TAG, 'SplashPage loaded (daily fortune redirect)');
+      if (mainWindow) {
+        this.applyDarkSystemBars(mainWindow).catch((_e: Error) => {
+          hilog.warn(0x0000, TAG, 'applyDarkSystemBars after loadContent (splash daily) failed');
+        });
+      }
+    });
   }
 
   async onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): Promise<void> {
@@ -132,12 +119,12 @@ export default class EntryAbility extends UIAbility {
 
     if (!privacyAccepted) {
       if (this.windowStage) {
-        this.windowStage.loadContent('pages/LaunchPage', (err) => {
+        this.windowStage.loadContent('pages/SplashPage', (err) => {
           if (err.code) {
-            hilog.error(0x0000, TAG, 'onNewWant Failed to load LaunchPage (privacy gate): %{public}s', JSON.stringify(err));
+            hilog.error(0x0000, TAG, 'onNewWant Failed to load SplashPage (privacy gate): %{public}s', JSON.stringify(err));
             return;
           }
-          hilog.info(0x0000, TAG, 'onNewWant LaunchPage loaded (privacy gate active)');
+          hilog.info(0x0000, TAG, 'onNewWant SplashPage loaded (privacy gate active)');
         });
       }
       return;
@@ -148,9 +135,10 @@ export default class EntryAbility extends UIAbility {
     const targetPage: string = params?.['targetPage'] ?? '';
     if (targetPage === 'dailyFortune') {
       if (this.windowStage) {
-        this.windowStage.loadContent('pages/DailyFortunePage', (err) => {
+        AppStorage.setOrCreate('splashTargetPage', 'pages/DailyFortunePage');
+        this.windowStage.loadContent('pages/SplashPage', (err) => {
           if (err.code) {
-            hilog.error(0x0000, TAG, 'Failed to load DailyFortunePage: %{public}s', JSON.stringify(err));
+            hilog.error(0x0000, TAG, 'onNewWant Failed to load SplashPage (daily fortune): %{public}s', JSON.stringify(err));
           }
         });
       }
@@ -218,10 +206,10 @@ export default class EntryAbility extends UIAbility {
   private async applyDarkSystemBars(mainWindow: window.Window): Promise<void> {
     try {
       await mainWindow.setWindowLayoutFullScreen(true);
-      mainWindow.setWindowBackgroundColor('#0F0F23');
+      mainWindow.setWindowBackgroundColor('#070B1C');
       const barProperties: window.SystemBarProperties = {
-        statusBarColor: '#0F0F23',
-        navigationBarColor: '#0F0F23',
+        statusBarColor: '#070B1C',
+        navigationBarColor: '#070B1C',
         statusBarContentColor: '#FFFFFF',
         navigationBarContentColor: '#FFFFFF'
       };

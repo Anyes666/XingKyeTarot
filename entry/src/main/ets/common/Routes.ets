@@ -1,4 +1,5 @@
 export class Routes {
+  static readonly SPLASH: string = 'pages/SplashPage';
   static readonly ONBOARDING: string = 'pages/OnboardingPage';
   static readonly HOME: string = 'pages/Index';
   static readonly DIVINATION: string = 'pages/DivinationPage';
@@ -29,4 +30,8 @@ export class Routes {
   static readonly HISTORY_DETAIL: string = 'pages/HistoryDetailPage';
   static readonly PRIVACY_POLICY: string = 'pages/PrivacyPolicyPage';
   static readonly USER_AGREEMENT: string = 'pages/UserAgreementPage';
+  static readonly SETTINGS: string = 'pages/SettingsPage';
+
+  // ── 星澜聊天 MVP ──
+  static readonly XINGLAN_CHAT: string = 'pages/XinglanChatPage';
 }
