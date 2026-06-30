@@ -2,60 +2,46 @@ import { router } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Routes } from '../common/Routes';
 import { AppBackButton } from '../components/AppBackButton';
+import { EmotionStarStorage, StarKeyLevel, NextLevelInfo } from '../common/EmotionStarStorage';
 
-// ===== 路由参数接口 =====
+/**
+ * 点亮情绪星页面路由参数
+ */
 interface EmotionStarRouteParams {
-  emotionTag: string
-  heartOptionIndex: number
-}
-
-// 星图数据
-interface StarDay {
-  day: number
-  label: string
-  lit: boolean
+  emotionTag: string;
+  heartOptionIndex: number;
+  cardName: string;
+  cardId: string;
+  totalLightDays: number;
+  currentLevelTitle: string;
 }
 
 @Entry
 @Component
 struct EmotionStarPage {
   @State emotionTag: string = '';
-  @State heartOptionIndex: number = 0;
-  @State starDays: StarDay[] = [
-    { day: 1, label: '今日', lit: true },
-    { day: 2, label: '明天', lit: false },
-    { day: 3, label: '后天', lit: false },
-    { day: 4, label: '第4天', lit: false },
-    { day: 5, label: '第5天', lit: false },
-    { day: 6, label: '第6天', lit: false },
-    { day: 7, label: '第7天', lit: false },
-  ];
+  @State cardName: string = '';
+  @State totalLightDays: number = 0;
+  @State currentLevelTitle: string = '初见';
+  @State nextLevelTitle: string = '星火初亮';
+  @State daysToNextLevel: number = 1;
+  @State isMaxLevel: boolean = false;
 
   aboutToAppear(): void {
     const rawParams: Object | undefined = router.getParams();
     if (rawParams) {
       const params: EmotionStarRouteParams = rawParams as EmotionStarRouteParams;
-      this.emotionTag = params.emotionTag || '关系边界';
-      this.heartOptionIndex = params.heartOptionIndex || 0;
+      this.emotionTag = params.emotionTag || '';
+      this.cardName = params.cardName || '';
+      this.totalLightDays = params.totalLightDays || 0;
+      this.currentLevelTitle = params.currentLevelTitle || '初见';
     }
-  }
 
-  /**
-   * 回到结果页：优先 router.back()，失败时 fallback 到首页。
-   * 逻辑与 AppBackButton.handleBack 等价（router.back + fallback HOME）。
-   */
-  private backToResultPage(): void {
-    try {
-      router.back();
-    } catch (err) {
-      hilog.error(0x0000, 'EmotionStarPage', 'Router back error, fallback to HOME');
-      try {
-        const options: router.RouterOptions = { url: Routes.HOME };
-        router.replaceUrl(options);
-      } catch (fallbackErr) {
-        hilog.error(0x0000, 'EmotionStarPage', 'Router fallback error');
-      }
-    }
+    // 计算下一等级信息
+    const nextInfo: NextLevelInfo = EmotionStarStorage.getNextLevelInfo(this.totalLightDays);
+    this.nextLevelTitle = nextInfo.title;
+    this.daysToNextLevel = nextInfo.daysLeft;
+    this.isMaxLevel = nextInfo.isMaxLevel;
   }
 
   build() {
@@ -67,103 +53,185 @@ struct EmotionStarPage {
       .width('100%')
       .padding({ top: 48 })
 
-      // ── Scroll 包裹主体内容，防止小屏挤出 ──
       Scroll() {
         Column() {
           // ══ 顶部点亮反馈区 ══
           Column() {
             Text('✨')
-              .fontSize(40)
-              .margin({ bottom: 10 })
+              .fontSize(48)
+              .margin({ bottom: 16 })
 
-            Text('你点亮了第 1 颗情绪星')
+            Text('你点亮了今天的情绪星')
               .fontSize(26)
               .fontWeight(FontWeight.Bold)
               .fontColor('#E5D9B6')
               .textAlign(TextAlign.Center)
-              .margin({ bottom: 6 })
+              .margin({ bottom: 12 })
 
+            // 今日星名
             Text('今日星名：' + this.emotionTag)
               .fontSize(18)
               .fontColor('#CA8A04')
               .fontWeight(FontWeight.Medium)
               .textAlign(TextAlign.Center)
+              .margin({ bottom: 8 })
+
+            // 今日牌名
+            Text('今日星钥：' + this.cardName)
+              .fontSize(15)
+              .fontColor('#94A3B8')
+              .textAlign(TextAlign.Center)
           }
           .width('100%')
-          .padding({ top: 32, bottom: 24 })
+          .padding({ top: 40, bottom: 32 })
 
-          // ══ 7 日情绪星轨卡片 ══
-          Column() {
-            // 卡片标题
-            Text('7 日情绪星轨')
-              .fontSize(18)
-              .fontWeight(FontWeight.Bold)
-              .fontColor('#E5D9B6')
-              .width('100%')
-              .margin({ bottom: 6 })
-
-            Text('再陪自己记录 6 天，星澜会帮你看见最近反复出现的心事。')
-              .fontSize(13)
-              .fontColor('#8B7A5C')
-              .width('100%')
-              .margin({ bottom: 14 })
-
-            // 7 天列表（紧凑行高 48vp）
-            ForEach(this.starDays, (item: StarDay) => {
-              Row() {
-                // 星标
-                Text(item.lit ? '⭐' : '☆')
-                  .fontSize(18)
-                  .fontColor(item.lit ? '#D99A00' : '#3A3A5A')
-                  .margin({ right: 14 })
-
-                // 标签
-                Text('Day ' + item.day + ' · ' + item.label)
-                  .fontSize(15)
-                  .fontColor(item.lit ? '#F8FAFC' : '#5A5A7A')
-                  .layoutWeight(1)
-
-                // 状态
-                Text(item.lit ? '已点亮' : '未点亮')
-                  .fontSize(13)
-                  .fontColor(item.lit ? '#D99A00' : '#3A3A5A')
-              }
-              .width('100%')
-              .height(48)
-              .padding({ left: 4, right: 4 })
-              .border({ width: { bottom: 0.5 }, color: 'rgba(46, 42, 74, 0.6)' })
-            })
-          }
-          .width('88%')
-          .padding({ left: 18, right: 18, top: 18, bottom: 18 })
-          .backgroundColor('#17172F')
-          .borderRadius(24)
-          .border({ width: 1, color: '#2E2A4A' })
-          .margin({ bottom: 24 })
-
-          // ══ 底部陪伴文案 ══
-          Text('再陪自己记录 6 天\n星澜会帮你看见最近反复出现的心事')
+          // ══ 星澜陪伴文案 ══
+          Text('星澜会替你记住：\n今天的你，也认真面对过自己的感受。')
             .fontSize(16)
             .fontColor('#C8B88A')
             .textAlign(TextAlign.Center)
-            .lineHeight(24)
+            .lineHeight(26)
             .width('82%')
-            .margin({ bottom: 28 })
+            .margin({ bottom: 32 })
 
-          // ══ 回到结果页按钮 ══
-          Button('← 回到结果页')
-            .type(ButtonType.Normal)
-            .fontSize(17)
-            .fontColor('#E5D9B6')
-            .backgroundColor('#1A1A2E')
-            .border({ width: 1, color: 'rgba(202, 138, 4, 0.35)' })
-            .borderRadius(24)
-            .width('76%')
-            .height(48)
-            .margin({ bottom: 48 })
-            .onClick(() => {
-              this.backToResultPage();
-            })
+          // ══ 累计点亮天数卡片 ══
+          Column() {
+            Row() {
+              Column() {
+                Text(this.totalLightDays.toString())
+                  .fontSize(36)
+                  .fontColor('#E5A50A')
+                  .fontWeight(FontWeight.Bold)
+                  .textAlign(TextAlign.Center)
+                  .width('100%')
+
+                Text('累计点亮')
+                  .fontSize(13)
+                  .fontColor('#94A3B8')
+                  .textAlign(TextAlign.Center)
+                  .width('100%')
+                  .margin({ top: 4 })
+              }
+              .layoutWeight(1)
+
+              // 分隔线
+              Column()
+                .width(1)
+                .height(48)
+                .backgroundColor('rgba(202, 138, 4, 0.2)')
+
+              Column() {
+                Text(this.currentLevelTitle)
+                  .fontSize(22)
+                  .fontColor('#E5D9B6')
+                  .fontWeight(FontWeight.Bold)
+                  .textAlign(TextAlign.Center)
+                  .width('100%')
+
+                Text('当前星钥等级')
+                  .fontSize(13)
+                  .fontColor('#94A3B8')
+                  .textAlign(TextAlign.Center)
+                  .width('100%')
+                  .margin({ top: 4 })
+              }
+              .layoutWeight(1)
+            }
+            .width('100%')
+            .padding({ top: 20, bottom: 20 })
+
+            // 下一等级信息
+            if (!this.isMaxLevel) {
+              Divider()
+                .strokeWidth(0.5)
+                .color('rgba(202, 138, 4, 0.12)')
+                .width('88%')
+
+              Text('下一称号：' + this.nextLevelTitle + '\n还差 ' + this.daysToNextLevel.toString() + ' 天')
+                .fontSize(14)
+                .fontColor('#94A3B8')
+                .textAlign(TextAlign.Center)
+                .lineHeight(22)
+                .padding({ top: 16, bottom: 4 })
+            } else {
+              Divider()
+                .strokeWidth(0.5)
+                .color('rgba(202, 138, 4, 0.12)')
+                .width('88%')
+
+              Text('你已到达最高星钥等级')
+                .fontSize(14)
+                .fontColor('#E5A50A')
+                .textAlign(TextAlign.Center)
+                .padding({ top: 16, bottom: 4 })
+            }
+          }
+          .width('88%')
+          .backgroundColor('#17172F')
+          .borderRadius(24)
+          .border({ width: 1, color: 'rgba(202, 138, 4, 0.15)' })
+          .margin({ bottom: 32 })
+
+          // ══ 操作按钮 ══
+          Column({ space: 12 }) {
+            // 回到首页
+            Button('回到首页')
+              .type(ButtonType.Normal)
+              .width('82%')
+              .height(48)
+              .fontSize(16)
+              .fontColor('#0F0F23')
+              .fontWeight(FontWeight.Bold)
+              .backgroundColor('#E5A50A')
+              .borderRadius(24)
+              .onClick(() => {
+                try {
+                  router.replaceUrl({ url: Routes.MAIN_FRAME });
+                } catch (_err) {
+                  // ignore
+                }
+              })
+
+            // 查看我的星历（跳转到我的页面的 tab=4）
+            Button('查看我的星历')
+              .type(ButtonType.Normal)
+              .width('82%')
+              .height(48)
+              .fontSize(16)
+              .fontColor('#E5D9B6')
+              .backgroundColor('rgba(202, 138, 4, 0.08)')
+              .border({ width: 1, color: 'rgba(202, 138, 4, 0.25)' })
+              .borderRadius(24)
+              .onClick(() => {
+                try {
+                  const options: router.RouterOptions = {
+                    url: Routes.MAIN_FRAME,
+                    params: { tab: 4 }
+                  };
+                  router.replaceUrl(options);
+                } catch (_err) {
+                  router.replaceUrl({ url: Routes.MAIN_FRAME });
+                }
+              })
+
+            // 再听星澜说一句（返回结果页继续探索）
+            Text('回到结果页')
+              .fontSize(14)
+              .fontColor('#94A3B8')
+              .textAlign(TextAlign.Center)
+              .width('82%')
+              .height(44)
+              .onClick(() => {
+                try {
+                  router.back();
+                } catch (_err) {
+                  router.replaceUrl({ url: Routes.MAIN_FRAME });
+                }
+              })
+          }
+          .width('100%')
+          .alignItems(HorizontalAlign.Center)
+          .margin({ bottom: 48 })
         }
         .width('100%')
         .alignItems(HorizontalAlign.Center)

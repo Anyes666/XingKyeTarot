@@ -89,7 +89,7 @@ struct OnboardingPage {
           .width('100%')
           .margin({ bottom: 16 })
       } else {
-        Text('单牌快占、圣三角、关系探索，会从不同角度帮你整理情绪和选择。')
+        Text('每日一占、圣三角、关系探索，会从不同角度帮你整理情绪和选择。')
           .fontSize(16)
           .fontColor(Theme.TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
@@ -116,7 +116,7 @@ struct OnboardingPage {
           .margin({ bottom: 24 })
       } else {
         Column() {
-          Text('单牌快占：30 秒，看见此刻心事')
+          Text('每日一占：30 秒，看见此刻心事')
             .fontSize(14)
             .fontColor(Theme.TEXT_SECONDARY)
             .margin({ bottom: 6 })

@@ -24,7 +24,7 @@ interface DivinationEntry {
 
 /**
  * Phase 6.1：占卜中心页
- * 把「单牌快占 / 圣三角牌阵 / 关系探索 / 历史查看」统一收进一级入口
+ * 把「每日一占 / 圣三角牌阵 / 关系探索 / 历史查看」统一收进一级入口
  */
 @Entry
 @Component
@@ -35,7 +35,7 @@ struct DivinationCenterPage {
     const entries: DivinationEntry[] = [
       {
         icon: '◇',
-        title: '单牌快占',
+        title: '每日一占',
         subtitle: '一句心事，一张星钥。',
         routeAction: (): void => {
           try {
@@ -105,11 +105,32 @@ struct DivinationCenterPage {
 
   build() {
     Stack() {
-      // 背景
+      // 沉浸式深空背景
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            [Theme.BG_DEEP_SPACE, 0.0],
+            [Theme.BG_DEEP_INDIGO, 0.55],
+            [Theme.BG_DEEP_INDIGO, 1.0]
+          ]
+        })
+
+      // 沉浸式顶部消隐渐变（融入状态栏）
+      Column()
+        .width('100%')
+        .height(Theme.IMMERSIVE_TOP_HEIGHT)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            [Theme.BG_DEEP_SPACE, 0.0],
+            ['rgba(15, 15, 35, 0)', 1.0]
+          ]
+        })
+        .hitTestBehavior(HitTestMode.Transparent)
+        .position({ x: 0, y: 0 })
 
       // 沉浸光感：底部金色径向光晕
       Column()
@@ -119,8 +140,8 @@ struct DivinationCenterPage {
           center: ['50%', '85%'],
           radius: '60%',
           colors: [
-            ['rgba(202, 138, 4, 0.03)', 0.0],
-            ['rgba(202, 138, 4, 0.015)', 0.4],
+            ['rgba(202, 138, 4, 0.04)', 0.0],
+            ['rgba(202, 138, 4, 0.02)', 0.45],
             ['rgba(0, 0, 0, 0)', 1.0]
           ]
         })
@@ -189,23 +210,18 @@ struct DivinationCenterPage {
                   .fontColor(Theme.GOLD_DIM)
               }
               .width('92%')
-              .padding(Theme.SPACE_MD)
+              .padding({ left: Theme.STARKEY_CARD_PADDING_H, right: Theme.STARKEY_CARD_PADDING_H, top: Theme.STARKEY_CARD_PADDING_V, bottom: Theme.STARKEY_CARD_PADDING_V })
               .margin({ bottom: Theme.SPACE_SM })
-              .backgroundColor('rgba(27, 27, 48, 0.68)')
-              .borderRadius(Theme.RADIUS_MD)
-              .border({ width: 1, color: 'rgba(216, 180, 90, 0.12)' })
-              .shadow({
-                radius: 6,
-                color: 'rgba(202, 138, 4, 0.06)',
-                offsetX: 0,
-                offsetY: 3
-              })
+              .backgroundColor(Theme.STARKEY_CARD_BG)
+              .borderRadius(Theme.STARKEY_CARD_RADIUS)
+              .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
+              .shadow(Theme.SHADOW_CARD_FLOAT)
               .scale({
-                x: this.pressedIndex === index ? 0.97 : 1.0,
-                y: this.pressedIndex === index ? 0.97 : 1.0
+                x: this.pressedIndex === index ? Theme.PRESS_SCALE : 1.0,
+                y: this.pressedIndex === index ? Theme.PRESS_SCALE : 1.0
               })
               .animation({
-                duration: 180,
+                duration: Theme.ANIM_PRESS_DURATION,
                 curve: Curve.EaseOut
               })
               .onTouch((event: TouchEvent) => {

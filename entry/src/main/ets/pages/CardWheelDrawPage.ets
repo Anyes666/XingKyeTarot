@@ -709,22 +709,29 @@ struct CardWheelDrawPage {
 
   build() {
     Stack() {
-      // 深蓝背景
+      // 沉浸式深空背景
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            [Theme.BG_DEEP_SPACE, 0.0],
+            [Theme.BG_DEEP_INDIGO, 0.55],
+            [Theme.BG_DEEP_INDIGO, 1.0]
+          ]
+        })
 
-      // 沉浸光感层：中心轻微金色径向渐变（透明度 4-6%）
+      // 沉浸光感层：中心柔和金色径向渐变（聚焦在牌轮区域）
       Column()
         .width('100%')
         .height('100%')
         .radialGradient({
-          center: ['50%', '48%'],
-          radius: '60%',
+          center: ['50%', '45%'],
+          radius: '55%',
           colors: [
-            ['rgba(229, 165, 10, 0.05)', 0.0],
-            ['rgba(229, 165, 10, 0.015)', 0.5],
+            ['rgba(229, 165, 10, 0.06)', 0.0],
+            ['rgba(229, 165, 10, 0.02)', 0.45],
             ['rgba(15, 15, 35, 0)', 1.0]
           ]
         })

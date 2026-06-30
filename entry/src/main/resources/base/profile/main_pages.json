@@ -36,6 +36,7 @@
     "pages/MaterialsLicensePage",
     "pages/CardWheelModePage",
     "pages/CardWheelDrawPage",
-    "pages/UsageGuidePage"
+    "pages/UsageGuidePage",
+    "pages/AvatarCropPage"
   ]
 }

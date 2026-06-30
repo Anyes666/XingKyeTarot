@@ -18,7 +18,7 @@ interface NavTabConfig {
  *   2. 星澜聊天
  *   3. 星澜语录
  *   4. 卡牌总览
- *   5. 设置
+ *   5. 我的
  *
  * 结构：
  *   外层 Stack（不 clip，高 88vp）
@@ -67,8 +67,8 @@ export struct CompanionBottomNav {
       }
     },
     {
-      icon: '⚙',
-      label: '设置',
+      icon: '☺',
+      label: '我的',
       onClick: (): void => {
         this.onTabChange(4);
       }

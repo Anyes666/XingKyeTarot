@@ -1,0 +1,25 @@
+> hvigor [33mWARN: 'C:\Windows\System32\wbem\wmic' 不是内部或外部命令，也不是可运行的程序
+或批处理文件。
+[39m
+> hvigor [91mERROR: AdaptorError: [31m00306054 Specification Limit Violation
+Error Message: Task [
+  '\\assembleHap\\',
+  '\\--mode\\',
+  '\\module\\',
+  '\\-p\\',
+  '\\module=entry@default\\',
+  '\\-p\\',
+  '\\product=default\\',
+  '\\--no-daemon\\'
+] was not found in the project XingKeyTarot. Invalid command to execute the build task, please verify the parameters in the command and try again.
+
+* Try the following:
+  > Run 'hvigorw --help' to learn more about hvigor command.
+  > Run 'hvigorw tasks' to get a list of available tasks.
+  > Run the command with '--info' or '--debug' option to get more log output.
+  > More info: https://developer.huawei.com/consumer/cn/doc/harmonyos-faqs/faqs-compiling-and-building-37
+[39m
+    at HvigorLogger.printErrorExit (D:\HarmonyOS\DevEco Studio\tools\hvigor\hvigor\src\base\log\hvigor-log.js:1:5087)
+    at D:\HarmonyOS\DevEco Studio\tools\hvigor\hvigor\src\base\internal\lifecycle\hvigor-process.js:1:7840
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async HvigorBuildProcess.<anonymous> (D:\HarmonyOS\DevEco Studio\tools\hvigor\hvigor\src\base\internal\lifecycle\hvigor-process.js:1:3081)[39m

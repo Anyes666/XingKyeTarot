@@ -212,12 +212,19 @@ struct TarotCardDetailPage {
   build() {
     Stack() {
       // ═══════════════════════════════════════════
-      // Layer 1: 背景
+      // Layer 1: 沉浸式深空背景
       // ═══════════════════════════════════════════
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            [Theme.BG_DEEP_SPACE, 0.0],
+            [Theme.BG_DEEP_INDIGO, 0.55],
+            [Theme.BG_DEEP_INDIGO, 1.0]
+          ]
+        })
 
       // ═══════════════════════════════════════════
       // Layer 2: 主内容
@@ -235,14 +242,15 @@ struct TarotCardDetailPage {
         if (this.card && this.reading) {
           Scroll() {
             Column() {
-              // ── 卡牌中图 ──
+              // ── 卡牌大图 ──
               Column() {
                 Image(this.getCardImageResource(this.card!))
                   .objectFit(ImageFit.Contain)
                   .height(320)
-                  .constraintSize({ maxWidth: '85%' })
-                  .borderRadius(Theme.RADIUS_SM)
-                  .border({ width: 1, color: Theme.GOLD_DIM, style: BorderStyle.Solid })
+                  .constraintSize({ maxWidth: '78%' })
+                  .borderRadius(Theme.TAROT_CARD_RADIUS)
+                  .border({ width: 1, color: 'rgba(232, 184, 61, 0.35)' })
+                  .shadow(Theme.SHADOW_CARD_HERO)
 
                 // 点击提示
                 Text('轻触查看大图')
@@ -464,9 +472,10 @@ struct TarotCardDetailPage {
         .width('100%')
     }
     .width('92%')
-    .backgroundColor('rgba(27, 27, 48, 0.52)')
-    .borderRadius(Theme.RADIUS_MD)
-    .padding(Theme.SPACE_MD)
+    .backgroundColor(Theme.STARKEY_CARD_BG)
+    .borderRadius(Theme.STARKEY_CARD_RADIUS)
+    .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
+    .padding({ left: Theme.STARKEY_CARD_PADDING_H, right: Theme.STARKEY_CARD_PADDING_H, top: Theme.STARKEY_CARD_PADDING_V, bottom: Theme.STARKEY_CARD_PADDING_V })
     .margin({ bottom: Theme.SPACE_SM })
   }
 }

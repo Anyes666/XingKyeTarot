@@ -22,7 +22,7 @@ export const SACRED_TRIANGLE_SPREAD: SpreadTemplate = {
 
 export const SINGLE_CARD_SPREAD: SpreadTemplate = {
   id: 'single_card',
-  name: '单牌快占',
+  name: '每日一占',
   positions: [
     { index: 0, name: '指引', meaning: '此刻最值得关注的一张牌' }
   ]

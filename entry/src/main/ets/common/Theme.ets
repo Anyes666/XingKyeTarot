@@ -60,6 +60,22 @@ export class Theme {
   // 危险操作红（MVP 新增）
   static readonly DANGER_RED: string = '#EF4444';
 
+  // ── 个人中心 / 头像新增 Token ──
+  static readonly AVATAR_BORDER: string = 'rgba(230, 168, 0, 0.65)';
+  static readonly AVATAR_GLOW: string = 'rgba(230, 168, 0, 0.15)';
+  static readonly CARD_BORDER_GOLD: string = 'rgba(212, 160, 42, 0.22)';
+  static readonly CARD_BORDER_GOLD_SUBTLE: string = 'rgba(212, 160, 42, 0.12)';
+  static readonly BUBBLE_BORDER: string = 'rgba(230, 168, 0, 0.18)';
+  static readonly BUBBLE_BG_XINGLAN: string = '#17172F';
+  static readonly CHIP_BG: string = 'rgba(202, 138, 4, 0.08)';
+  static readonly CHIP_BORDER: string = 'rgba(202, 138, 4, 0.2)';
+
+  // ── 头像相关尺寸 ──
+  static readonly AVATAR_CHAT_DIAMETER: number = 38;    // 聊天头像直径
+  static readonly AVATAR_PROFILE_DIAMETER: number = 88;  // 我的页面头像直径
+  static readonly AVATAR_BORDER_WIDTH: number = 2;       // 头像描边宽度
+  static readonly AVATAR_NAV_DIAMETER: number = 42;      // 导航栏星钥图标直径
+
   // ── 间距 ──
   static readonly SPACE_XS: number = 4;
   static readonly SPACE_SM: number = 8;
@@ -127,6 +143,73 @@ export class Theme {
   static readonly ANIM_SLIDE_UP: number = 350;
   static readonly ANIM_STAR_TWINKLE: number = 2000;
 
+  // ── 空间感美化专项：动效 Token ──
+  /** 卡片按压缩放 */
+  static readonly PRESS_SCALE: number = 0.97;
+  /** 按压动画时长 ms */
+  static readonly ANIM_PRESS_DURATION: number = 140;
+  /** 页面元素淡入时长 */
+  static readonly ANIM_ENTER_FADE: number = 200;
+  /** 弹窗滑出时长 */
+  static readonly ANIM_SHEET_SLIDE: number = 220;
+  /** 聊天气泡淡入时长 */
+  static readonly ANIM_BUBBLE_FADE: number = 180;
+  /** 卡牌详情放大进入 */
+  static readonly ANIM_CARD_ZOOM_IN: number = 240;
+
+  // ── 空间感美化专项：背景 Token ──
+  /** 沉浸式顶部渐变：深蓝星空 → 透明（从顶部向下 120vp） */
+  static readonly IMMERSIVE_TOP_HEIGHT: number = 120;
+  /** 深空背景色（比 BG_DEEP_INDIGO 更深） */
+  static readonly BG_DEEP_SPACE: string = '#050714';
+  /** 星空面板半透明底色 */
+  static readonly BG_STAR_PANEL: string = 'rgba(15, 15, 35, 0.75)';
+
+  // ── 空间感美化专项：阴影 Token ──
+  /** 卡片悬浮阴影 */
+  static readonly SHADOW_CARD_FLOAT: ShadowOptions = {
+    radius: 16,
+    color: 'rgba(0, 0, 0, 0.35)',
+    offsetX: 0,
+    offsetY: 4
+  };
+  /** 卡片轻微阴影 */
+  static readonly SHADOW_CARD_SUBTLE: ShadowOptions = {
+    radius: 8,
+    color: 'rgba(0, 0, 0, 0.25)',
+    offsetX: 0,
+    offsetY: 2
+  };
+  /** 头像柔光外圈阴影 */
+  static readonly SHADOW_AVATAR_GLOW: ShadowOptions = {
+    radius: 14,
+    color: 'rgba(230, 168, 0, 0.18)',
+    offsetX: 0,
+    offsetY: 0
+  };
+  /** 大牌图悬浮阴影 */
+  static readonly SHADOW_CARD_HERO: ShadowOptions = {
+    radius: 24,
+    color: 'rgba(202, 138, 4, 0.1)',
+    offsetX: 0,
+    offsetY: 6
+  };
+
+  // ── 空间感美化专项：金色光感 Token ──
+  /** 卡片顶部金色光斑（径向渐变起点色） */
+  static readonly GLOW_GOLD_TOP: string = 'rgba(202, 138, 4, 0.04)';
+  /** 卡片底部深色 */
+  static readonly GLOW_CARD_BOTTOM: string = 'rgba(0, 0, 0, 0)';
+  /** 头像金色外发光色 */
+  static readonly GLOW_AVATAR_OUTER: string = 'rgba(230, 168, 0, 0.2)';
+
+  // ── 空间感美化专项：星钥卡片统一样式 Token ──
+  static readonly STARKEY_CARD_BG: string = 'rgba(20, 22, 45, 0.72)';
+  static readonly STARKEY_CARD_BORDER: string = 'rgba(216, 180, 90, 0.1)';
+  static readonly STARKEY_CARD_RADIUS: number = 20;
+  static readonly STARKEY_CARD_PADDING_H: number = 20;
+  static readonly STARKEY_CARD_PADDING_V: number = 18;
+
   /**
    * 生成星空渐变背景色值（从上到下）
    */
@@ -139,5 +222,26 @@ export class Theme {
    */
   static goldButtonGradient(): string {
     return `linear-gradient(135deg, ${Theme.GOLD} 0%, ${Theme.GOLD_DIM} 100%)`;
+  }
+
+  /**
+   * 生成沉浸式深空背景渐变（从上到下，顶部更深，融入状态栏）
+   */
+  static deepSpaceGradient(): string {
+    return `linear-gradient(180deg, ${Theme.BG_DEEP_SPACE} 0%, ${Theme.BG_DEEP_INDIGO} 55%, ${Theme.BG_DEEP_INDIGO} 100%)`;
+  }
+
+  /**
+   * 生成沉浸式顶部消隐渐变（状态栏区域 → 透明）
+   */
+  static immersiveTopFade(): string {
+    return `linear-gradient(180deg, ${Theme.BG_DEEP_SPACE} 0%, rgba(15, 15, 35, 0) 100%)`;
+  }
+
+  /**
+   * 生成星钥卡片顶部金色微光渐变
+   */
+  static starkeyCardGlow(): string {
+    return `linear-gradient(180deg, ${Theme.GLOW_GOLD_TOP} 0%, ${Theme.GLOW_CARD_BOTTOM} 30%)`;
   }
 }

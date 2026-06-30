@@ -103,11 +103,18 @@ struct TarotCardsPage {
 
   build() {
     Stack() {
-      // 背景
+      // 沉浸式深空背景
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            [Theme.BG_DEEP_SPACE, 0.0],
+            [Theme.BG_DEEP_INDIGO, 0.55],
+            [Theme.BG_DEEP_INDIGO, 1.0]
+          ]
+        })
 
       Column() {
         // 顶部安全区 + 返回按钮
@@ -222,10 +229,11 @@ struct TarotCardsPage {
                     .fontColor(Theme.GOLD_DIM)
                 }
                 .width('100%')
-                .padding(Theme.SPACE_MD)
+                .padding({ left: Theme.STARKEY_CARD_PADDING_H, right: Theme.STARKEY_CARD_PADDING_H, top: Theme.SPACE_SM, bottom: Theme.SPACE_SM })
                 .alignItems(VerticalAlign.Center)
-                .backgroundColor('rgba(27, 27, 48, 0.52)')
-                .borderRadius(Theme.RADIUS_SM)
+                .backgroundColor(Theme.STARKEY_CARD_BG)
+                .borderRadius(Theme.STARKEY_CARD_RADIUS)
+                .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
                 .margin({ bottom: 6, left: Theme.SPACE_MD, right: Theme.SPACE_MD })
                 .onClick(() => {
                   this.navigateToDetail(card);

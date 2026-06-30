@@ -55,7 +55,7 @@ struct UsageGuidePage {
     {
       icon: '\u266B',
       title: '\u80CC\u666F\u97F3\u4E50\u4E0E\u8BBE\u7F6E',
-      body: '\u5728\u300C\u8BBE\u7F6E\u300D\u9875\uFF0C\u4F60\u53EF\u4EE5\u5F00\u542F\u6216\u5173\u95ED\u80CC\u666F\u97F3\u4E50\u3002\u5F00\u542F\u540E\uFF0C\u661F\u94A5\u5854\u7F57\u4F1A\u64AD\u653E\u4E00\u9996\u4F4E\u97F3\u91CF\u7684\u5168\u5C40\u4E3B\u65CB\u5F8B\u3002\n\n\u6B64\u5916\uFF0C\u8BBE\u7F6E\u9875\u8FD8\u63D0\u4F9B\u4E86\uFF1A\n\u25C7 \u91CD\u65B0\u542C\u542C\u661F\u6F9C\u7684\u4ECB\u7ECD \u2014 \u8BA9\u661F\u6F9C\u91CD\u65B0\u966A\u4F60\u8D70\u4E00\u904D\u9996\u6B21\u5F15\u5BFC\u3002\n\u25C7 \u4F7F\u7528\u8BF4\u660E \u2014 \u5C31\u662F\u4F60\u73B0\u5728\u5728\u770B\u7684\u8FD9\u4E2A\u9875\u9762\u3002\n\u25C7 \u5173\u4E8E\u661F\u94A5\u5854\u7F57 \u2014 \u7248\u672C\u4FE1\u606F\u3001\u9690\u79C1\u653F\u7B56\u3001\u7528\u6237\u534F\u8BAE\u3001\u7D20\u6750\u4E0E\u6388\u6743\u3002'
+      body: '\u5728\u300C\u6211\u7684\u300D\u9875\uFF0C\u4F60\u53EF\u4EE5\u70B9\u51FB\u5934\u50CF\u8FDB\u884C\u66F4\u6362\uFF0C\u4ECE\u76F8\u518C\u9009\u62E9\u56FE\u7247\u5E76\u5728\u5E94\u7528\u5185\u8FDB\u884C\u88C1\u526A\u3002\u5934\u50CF\u4EC5\u7528\u4E8E\u672C\u5730\u5C55\u793A\uFF0C\u4E0D\u4F1A\u4E0A\u4F20\u4E91\u7AEF\uFF1B\u4E5F\u53EF\u4EE5\u968F\u65F6\u6062\u590D\u9ED8\u8BA4\u5934\u50CF\u3002\n\n\u4F60\u4E5F\u53EF\u4EE5\u5F00\u542F\u6216\u5173\u95ED\u80CC\u666F\u97F3\u4E50\u3002\u5F00\u542F\u540E\uFF0C\u661F\u94A5\u5854\u7F57\u4F1A\u64AD\u653E\u4E00\u9996\u4F4E\u97F3\u91CF\u7684\u5168\u5C40\u4E3B\u65CB\u5F8B\u3002\n\n\u6B64\u5916\uFF0C\u8BBE\u7F6E\u9875\u8FD8\u63D0\u4F9B\u4E86\uFF1A\n\u25C7 \u91CD\u65B0\u542C\u542C\u661F\u6F9C\u7684\u4ECB\u7ECD \u2014 \u8BA9\u661F\u6F9C\u91CD\u65B0\u966A\u4F60\u8D70\u4E00\u904D\u9996\u6B21\u5F15\u5BFC\u3002\n\u25C7 \u4F7F\u7528\u8BF4\u660E \u2014 \u5C31\u662F\u4F60\u73B0\u5728\u5728\u770B\u7684\u8FD9\u4E2A\u9875\u9762\u3002\n\u25C7 \u5173\u4E8E\u661F\u94A5\u5854\u7F57 \u2014 \u7248\u672C\u4FE1\u606F\u3001\u9690\u79C1\u653F\u7B56\u3001\u7528\u6237\u534F\u8BAE\u3001\u7D20\u6750\u4E0E\u6388\u6743\u3002'
     },
     {
       icon: '\u2606',
@@ -106,20 +106,28 @@ struct UsageGuidePage {
         .textAlign(TextAlign.Start)
     }
     .width('100%')
-    .padding({ top: 20, bottom: 20, left: 20, right: 20 })
-    .backgroundColor('rgba(27, 27, 48, 0.68)')
-    .borderRadius(Theme.RADIUS_MD)
-    .border({ width: 1, color: 'rgba(216, 180, 90, 0.12)' })
+    .padding({ top: Theme.STARKEY_CARD_PADDING_V, bottom: Theme.STARKEY_CARD_PADDING_V, left: Theme.STARKEY_CARD_PADDING_H, right: Theme.STARKEY_CARD_PADDING_H })
+    .backgroundColor(Theme.STARKEY_CARD_BG)
+    .borderRadius(Theme.STARKEY_CARD_RADIUS)
+    .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
+    .shadow(Theme.SHADOW_CARD_SUBTLE)
     .margin({ bottom: Theme.SPACE_MD })
   }
 
   build() {
     Stack() {
-      // 背景
+      // 沉浸式深空背景
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            [Theme.BG_DEEP_SPACE, 0.0],
+            [Theme.BG_DEEP_INDIGO, 0.55],
+            [Theme.BG_DEEP_INDIGO, 1.0]
+          ]
+        })
 
       // 主内容
       Column() {

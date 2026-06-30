@@ -1435,7 +1435,14 @@ struct HomePage {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor('#030716')
+    .linearGradient({
+      direction: GradientDirection.Bottom,
+      colors: [
+        [Theme.BG_DEEP_SPACE, 0.0],
+        ['#030716', 0.55],
+        ['#030716', 1.0]
+      ]
+    })
     .alignContent(Alignment.TopStart)
   }
 }

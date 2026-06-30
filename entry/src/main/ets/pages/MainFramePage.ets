@@ -8,7 +8,10 @@ import { TAROT_CARDS } from '../data/TarotCardData';
 import { TarotCard, ArcanaType, TarotSuit } from '../model/TarotCard';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { GlobalBgmManager } from '../common/GlobalBgmManager';
+import { UserProfileStore } from '../common/UserProfileStore';
+import { EmotionStarStorage, EmotionStarRecord, StarKeyLevel, NextLevelInfo } from '../common/EmotionStarStorage';
 import { common } from '@kit.AbilityKit';
+import { photoAccessHelper } from '@kit.MediaLibraryKit';
 
 /**
  * Phase 6.8：主框架页面 — 底部导航容器
@@ -18,7 +21,7 @@ import { common } from '@kit.AbilityKit';
  *   1. 星澜聊天 (XinglanChatPage)
  *   2. 星澜语录 (HomePage)
  *   3. 卡牌总览 (TarotCardsPage)
- *   4. 设置 (SettingsPage)
+ *   4. 我的 (SettingsPage)
  *
  * 只渲染当前 tab 内容，避免一次性构建所有页面导致卡顿。
  * 底部导航 CompanionBottomNav 通过 onTabChange 回调驱动 currentTab 切换。
@@ -96,16 +99,7 @@ struct MainFramePage {
     if (index < 0 || index > 4) {
       return;
     }
-    // Tab 1（星澜聊天）：直接 push 独立聊天页，不切换 MainFrame 内容
-    if (index === 1) {
-      try {
-        const options: router.RouterOptions = { url: Routes.XINGLAN_CHAT };
-        router.pushUrl(options);
-      } catch (_err) {
-        // ignore
-      }
-      return;
-    }
+    // Tab 1（星澜聊天）：切换到入口页（XinglanChatTabContent），不再直接进入聊天页
     if (this.currentTab === index) {
       return;
     }
@@ -240,7 +234,7 @@ struct DivinationCenterTabContent {
     const entries: DivinationEntry[] = [
       {
         icon: '◇',
-        title: '单牌快占',
+        title: '每日一占',
         subtitle: '一句心事，一张星钥。',
         routeAction: (): void => {
           try {
@@ -410,84 +404,195 @@ struct DivinationCenterTabContent {
 
 @Component
 struct XinglanChatTabContent {
+  @State private buttonPressed: boolean = false;
+
+  private static readonly GOLD_CAPSULE_BG: string = '#E5A50A';
+  private static readonly GOLD_CAPSULE_PRESSED: string = '#CA8A04';
+  private static readonly ENTRY_CARD_BG: string = 'rgba(26, 26, 48, 0.72)';
+  private static readonly ENTRY_CARD_BORDER: string = 'rgba(216, 180, 90, 0.14)';
+
   build() {
     Stack() {
+      // ═══════════════════════════════════════════
+      // Layer 1: 深空渐变背景
+      // ═══════════════════════════════════════════
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
-
-      Column() {
-        // 顶部安全区
-        Column()
-          .width('100%')
-          .height(Theme.SAFE_TOP + 16)
-          .backgroundColor(Theme.BG_DEEP_INDIGO)
-
-        // 标题
-        Text('星澜聊天')
-          .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.GOLD_LIGHT)
-          .fontWeight(FontWeight.Bold)
-          .textAlign(TextAlign.Center)
-          .width('100%')
-          .margin({ top: Theme.SPACE_MD })
-
-        Text('和星澜说说话，不用想太多。')
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.MOON_MUTED)
-          .textAlign(TextAlign.Center)
-          .width('100%')
-          .margin({ top: Theme.SPACE_SM, bottom: Theme.SPACE_LG })
-
-        // 进入聊天按钮
-        Column() {
-          Text('◉')
-            .fontSize(48)
-            .fontColor('#E8B83D')
-            .margin({ bottom: Theme.SPACE_MD })
-
-          Text('进入星澜聊天')
-            .fontSize(Theme.FONT_SUBTITLE)
-            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
-            .fontWeight(FontWeight.Medium)
-            .margin({ bottom: Theme.SPACE_SM })
-
-          Text('星澜会倾听你的心事，陪你慢慢聊。')
-            .fontSize(Theme.FONT_CAPTION)
-            .fontColor(Theme.MOON_MUTED)
-            .textAlign(TextAlign.Center)
-            .lineHeight(20)
-        }
-        .width('92%')
-        .backgroundColor('rgba(27, 27, 48, 0.68)')
-        .borderRadius(Theme.RADIUS_MD)
-        .border({ width: 1, color: 'rgba(216, 180, 90, 0.18)' })
-        .padding({ top: 36, bottom: 36, left: Theme.SPACE_MD, right: Theme.SPACE_MD })
-        .alignItems(HorizontalAlign.Center)
-        .margin({ top: Theme.SPACE_LG })
-        .onClick(() => {
-          try {
-            const options: router.RouterOptions = { url: Routes.XINGLAN_CHAT };
-            router.pushUrl(options);
-          } catch (_err) {
-            // ignore
-          }
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            [Theme.BG_DEEP_SPACE, 0.0],
+            [Theme.BG_DEEP_INDIGO, 0.45],
+            ['#0A0D20', 1.0]
+          ]
         })
 
-        Blank()
+      // ═══════════════════════════════════════════
+      // Layer 2: 星点装饰（用背景图片呈现星空感）
+      // ═══════════════════════════════════════════
+      Image($r('app.media.xinglan_home_main'))
+        .objectFit(ImageFit.Cover)
+        .width('100%')
+        .height('60%')
+        .position({ x: 0, y: '26%' })
+        .opacity(0.35)
+        .hitTestBehavior(HitTestMode.Transparent)
 
-        Text(Constants.COMPLIANCE_FOOTER)
-          .fontSize(11)
-          .fontColor(Theme.MOON_MUTED)
-          .textAlign(TextAlign.Center)
-          .lineHeight(16)
+      // ═══════════════════════════════════════════
+      // Layer 3: 渐变遮罩（上下消隐）
+      // ═══════════════════════════════════════════
+      Column()
+        .width('100%')
+        .height('100%')
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            ['rgba(5, 7, 20, 0.92)', 0.0],
+            ['rgba(15, 15, 35, 0.55)', 0.12],
+            ['rgba(15, 15, 35, 0.08)', 0.30],
+            ['rgba(15, 15, 35, 0.04)', 0.50],
+            ['rgba(10, 13, 32, 0.35)', 0.72],
+            ['#0A0D20', 1.0]
+          ]
+        })
+        .hitTestBehavior(HitTestMode.Transparent)
+
+      // ═══════════════════════════════════════════
+      // Layer 4: 主内容区
+      // ═══════════════════════════════════════════
+      Scroll() {
+        Column() {
+          // 顶部安全间距
+          Column()
+            .width('100%')
+            .height(Theme.SAFE_TOP + 20)
+
+          // 标题
+          Text('星澜聊天')
+            .fontSize(Theme.FONT_HEADLINE)
+            .fontColor(Theme.GOLD_LIGHT)
+            .fontWeight(FontWeight.Bold)
+            .textAlign(TextAlign.Center)
+            .width('100%')
+            .margin({ top: Theme.SPACE_LG })
+
+          // 副标题
+          Text('慢慢说，星澜会先听你说完。')
+            .fontSize(Theme.FONT_BODY)
+            .fontColor(Theme.MOON_MUTED)
+            .textAlign(TextAlign.Center)
+            .width('100%')
+            .margin({ top: Theme.SPACE_SM, bottom: Theme.SPACE_XXL })
+
+          // ═══ 星澜形象区 ═══
+          Column() {
+            // 星澜圆形头像
+            Image($r('app.media.app_icon5'))
+              .width(88)
+              .height(88)
+              .borderRadius(44)
+              .objectFit(ImageFit.Cover)
+              .clip(true)
+              .border({ width: 2.5, color: 'rgba(232, 184, 61, 0.55)' })
+              .shadow({
+                radius: 22,
+                color: 'rgba(230, 168, 0, 0.22)',
+                offsetX: 0,
+                offsetY: 0
+              })
+              .margin({ bottom: 20 })
+
+            // 星澜名字
+            Text('星澜在这里')
+              .fontSize(20)
+              .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+              .fontWeight(FontWeight.Medium)
+              .margin({ bottom: 16 })
+
+            // 引导文案
+            Text('你可以慢慢说。\n星澜不会替你判断，也不会催你变好。\n这里，只陪你把心里的话放下来一点。')
+              .fontSize(Theme.FONT_BODY)
+              .fontColor(Theme.GOLD_PALE)
+              .lineHeight(26)
+              .textAlign(TextAlign.Center)
+              .maxLines(5)
+              .width('86%')
+          }
           .width('100%')
-          .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, bottom: 12 })
+          .alignItems(HorizontalAlign.Center)
+          .margin({ bottom: Theme.SPACE_XXL })
+
+          // ═══ 进入聊天按钮 ═══
+          Column() {
+            Text('进入星澜聊天')
+              .fontSize(17)
+              .fontColor('#0A0D20')
+              .fontWeight(FontWeight.Bold)
+              .width('100%')
+              .height(56)
+              .textAlign(TextAlign.Center)
+              .backgroundColor(this.buttonPressed ?
+                XinglanChatTabContent.GOLD_CAPSULE_PRESSED :
+                XinglanChatTabContent.GOLD_CAPSULE_BG)
+              .borderRadius(Theme.RADIUS_FULL)
+              .shadow({
+                radius: this.buttonPressed ? 8 : 16,
+                color: this.buttonPressed ?
+                  'rgba(202, 138, 4, 0.35)' :
+                  'rgba(202, 138, 4, 0.45)',
+                offsetX: 0,
+                offsetY: this.buttonPressed ? 1 : 3
+              })
+              .scale({ x: this.buttonPressed ? 0.98 : 1, y: this.buttonPressed ? 0.98 : 1 })
+              .animation({ duration: 140, curve: Curve.EaseOut })
+              .onTouch((event: TouchEvent) => {
+                if (event.type === TouchType.Down) {
+                  this.buttonPressed = true;
+                } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+                  this.buttonPressed = false;
+                  if (event.type === TouchType.Up) {
+                    try {
+                      const options: router.RouterOptions = { url: Routes.XINGLAN_CHAT };
+                      router.pushUrl(options);
+                    } catch (_err) {
+                      // ignore
+                    }
+                  }
+                }
+              })
+          }
+          .width('82%')
+          .alignItems(HorizontalAlign.Center)
+          .margin({ bottom: 14 })
+
+          // 按钮副文案
+          Text('开始一段安静的对话')
+            .fontSize(Theme.FONT_CAPTION)
+            .fontColor(Theme.MOON_MUTED)
+            .opacity(0.65)
+            .textAlign(TextAlign.Center)
+            .margin({ bottom: Theme.SPACE_XXL })
+
+          Blank()
+
+          // ═══ 免责声明 ═══
+          Text('星澜的回应仅供陪伴与自我探索参考，不构成任何专业建议。')
+            .fontSize(11)
+            .fontColor(Theme.MOON_MUTED)
+            .opacity(0.55)
+            .textAlign(TextAlign.Center)
+            .lineHeight(16)
+            .width('100%')
+            .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, bottom: 16 })
+        }
+        .width('100%')
+        .alignItems(HorizontalAlign.Center)
       }
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
       .width('100%')
       .height('100%')
-      .alignItems(HorizontalAlign.Center)
     }
     .width('100%')
     .height('100%')
@@ -631,22 +736,37 @@ struct XinglanQuotesTabContent {
 
         // 语录滚动区
         Scroll(this.scroller) {
-          Column({ space: 10 }) {
+          Column({ space: 12 }) {
             ForEach(this.quoteList, (quote: string, index: number) => {
-              Text(quote)
-                .fontSize(16)
-                .fontColor(Theme.TEXT_PRIMARY_LIGHT)
-                .lineHeight(24)
-                .backgroundColor('rgba(27, 27, 48, 0.68)')
-                .borderRadius(16)
-                .padding({ left: 14, right: 14, top: 12, bottom: 12 })
-                .constraintSize({ maxWidth: '80%' })
-                .alignSelf(ItemAlign.Start)
+              // 星澜气泡 — 左侧排列，金色细边
+              Row() {
+                Image($r('app.media.app_icon5'))
+                  .width(34)
+                  .height(34)
+                  .borderRadius(17)
+                  .border({ width: 1.5, color: 'rgba(232, 184, 61, 0.45)' })
+                  .objectFit(ImageFit.Cover)
+                  .margin({ right: 10 })
+
+                Text(quote)
+                  .fontSize(16)
+                  .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                  .lineHeight(24)
+                  .backgroundColor('rgba(27, 27, 48, 0.68)')
+                  .border({ width: 1, color: 'rgba(202, 138, 4, 0.15)' })
+                  .borderRadius({ topLeft: 4, topRight: 16, bottomLeft: 16, bottomRight: 16 })
+                  .padding({ left: 14, right: 14, top: 12, bottom: 12 })
+                  .constraintSize({ maxWidth: '64%' })
+
+                Blank()
+              }
+              .width('100%')
+              .alignItems(VerticalAlign.Top)
             }, (quote: string, index: number) => 'ql_' + index.toString() + '_' + quote.substring(0, 4))
           }
           .width('100%')
           .alignItems(HorizontalAlign.Start)
-          .padding({ top: 36, bottom: 12, left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD })
+          .padding({ top: 28, bottom: 12, left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD })
         }
         .width('100%')
         .layoutWeight(1)
@@ -659,6 +779,7 @@ struct XinglanQuotesTabContent {
         Text('轻触上方区域，星澜会回应你。')
           .fontSize(12)
           .fontColor(Theme.MOON_MUTED)
+          .opacity(0.7)
           .textAlign(TextAlign.Center)
           .width('100%')
           .padding({ bottom: 12 })
@@ -878,8 +999,9 @@ struct TarotCardsTabContent {
                 .padding(Theme.SPACE_MD)
                 .alignItems(VerticalAlign.Center)
                 .backgroundColor('rgba(27, 27, 48, 0.52)')
-                .borderRadius(Theme.RADIUS_SM)
-                .margin({ bottom: 6, left: Theme.SPACE_MD, right: Theme.SPACE_MD })
+                .border({ width: 1, color: 'rgba(212, 160, 42, 0.12)' })
+                .borderRadius(Theme.RADIUS_MD)
+                .margin({ bottom: 8, left: Theme.SPACE_MD, right: Theme.SPACE_MD })
                 .onClick(() => {
                   this.navigateToDetail(card);
                 })
@@ -905,39 +1027,280 @@ struct TarotCardsTabContent {
 }
 
 // ═══════════════════════════════════════════════════════════
-// Tab 4: 设置
+// Tab 4: 我的（原设置页升级为个人中心）
 // ═══════════════════════════════════════════════════════════
 
 @Component
 struct SettingsTabContent {
   @State isResetting: boolean = false;
   @State bgmEnabled: boolean = true;
+  @State avatarUri: string = '';
+  @State nickname: string = '未命名旅者';
+  @State level: string = '初见';
+  /** 头像操作面板可见 */
+  @State showAvatarSheet: boolean = false;
+  /** 是否正在选择图片 */
+  @State isPickingPhoto: boolean = false;
   /** 用于抑制 loadBgmEnabled 中程序化 @State 更新触发的 Toggle.onChange */
   private isLoadingBgmState: boolean = false;
+  private isProfileLoaded: boolean = false;
+
+  // ── 星澜星历状态 ──
+  @State starRecords: EmotionStarRecord[] = [];
+  @State cumulativeLightDays: number = 0;
+  @State streakDays: number = 0;
+  @State nextLevelTitle: string = '星火初亮';
+  @State daysToNextLevel: number = 1;
+  @State isMaxLevel: boolean = false;
+  @State isTodayLit: boolean = false;
+
+  // ── 可翻页日历状态 ──
+  @State visibleYear: number = 0;        // 当前显示的年份，0 表示未初始化
+  @State visibleMonth: number = 0;       // 当前显示的月份，0 表示未初始化
+  @State currentYear: number = 0;        // 真实今天的年份
+  @State currentMonth: number = 0;       // 真实今天的月份
+  @State calendarDays: number[] = [];
+  @State calendarOffset: number = 0;
+  @State visibleMonthRecords: EmotionStarRecord[] = [];
+  @State visibleMonthLightDays: number = 0;
+
+  // ── 日期详情弹窗 ──
+  @State selectedDateKey: string = '';
+  @State selectedRecord: EmotionStarRecord | null = null;
+  @State showDateDetail: boolean = false;
 
   aboutToAppear(): void {
     this.loadBgmEnabled();
+    this.loadProfile();
+    this.loadStarCalendar();
+  }
+
+  /**
+   * 加载星澜星历数据（每次页面出现都刷新）
+   * visibleYear/visibleMonth 只在首次初始化时设为当前月份，翻页后刷新保持不变
+   */
+  private async loadStarCalendar(): Promise<void> {
+    try {
+      const records: EmotionStarRecord[] = await EmotionStarStorage.getRecords(getContext(this));
+      this.starRecords = records;
+
+      // 今天日期（全局参考）
+      const today: Date = new Date();
+      this.currentYear = today.getFullYear();
+      this.currentMonth = today.getMonth() + 1;
+
+      // 首次加载时 visible 初始化为当前月
+      if (this.visibleMonth === 0) {
+        this.visibleYear = this.currentYear;
+        this.visibleMonth = this.currentMonth;
+      }
+
+      // 全局统计（不受翻页影响）
+      this.isTodayLit = await EmotionStarStorage.hasLightedToday(getContext(this));
+      this.cumulativeLightDays = EmotionStarStorage.getTotalLightDays(records);
+      this.streakDays = EmotionStarStorage.getCurrentStreakDays(records);
+
+      // 等级
+      const level: StarKeyLevel = EmotionStarStorage.getLevelByTotalDays(this.cumulativeLightDays);
+      this.level = level.title;
+
+      // 下一等级
+      const nextInfo: NextLevelInfo = EmotionStarStorage.getNextLevelInfo(this.cumulativeLightDays);
+      this.nextLevelTitle = nextInfo.title;
+      this.daysToNextLevel = nextInfo.daysLeft;
+      this.isMaxLevel = nextInfo.isMaxLevel;
+
+      // 刷新可见月份数据
+      this.refreshVisibleMonth();
+    } catch (_err) {
+      // keep defaults
+    }
+  }
+
+  /**
+   * 根据 visibleYear/visibleMonth 刷新日历格子和本月统计
+   */
+  private refreshVisibleMonth(): void {
+    if (this.visibleMonth === 0) {
+      return;
+    }
+    this.visibleMonthRecords = EmotionStarStorage.getMonthRecords(
+      this.starRecords, this.visibleYear, this.visibleMonth
+    );
+    // 按日期倒序（最新的在前，用于历史列表）
+    this.visibleMonthRecords = [...this.visibleMonthRecords].sort(
+      (a: EmotionStarRecord, b: EmotionStarRecord) => {
+        if (a.date > b.date) {
+          return -1;
+        }
+        if (a.date < b.date) {
+          return 1;
+        }
+        return 0;
+      }
+    );
+    this.visibleMonthLightDays = this.visibleMonthRecords.length;
+    this.generateCalendar();
+  }
+
+  /**
+   * 生成可见月份日历数据
+   */
+  private generateCalendar(): void {
+    const daysInMonth: number = EmotionStarStorage.getDaysInMonth(this.visibleYear, this.visibleMonth);
+    const firstDayOfWeek: number = EmotionStarStorage.getFirstDayOfWeek(this.visibleYear, this.visibleMonth);
+
+    this.calendarOffset = firstDayOfWeek;
+    this.calendarDays = [];
+    for (let i = 1; i <= daysInMonth; i++) {
+      this.calendarDays.push(i);
+    }
+  }
+
+  /**
+   * 判断可见月份中日历某个日期是否已点亮
+   */
+  private isDayLit(day: number): boolean {
+    const dateStr: string = EmotionStarStorage.formatDateString(this.visibleYear, this.visibleMonth, day);
+    for (let i = 0; i < this.starRecords.length; i++) {
+      if (this.starRecords[i].date === dateStr) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // ── 月份翻页 ──
+
+  private goToPreviousMonth(): void {
+    if (this.visibleMonth <= 1) {
+      this.visibleMonth = 12;
+      this.visibleYear -= 1;
+    } else {
+      this.visibleMonth -= 1;
+    }
+    this.reloadVisibleMonth();
+  }
+
+  private goToNextMonth(): void {
+    let nextMonth: number = this.visibleMonth + 1;
+    let nextYear: number = this.visibleYear;
+    if (nextMonth > 12) {
+      nextMonth = 1;
+      nextYear += 1;
+    }
+    this.visibleMonth = nextMonth;
+    this.visibleYear = nextYear;
+    this.reloadVisibleMonth();
+  }
+
+  /**
+   * 当前是否在查看未来月份
+   */
+  private isViewingFutureMonth(): boolean {
+    return EmotionStarStorage.compareYearMonth(
+      this.visibleYear, this.visibleMonth, this.currentYear, this.currentMonth
+    ) > 0;
+  }
+
+  private goToCurrentMonth(): void {
+    if (this.visibleYear === this.currentYear && this.visibleMonth === this.currentMonth) {
+      return;
+    }
+    this.visibleYear = this.currentYear;
+    this.visibleMonth = this.currentMonth;
+    this.reloadVisibleMonth();
+  }
+
+  private isViewingCurrentMonth(): boolean {
+    return this.visibleYear === this.currentYear && this.visibleMonth === this.currentMonth;
+  }
+
+  private async reloadVisibleMonth(): Promise<void> {
+    try {
+      const records: EmotionStarRecord[] = await EmotionStarStorage.getRecords(getContext(this));
+      this.starRecords = records;
+      this.refreshVisibleMonth();
+    } catch (_err) {
+      // ignore
+    }
+  }
+
+  // ── 日期详情弹窗 ──
+
+  /**
+   * 检查可见月份中某个日期是否属于未来
+   */
+  private dayIsFuture(day: number): boolean {
+    const dateKey: string = EmotionStarStorage.formatDateString(this.visibleYear, this.visibleMonth, day);
+    return EmotionStarStorage.isFutureDate(dateKey);
+  }
+
+  /**
+   * 当前选中的日期详情是否指向今天
+   */
+  private isSelectedDateToday(): boolean {
+    return this.selectedDateKey === EmotionStarStorage.todayString();
+  }
+
+  private isSelectedDateFuture(): boolean {
+    return EmotionStarStorage.isFutureDate(this.selectedDateKey);
+  }
+
+  private handleDateClick(day: number): void {
+    const dateKey: string = EmotionStarStorage.formatDateString(this.visibleYear, this.visibleMonth, day);
+    this.selectedDateKey = dateKey;
+    this.selectedRecord = EmotionStarStorage.getRecordByDate(this.starRecords, dateKey);
+    this.showDateDetail = true;
+  }
+
+  private handleHistoryItemClick(record: EmotionStarRecord): void {
+    this.selectedDateKey = record.date;
+    this.selectedRecord = record;
+    this.showDateDetail = true;
+  }
+
+  private closeDateDetail(): void {
+    this.showDateDetail = false;
+    this.selectedDateKey = '';
+    this.selectedRecord = null;
+  }
+
+  private async loadProfile(): Promise<void> {
+    if (this.isProfileLoaded) {
+      // 昵称和等级只加载一次，但头像总是刷新
+      try {
+        this.avatarUri = await UserProfileStore.getAvatarUri(getContext(this));
+      } catch (_err) {
+        // keep current
+      }
+      return;
+    }
+    this.isProfileLoaded = true;
+    try {
+      this.avatarUri = await UserProfileStore.getAvatarUri(getContext(this));
+      this.nickname = await UserProfileStore.getNickname(getContext(this));
+      this.level = await UserProfileStore.getLevel(getContext(this));
+    } catch (_err) {
+      // keep defaults
+    }
   }
 
   private async loadBgmEnabled(): Promise<void> {
     try {
       const enabled: boolean = await PreferenceStore.getBoolean('bgm_enabled', true, getContext(this));
-      // 抑制 onChange 触发：先设 flag，再更新 @State，防止 Toggle 误认为用户操作
       this.isLoadingBgmState = true;
       this.bgmEnabled = enabled;
       this.isLoadingBgmState = false;
     } catch (_err) {
-      // 读取失败时保守保留当前 UI 状态，不覆盖为 true
       this.bgmEnabled = GlobalBgmManager.getInstance().getMusicEnabled();
     }
   }
 
   private async toggleBgm(isOn: boolean): Promise<void> {
-    // 防止 onChange 在程序更新 @State 时触发（loadBgmEnabled 中的赋值）
     if (this.isLoadingBgmState) {
       return;
     }
-    // 防止重复触发（@State 已与 isOn 一致）
     if (this.bgmEnabled === isOn) {
       return;
     }
@@ -992,47 +1355,467 @@ struct SettingsTabContent {
     }
   }
 
+  /**
+   * 当从 AvatarCropPage 返回时，刷新头像 URI
+   * 在 onPageShow / 生命周期中调用
+   */
+  private async refreshAvatar(): Promise<void> {
+    try {
+      this.avatarUri = await UserProfileStore.getAvatarUri(getContext(this));
+    } catch (_err) {
+      // keep current
+    }
+  }
+
+  /**
+   * 打开系统图片选择器，选择头像图片
+   */
+  private async openPhotoPicker(): Promise<void> {
+    this.showAvatarSheet = false;
+    if (this.isPickingPhoto) {
+      return;
+    }
+    this.isPickingPhoto = true;
+    try {
+      const ctx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+      const helper: photoAccessHelper.PhotoAccessHelper =
+        photoAccessHelper.getPhotoAccessHelper(ctx);
+      const picker: photoAccessHelper.PhotoViewPicker = new photoAccessHelper.PhotoViewPicker();
+
+      const result: photoAccessHelper.PhotoSelectResult = await picker.select({
+        MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
+        maxSelectNumber: 1
+      });
+
+      if (result.photoUris && result.photoUris.length > 0) {
+        const selectedUri: string = result.photoUris[0];
+        // 跳转到 AvatarCropPage 进行裁剪
+        try {
+          const options: router.RouterOptions = {
+            url: Routes.AVATAR_CROP,
+            params: { imageUri: selectedUri }
+          };
+          router.pushUrl(options);
+        } catch (_err2) {
+          // ignore
+        }
+      }
+    } catch (err) {
+      const errStr: string = JSON.stringify(err);
+      // 用户取消选择不会触发错误，这里处理真正的异常
+      if (!errStr.includes('cancel') && !errStr.includes('Cancel')) {
+        hilog.warn(0x0000, 'SettingsTab', 'PhotoPicker error: %{public}s', errStr);
+      }
+    } finally {
+      this.isPickingPhoto = false;
+    }
+  }
+
+  /**
+   * 恢复默认头像
+   */
+  private async resetAvatar(): Promise<void> {
+    this.showAvatarSheet = false;
+    try {
+      await UserProfileStore.clearAvatarUri(getContext(this));
+      this.avatarUri = '';
+    } catch (_err) {
+      // ignore
+    }
+  }
+
   build() {
     Stack() {
+      // 沉浸式深空背景
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            [Theme.BG_DEEP_SPACE, 0.0],
+            [Theme.BG_DEEP_INDIGO, 0.55],
+            [Theme.BG_DEEP_INDIGO, 1.0]
+          ]
+        })
 
-      Column() {
-        Column()
-          .width('100%')
-          .height(Theme.SAFE_TOP + 16)
-          .backgroundColor(Theme.BG_DEEP_INDIGO)
-
-        Text('设置')
-          .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.GOLD_LIGHT)
-          .fontWeight(FontWeight.Bold)
-          .textAlign(TextAlign.Center)
-          .width('100%')
-          .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_LG })
-
-        // 设置项：重新听听星澜的介绍
+      Scroll() {
         Column() {
-          Text('重新听听星澜的介绍')
-            .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+          Column()
             .width('100%')
-            .padding({ top: 16, bottom: 16, left: 20, right: 20 })
+            .height(Theme.SAFE_TOP + 16)
+            .linearGradient({
+              direction: GradientDirection.Bottom,
+              colors: [
+                [Theme.BG_DEEP_SPACE, 0.0],
+                ['rgba(15, 15, 35, 0)', 1.0]
+              ]
+            })
 
-          Text('星澜会重新陪你走一遍语录页的第一次介绍。')
-            .fontSize(13)
+          Text('我的')
+            .fontSize(Theme.FONT_HEADLINE)
+            .fontColor(Theme.GOLD_LIGHT)
+            .fontWeight(FontWeight.Bold)
+            .textAlign(TextAlign.Center)
+            .width('100%')
+            .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_SM })
+
+        // ═══ 头像区 ═══
+        Column() {
+          // 圆形头像
+          Stack() {
+            if (this.avatarUri.length > 0) {
+              Image(this.avatarUri)
+                .width(88)
+                .height(88)
+                .borderRadius(44)
+                .objectFit(ImageFit.Cover)
+                .clip(true)
+            } else {
+              Image($r('app.media.app_icon3'))
+                .width(88)
+                .height(88)
+                .borderRadius(44)
+                .objectFit(ImageFit.Cover)
+                .clip(true)
+                .opacity(0.85)
+            }
+          }
+          .width(92)
+          .height(92)
+          .borderRadius(46)
+          .border({ width: Theme.AVATAR_BORDER_WIDTH, color: Theme.AVATAR_BORDER })
+          .shadow(Theme.SHADOW_AVATAR_GLOW)
+          .alignContent(Alignment.Center)
+          .margin({ bottom: 14 })
+          .onClick(() => { this.showAvatarSheet = true; })
+
+          // 昵称
+          Text(this.nickname)
+            .fontSize(Theme.FONT_SUBTITLE)
+            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+            .fontWeight(FontWeight.Medium)
+            .margin({ bottom: 8 })
+
+          // 等级标签
+          Text('星钥等级：' + this.level)
+            .fontSize(Theme.FONT_CAPTION)
+            .fontColor(Theme.GOLD_PALE)
+            .padding({ left: 16, right: 16, top: 4, bottom: 4 })
+            .backgroundColor('rgba(202, 138, 4, 0.12)')
+            .border({ width: 1, color: 'rgba(202, 138, 4, 0.25)' })
+            .borderRadius(Theme.RADIUS_FULL)
+        }
+        .width('100%')
+        .alignItems(HorizontalAlign.Center)
+        .padding({ top: 16, bottom: 16 })
+        .margin({ bottom: Theme.SPACE_MD })
+
+        // ═══ 今日点亮状态提示 ═══
+        Column() {
+          Row() {
+            Text(this.isTodayLit ? '⭐' : '☆')
+              .fontSize(20)
+              .fontColor(this.isTodayLit ? '#E5A50A' : '#3A3A5A')
+              .margin({ right: 8 })
+
+            Text(this.isTodayLit ? '今日已点亮' : '今日未点亮')
+              .fontSize(15)
+              .fontColor(this.isTodayLit ? '#E5D9B6' : '#94A3B8')
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.Center)
+          .padding({ top: 8, bottom: 8 })
+        }
+        .width('88%')
+        .margin({ bottom: Theme.SPACE_MD })
+
+        // ═══ 星澜星历日历卡片 ═══
+        Column() {
+          // 卡片标题
+          Text('星澜星历')
+            .fontSize(Theme.FONT_SUBTITLE)
+            .fontColor(Theme.GOLD_LIGHT)
+            .fontWeight(FontWeight.Bold)
+            .width('100%')
+            .margin({ bottom: 4 })
+
+          Text('不是打卡，只是把认真感受过的日子轻轻留下。')
+            .fontSize(Theme.FONT_CAPTION)
             .fontColor(Theme.MOON_MUTED)
             .width('100%')
-            .padding({ left: 20, right: 20, bottom: 16 })
+            .margin({ bottom: 16 })
+
+          // ═══ 月份翻页控件 ═══
+          Row() {
+            // 左箭头
+            Text('‹')
+              .fontSize(26)
+              .fontColor('#E5A50A')
+              .fontWeight(FontWeight.Lighter)
+              .width(36)
+              .height(36)
+              .textAlign(TextAlign.Center)
+              .onClick(() => { this.goToPreviousMonth(); })
+
+            // 月份标题
+            Text(this.visibleYear.toString() + ' 年 ' + this.visibleMonth.toString() + ' 月')
+              .fontSize(16)
+              .fontColor('#E5D9B6')
+              .fontWeight(FontWeight.Medium)
+              .textAlign(TextAlign.Center)
+              .layoutWeight(1)
+
+            // 右箭头（始终可翻页）
+            Text('›')
+              .fontSize(26)
+              .fontColor('#E5A50A')
+              .fontWeight(FontWeight.Lighter)
+              .width(36)
+              .height(36)
+              .textAlign(TextAlign.Center)
+              .onClick(() => { this.goToNextMonth(); })
+          }
+          .width('100%')
+          .margin({ bottom: 6 })
+
+          // 回到本月按钮（历史月份时显示）
+          if (!this.isViewingCurrentMonth()) {
+            Text('回到本月')
+              .fontSize(12)
+              .fontColor('#E5A50A')
+              .padding({ left: 14, right: 14, top: 4, bottom: 4 })
+              .border({ width: 1, color: 'rgba(229, 165, 10, 0.3)' })
+              .borderRadius(Theme.RADIUS_FULL)
+              .onClick(() => { this.goToCurrentMonth(); })
+              .margin({ bottom: 14 })
+          } else {
+            Blank()
+              .height(6)
+          }
+
+          // 星期头
+          Row() {
+            ForEach(['一', '二', '三', '四', '五', '六', '日'], (label: string) => {
+              Text(label)
+                .fontSize(12)
+                .fontColor('#6B6380')
+                .width('14.28%')
+                .textAlign(TextAlign.Center)
+                .height(28)
+            }, (label: string) => 'wkd_' + label)
+          }
+          .width('100%')
+
+          // 日期格（7 列布局，可点击）
+          Flex({ wrap: FlexWrap.Wrap }) {
+            // 前面的空白格
+            ForEach(new Array(this.calendarOffset).fill(0), (_empty: number, idx: number) => {
+              Column()
+                .width('14.28%')
+                .height(42)
+            }, (_empty: number, idx: number) => 'offset_' + idx.toString())
+
+            // 日期格
+            ForEach(this.calendarDays, (day: number) => {
+              Column() {
+                if (this.isDayLit(day)) {
+                  // 已点亮：金色星星
+                  Text('⭐')
+                    .fontSize(16)
+                    .fontColor('#E5A50A')
+                } else {
+                  // 未点亮：灰蓝日期数字 或 未来日期置灰
+                  Text(day.toString())
+                    .fontSize(13)
+                    .fontColor(this.dayIsFuture(day) ? '#2E2E4A' : '#5A5A7A')
+                }
+              }
+              .width('14.28%')
+              .height(42)
+              .justifyContent(FlexAlign.Center)
+              .borderRadius(8)
+              .border({
+                width: EmotionStarStorage.isToday(this.visibleYear, this.visibleMonth, day) ? 1.5 : 0,
+                color: EmotionStarStorage.isToday(this.visibleYear, this.visibleMonth, day) ?
+                  '#E5A50A' : 'transparent'
+              })
+              .backgroundColor(
+                EmotionStarStorage.isToday(this.visibleYear, this.visibleMonth, day) &&
+                  !this.isDayLit(day) ? 'rgba(229, 165, 10, 0.06)' : 'transparent'
+              )
+              .onClick(() => { this.handleDateClick(day); })
+            }, (day: number) => 'cal_day_' + day.toString())
+          }
+          .width('100%')
+          .margin({ bottom: 16 })
+
+          // 统计行
+          Divider()
+            .strokeWidth(0.5)
+            .color('rgba(202, 138, 4, 0.12)')
+            .width('100%')
+            .margin({ bottom: 14 })
+
+          Row() {
+            Column() {
+              Text(this.visibleMonthLightDays.toString())
+                .fontSize(20)
+                .fontColor('#E5A50A')
+                .fontWeight(FontWeight.Bold)
+                .textAlign(TextAlign.Center)
+                .width('100%')
+
+              Text('本月点亮')
+                .fontSize(11)
+                .fontColor('#94A3B8')
+                .textAlign(TextAlign.Center)
+                .width('100%')
+                .margin({ top: 2 })
+            }
+            .layoutWeight(1)
+
+            Column() {
+              Text(this.cumulativeLightDays.toString())
+                .fontSize(20)
+                .fontColor('#E5D9B6')
+                .fontWeight(FontWeight.Bold)
+                .textAlign(TextAlign.Center)
+                .width('100%')
+
+              Text('累计点亮')
+                .fontSize(11)
+                .fontColor('#94A3B8')
+                .textAlign(TextAlign.Center)
+                .width('100%')
+                .margin({ top: 2 })
+            }
+            .layoutWeight(1)
+
+            Column() {
+              Text(this.streakDays.toString())
+                .fontSize(20)
+                .fontColor('#CA8A04')
+                .fontWeight(FontWeight.Bold)
+                .textAlign(TextAlign.Center)
+                .width('100%')
+
+              Text('连续点亮')
+                .fontSize(11)
+                .fontColor('#94A3B8')
+                .textAlign(TextAlign.Center)
+                .width('100%')
+                .margin({ top: 2 })
+            }
+            .layoutWeight(1)
+          }
+          .width('100%')
+          .margin({ bottom: 14 })
+
+          // 下一称号信息
+          if (!this.isMaxLevel) {
+            Text('下一称号：' + this.nextLevelTitle)
+              .fontSize(13)
+              .fontColor('#94A3B8')
+              .width('100%')
+              .textAlign(TextAlign.Center)
+              .margin({ bottom: 4 })
+
+            Text('距离「' + this.nextLevelTitle + '」还差 ' + this.daysToNextLevel.toString() + ' 天')
+              .fontSize(12)
+              .fontColor('#6B6380')
+              .width('100%')
+              .textAlign(TextAlign.Center)
+          } else {
+            Text('你已到达最高星钥等级')
+              .fontSize(13)
+              .fontColor('#E5A50A')
+              .width('100%')
+              .textAlign(TextAlign.Center)
+          }
+
+          // ═══ 本月星光记录 ═══
+          if (this.visibleMonthRecords.length > 0) {
+            Divider()
+              .strokeWidth(0.5)
+              .color('rgba(202, 138, 4, 0.12)')
+              .width('100%')
+              .margin({ top: 16, bottom: 14 })
+
+            Text('本月星光记录')
+              .fontSize(14)
+              .fontColor('#E5D9B6')
+              .fontWeight(FontWeight.Medium)
+              .width('100%')
+              .margin({ bottom: 10 })
+
+            ForEach(this.visibleMonthRecords, (record: EmotionStarRecord, idx: number) => {
+              Row() {
+                Text(EmotionStarStorage.formatMonthDay(record.date))
+                  .fontSize(13)
+                  .fontColor('#94A3B8')
+                  .width(72)
+
+                Text(record.starName)
+                  .fontSize(13)
+                  .fontColor('#E5D9B6')
+                  .fontWeight(FontWeight.Medium)
+                  .layoutWeight(1)
+                  .maxLines(1)
+                  .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+                Text('›')
+                  .fontSize(16)
+                  .fontColor(Theme.GOLD_DIM)
+                  .width(20)
+                  .textAlign(TextAlign.Center)
+              }
+              .width('100%')
+              .padding({ top: 8, bottom: 8 })
+              .border({
+                width: idx < this.visibleMonthRecords.length - 1 ? 0.5 : 0,
+                color: 'rgba(202, 138, 4, 0.08)'
+              })
+              .onClick(() => { this.handleHistoryItemClick(record); })
+            }, (record: EmotionStarRecord) => 'star_month_item_' + record.date)
+          } else {
+            Divider()
+              .strokeWidth(0.5)
+              .color('rgba(202, 138, 4, 0.12)')
+              .width('100%')
+              .margin({ top: 16, bottom: 14 })
+
+            if (this.isViewingCurrentMonth()) {
+              Text('这个月还没有留下星光。\n完成一次每日一占，就能点亮今天。')
+                .fontSize(12)
+                .fontColor('#6B6380')
+                .textAlign(TextAlign.Center)
+                .lineHeight(20)
+                .width('100%')
+            } else if (this.isViewingFutureMonth()) {
+              Text('这些日子还在星光前方。')
+                .fontSize(12)
+                .fontColor('#6B6380')
+                .textAlign(TextAlign.Center)
+                .width('100%')
+            } else {
+              Text('这个月没有点亮记录。')
+                .fontSize(12)
+                .fontColor('#6B6380')
+                .textAlign(TextAlign.Center)
+                .width('100%')
+            }
+          }
         }
         .width('92%')
-        .backgroundColor('rgba(27, 27, 48, 0.68)')
-        .borderRadius(Theme.RADIUS_MD)
+        .padding(Theme.STARKEY_CARD_PADDING_H)
+        .backgroundColor(Theme.STARKEY_CARD_BG)
+        .borderRadius(Theme.STARKEY_CARD_RADIUS)
+        .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
+        .shadow(Theme.SHADOW_CARD_SUBTLE)
         .margin({ bottom: Theme.SPACE_MD })
-        .onClick(() => { this.resetAllGuides(); })
 
+        // ═══ 偏好设置卡片 ═══
         // 背景音乐开关
         Column() {
           Row() {
@@ -1040,6 +1823,7 @@ struct SettingsTabContent {
               Text('背景音乐')
                 .fontSize(Theme.FONT_BODY)
                 .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                .fontWeight(FontWeight.Medium)
                 .width('100%')
 
               Text('开启后，星钥塔罗会播放一首低音量的全局主旋律。')
@@ -1061,17 +1845,66 @@ struct SettingsTabContent {
           .padding({ top: 16, bottom: 16, left: 20, right: 20 })
         }
         .width('92%')
-        .backgroundColor('rgba(27, 27, 48, 0.68)')
-        .borderRadius(Theme.RADIUS_MD)
+        .backgroundColor(Theme.STARKEY_CARD_BG)
+        .borderRadius(Theme.STARKEY_CARD_RADIUS)
+        .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
+        .shadow(Theme.SHADOW_CARD_SUBTLE)
         .margin({ bottom: Theme.SPACE_MD })
 
+        // 重新听听星澜的介绍
+        Column() {
+          Row() {
+            Column() {
+              Text('重新听听星澜的介绍')
+                .fontSize(Theme.FONT_BODY)
+                .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                .fontWeight(FontWeight.Medium)
+                .width('100%')
+            }
+            .layoutWeight(1)
+
+            Text('›')
+              .fontSize(20)
+              .fontColor(Theme.GOLD_DIM)
+          }
+          .width('100%')
+          .alignItems(VerticalAlign.Center)
+          .padding({ top: 16, bottom: 16, left: 20, right: 20 })
+
+          Text('星澜会重新陪你走一遍语录页的第一次介绍。')
+            .fontSize(13)
+            .fontColor(Theme.MOON_MUTED)
+            .width('100%')
+            .padding({ left: 20, right: 20, bottom: 16 })
+        }
+        .width('92%')
+        .backgroundColor(Theme.STARKEY_CARD_BG)
+        .borderRadius(Theme.STARKEY_CARD_RADIUS)
+        .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
+        .shadow(Theme.SHADOW_CARD_SUBTLE)
+        .margin({ bottom: Theme.SPACE_MD })
+        .onClick(() => { this.resetAllGuides(); })
+
+        // ═══ 帮助卡片 ═══
         // 使用说明
         Column() {
-          Text('使用说明')
-            .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
-            .width('100%')
-            .padding({ top: 16, bottom: 16, left: 20, right: 20 })
+          Row() {
+            Column() {
+              Text('使用说明')
+                .fontSize(Theme.FONT_BODY)
+                .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                .fontWeight(FontWeight.Medium)
+                .width('100%')
+            }
+            .layoutWeight(1)
+
+            Text('›')
+              .fontSize(20)
+              .fontColor(Theme.GOLD_DIM)
+          }
+          .width('100%')
+          .alignItems(VerticalAlign.Center)
+          .padding({ top: 16, bottom: 16, left: 20, right: 20 })
 
           Text('了解星钥塔罗每个板块的用法和设计初衷。')
             .fontSize(13)
@@ -1080,8 +1913,10 @@ struct SettingsTabContent {
             .padding({ left: 20, right: 20, bottom: 16 })
         }
         .width('92%')
-        .backgroundColor('rgba(27, 27, 48, 0.68)')
-        .borderRadius(Theme.RADIUS_MD)
+        .backgroundColor(Theme.STARKEY_CARD_BG)
+        .borderRadius(Theme.STARKEY_CARD_RADIUS)
+        .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
+        .shadow(Theme.SHADOW_CARD_SUBTLE)
         .margin({ bottom: Theme.SPACE_MD })
         .onClick(() => {
           try {
@@ -1092,23 +1927,38 @@ struct SettingsTabContent {
           }
         })
 
-        // 设置项：关于星钥塔罗
+        // ═══ 关于卡片 ═══
+        // 关于星钥塔罗
         Column() {
-          Text('关于星钥塔罗')
-            .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
-            .width('100%')
-            .padding({ top: 16, bottom: 16, left: 20, right: 20 })
+          Row() {
+            Column() {
+              Text('关于星钥塔罗')
+                .fontSize(Theme.FONT_BODY)
+                .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                .fontWeight(FontWeight.Medium)
+                .width('100%')
+            }
+            .layoutWeight(1)
 
-          Text('版本信息、隐私政策、用户协议、素材与授权')
+            Text('›')
+              .fontSize(20)
+              .fontColor(Theme.GOLD_DIM)
+          }
+          .width('100%')
+          .alignItems(VerticalAlign.Center)
+          .padding({ top: 16, bottom: 16, left: 20, right: 20 })
+
+          Text('版本信息、隐私政策、用户协议、素材与授权。')
             .fontSize(13)
             .fontColor(Theme.MOON_MUTED)
             .width('100%')
             .padding({ left: 20, right: 20, bottom: 16 })
         }
         .width('92%')
-        .backgroundColor('rgba(27, 27, 48, 0.68)')
-        .borderRadius(Theme.RADIUS_MD)
+        .backgroundColor(Theme.STARKEY_CARD_BG)
+        .borderRadius(Theme.STARKEY_CARD_RADIUS)
+        .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
+        .shadow(Theme.SHADOW_CARD_SUBTLE)
         .margin({ bottom: Theme.SPACE_MD })
         .onClick(() => {
           try {
@@ -1128,10 +1978,273 @@ struct SettingsTabContent {
           .lineHeight(16)
           .width('100%')
           .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, bottom: 12 })
+        }
+        .width('100%')
+        .alignItems(HorizontalAlign.Center)
       }
+      .scrollBar(BarState.Off)
+      .scrollable(ScrollDirection.Vertical)
+      .edgeEffect(EdgeEffect.Spring)
       .width('100%')
       .height('100%')
-      .alignItems(HorizontalAlign.Center)
+
+      // ═══ 头像操作面板（底部弹出）═══
+      if (this.showAvatarSheet) {
+        // 半透明遮罩
+        Column()
+          .width('100%')
+          .height('100%')
+          .backgroundColor('rgba(8, 11, 24, 0.6)')
+          .onClick(() => { this.showAvatarSheet = false; })
+
+        // 底部面板
+        Column() {
+          // 标题
+          Text('更换头像')
+            .fontSize(Theme.FONT_SUBTITLE)
+            .fontColor(Theme.GOLD_LIGHT)
+            .fontWeight(FontWeight.Bold)
+            .width('100%')
+            .textAlign(TextAlign.Center)
+            .padding({ top: 20, bottom: 16 })
+
+          // 分割线
+          Divider()
+            .strokeWidth(0.5)
+            .color('rgba(212, 160, 42, 0.18)')
+            .width('88%')
+
+          // 从相册选择
+          Row() {
+            Text('从相册选择')
+              .fontSize(Theme.FONT_BODY)
+              .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+              .width('100%')
+              .textAlign(TextAlign.Center)
+              .padding({ top: 18, bottom: 18 })
+          }
+          .width('100%')
+          .onClick(() => { this.openPhotoPicker(); })
+
+          Divider()
+            .strokeWidth(0.5)
+            .color('rgba(212, 160, 42, 0.12)')
+            .width('88%')
+
+          // 恢复默认头像
+          Row() {
+            Text('恢复默认头像')
+              .fontSize(Theme.FONT_BODY)
+              .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+              .width('100%')
+              .textAlign(TextAlign.Center)
+              .padding({ top: 18, bottom: 18 })
+          }
+          .width('100%')
+          .onClick(() => { this.resetAvatar(); })
+
+          Divider()
+            .strokeWidth(0.5)
+            .color('rgba(212, 160, 42, 0.12)')
+            .width('88%')
+
+          // 取消
+          Row() {
+            Text('取消')
+              .fontSize(Theme.FONT_BODY)
+              .fontColor(Theme.MOON_MUTED)
+              .width('100%')
+              .textAlign(TextAlign.Center)
+              .padding({ top: 18, bottom: 18 })
+          }
+          .width('100%')
+          .onClick(() => { this.showAvatarSheet = false; })
+
+          // 底部安全区
+          Row()
+            .width('100%')
+            .height(Theme.SAFE_BOTTOM)
+        }
+        .width('100%')
+        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .borderRadius({ topLeft: Theme.RADIUS_LG, topRight: Theme.RADIUS_LG })
+        .position({ x: 0, y: '100%' })
+        .translate({ x: 0, y: '-100%' })
+        .zIndex(100)
+      }
+
+      // ═══ 日期详情弹窗（居中卡片）═══
+      if (this.showDateDetail) {
+        // 半透明遮罩
+        Column()
+          .width('100%')
+          .height('100%')
+          .backgroundColor('rgba(8, 11, 24, 0.65)')
+          .onClick(() => { this.closeDateDetail(); })
+          .zIndex(150)
+
+        // 居中详情卡片
+        Column() {
+          // 日期标题
+          Text(EmotionStarStorage.formatMonthDay(this.selectedDateKey))
+            .fontSize(20)
+            .fontColor('#E5D9B6')
+            .fontWeight(FontWeight.Bold)
+            .width('100%')
+            .textAlign(TextAlign.Center)
+            .margin({ bottom: 16 })
+
+          if (this.selectedRecord !== null) {
+            // ======== 已点亮：展示详情 ========
+            Text('这一天，你留下了一颗情绪星。')
+              .fontSize(14)
+              .fontColor('#94A3B8')
+              .width('100%')
+              .textAlign(TextAlign.Center)
+              .margin({ bottom: 18 })
+
+            // 星名
+            Row() {
+              Text('今日星名')
+                .fontSize(13)
+                .fontColor('#6B6380')
+                .width(72)
+
+              Text(this.selectedRecord.starName)
+                .fontSize(14)
+                .fontColor('#E5D9B6')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+            }
+            .width('100%')
+            .margin({ bottom: 10 })
+
+            // 牌名
+            Row() {
+              Text('今日牌名')
+                .fontSize(13)
+                .fontColor('#6B6380')
+                .width(72)
+
+              Text(this.selectedRecord.cardName)
+                .fontSize(14)
+                .fontColor('#E5D9B6')
+                .fontWeight(FontWeight.Medium)
+                .layoutWeight(1)
+            }
+            .width('100%')
+            .margin({ bottom: 10 })
+
+            // 点亮时间
+            Row() {
+              Text('点亮时间')
+                .fontSize(13)
+                .fontColor('#6B6380')
+                .width(72)
+
+              Text(EmotionStarStorage.formatTimeFromTimestamp(this.selectedRecord.createdAt))
+                .fontSize(14)
+                .fontColor('#E5D9B6')
+                .layoutWeight(1)
+            }
+            .width('100%')
+            .margin({ bottom: 18 })
+
+            Divider()
+              .strokeWidth(0.5)
+              .color('rgba(202, 138, 4, 0.12)')
+              .width('100%')
+              .margin({ bottom: 16 })
+
+            Text('星澜记得：')
+              .fontSize(13)
+              .fontColor('#E5A50A')
+              .width('100%')
+              .margin({ bottom: 8 })
+
+            Text('那天的你，也认真面对过自己的感受。')
+              .fontSize(14)
+              .fontColor('#E5D9B6')
+              .lineHeight(22)
+              .width('100%')
+              .margin({ bottom: 20 })
+          } else {
+            // ======== 未点亮 ========
+            if (this.isSelectedDateToday()) {
+              Text('今天还没有点亮情绪星。')
+                .fontSize(15)
+                .fontColor('#E5D9B6')
+                .fontWeight(FontWeight.Medium)
+                .width('100%')
+                .textAlign(TextAlign.Center)
+                .margin({ bottom: 12 })
+
+              Text('完成一次每日一占，就能为今天留下一点星光。')
+                .fontSize(13)
+                .fontColor('#94A3B8')
+                .lineHeight(20)
+                .width('100%')
+                .textAlign(TextAlign.Center)
+                .margin({ bottom: 20 })
+            } else if (this.isSelectedDateFuture()) {
+              // ======== 未来日期 ========
+              Text('这一天还在星光前方。')
+                .fontSize(15)
+                .fontColor('#E5D9B6')
+                .fontWeight(FontWeight.Medium)
+                .width('100%')
+                .textAlign(TextAlign.Center)
+                .margin({ bottom: 12 })
+
+              Text('未来的每一天，都值得期待。')
+                .fontSize(13)
+                .fontColor('#94A3B8')
+                .lineHeight(20)
+                .width('100%')
+                .textAlign(TextAlign.Center)
+                .margin({ bottom: 20 })
+            } else {
+              Text('这一天还没有留下星光。')
+                .fontSize(15)
+                .fontColor('#E5D9B6')
+                .fontWeight(FontWeight.Medium)
+                .width('100%')
+                .textAlign(TextAlign.Center)
+                .margin({ bottom: 12 })
+
+              Text('没关系，不是每天都需要记录。\n你愿意回来看看自己，就已经很好了。')
+                .fontSize(13)
+                .fontColor('#94A3B8')
+                .lineHeight(20)
+                .width('100%')
+                .textAlign(TextAlign.Center)
+                .margin({ bottom: 20 })
+            }
+          }
+
+          // 关闭按钮
+          Text('知道了')
+            .fontSize(15)
+            .fontColor('#E5A50A')
+            .fontWeight(FontWeight.Bold)
+            .width('100%')
+            .height(44)
+            .textAlign(TextAlign.Center)
+            .backgroundColor('rgba(229, 165, 10, 0.08)')
+            .border({ width: 1, color: 'rgba(229, 165, 10, 0.25)' })
+            .borderRadius(Theme.RADIUS_FULL)
+            .onClick(() => { this.closeDateDetail(); })
+        }
+        .width('82%')
+        .padding(24)
+        .backgroundColor(Theme.BG_CARD_DARK)
+        .borderRadius(Theme.RADIUS_LG)
+        .border({ width: 1, color: 'rgba(216, 180, 90, 0.18)' })
+        .shadow(Theme.SHADOW_CARD_FLOAT)
+        .position({ x: '50%', y: '50%' })
+        .translate({ x: '-50%', y: '-50%' })
+        .zIndex(200)
+      }
     }
     .width('100%')
     .height('100%')

@@ -174,3 +174,44 @@
 - 禁止蓝白配色体系
 - 防过度拟人/恋爱化
 - Agent 实施提示词已包含在第 4 部分文件末尾
+
+## UI 美化 + 我的页面 + 聊天头像系统专项（2026-06-30）
+
+### 已完成 Phase
+- **Phase 1**：Theme.ets 新增设计 Token（AVATAR_BORDER, AVATAR_GLOW, CARD_BORDER_GOLD, CARD_BORDER_GOLD_SUBTLE, BUBBLE_BORDER, BUBBLE_BG_XINGLAN, CHIP_BG, CHIP_BORDER, 头像尺寸常量）
+- **Phase 2**：CompanionBottomNav.ets tab 4 从"设置"→"我的"，图标 ⚙ → ☺
+- **Phase 3**：MainFramePage.ets SettingsTabContent 全新"我的"页面（88vp 圆形头像 + 金色边框 + 光晕、昵称"未命名旅者"、等级"初见"、重新整理设置卡片）
+- **Phase 4**：头像上传/裁剪 — 用户明确推迟到下一轮
+- **Phase 5**：XinglanChatPage.ets 聊天双头像系统（星澜 38vp 圆形头像左侧、用户 40vp 圆形头像右侧、金色描边、气泡自适应 maxWidth 64%）
+- **Phase 6**：MainFramePage.ets XinglanQuotesTabContent 视觉打磨（星澜迷你头像 34vp + 金色气泡边框）
+- **Phase 7**：聊天页 chips 与输入区已在 Phase 5 中一并完成（金色边框 chips、输入框金色描边）
+- **Phase 8**：MainFramePage.ets TarotCardsTabContent 金色细边框 + borderRadius 统一
+- **Phase 9**：LegalDocuments.ets 隐私政策/用户协议同步更新（生效日期更新至 6月30日、新增头像/昵称/等级本地存储说明、新增"我的"页面功能条目）
+- **Phase 10**：最终编译验证 BUILD SUCCESSFUL（421ms，ERROR=0）
+
+### 新增文件
+- `entry/src/main/ets/common/UserProfileStore.ets` — 头像 URI / 昵称 / 等级持久化存储（基于 PreferenceStore）
+
+### 编译基线
+- BUILD SUCCESSFUL，ERROR=0，仅存在预存 WARN（deprecated API 等）
+
+### 推迟事项
+- （无 — Phase 4 已于 2026-06-30 完成）
+
+## 头像功能完整实现（2026-06-30 18:57）
+
+### 完成内容
+- **AvatarCropPage.ets**：新建头像裁剪页，支持双指缩放+单指拖动，圆形裁剪框，文件复制到 filesDir/avatar_user.jpg，UserProfileStore 持久化
+- **MainFramePage.ets**：新增 openPhotoPicker()（PhotoViewPicker 系统相册）、resetAvatar()、底部弹窗 AvatarSheet、头像刷新
+- **LegalDocuments.ets**：隐私政策第 9 条更新（说明本地裁剪、不上传、不扫描）、用户协议新增头像更换功能、用户内容责任条款
+- **UsageGuidePage.ets**：新增头像使用说明
+- **Routes.ets**：新增 AVATAR_CROP 路由
+- **main_pages.json**：注册 AvatarCropPage
+
+### 编译结果
+BUILD SUCCESSFUL in 10s 878ms, ERROR=0
+
+### 关键踩坑
+1. `imageSource.getImageInfo()` 返回 `Promise<ImageInfo>`，必须 `await`
+2. ArkTS `build()` 方法内**不允许 `let`/`const` 局部变量声明**，否则报 "only one root node" 错误，必须内联表达式
+3. `if` 条件块内嵌在 Stack 中可能导致根节点解析问题，Toast 改用 `.visibility()` + `.opacity()` 属性控制

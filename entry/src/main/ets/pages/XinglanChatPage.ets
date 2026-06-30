@@ -6,6 +6,7 @@ import { router } from '@kit.ArkUI';
 import { Theme } from '../common/Theme';
 import { Routes } from '../common/Routes';
 import { AppBackButton } from '../components/AppBackButton';
+import { UserProfileStore } from '../common/UserProfileStore';
 import {
   XinglanChatRole, XinglanChatMessage, XinglanSpecialIntent,
   XinglanMiniInteractionKey, XinglanCompanionChoice, XinglanCompanionChoiceDef,
@@ -94,12 +95,22 @@ struct XinglanChatPage {
   @State showMemoryConfirm: boolean = false;
   @State savedMemories: XinglanLightMemory[] = [];
   @State memoryInputText: string = '';
+  @State userAvatarUri: string = '';
   private echoTurnCounter: number = 0;
   private lastUserEmotionText: string = '';
 
   aboutToAppear(): void {
     this.showWelcome = true;
     setTimeout(() => { this.showWelcome = false; }, 2500);
+    this.loadUserAvatar();
+  }
+
+  private async loadUserAvatar(): Promise<void> {
+    try {
+      this.userAvatarUri = await UserProfileStore.getAvatarUri(getContext(this));
+    } catch (_err) {
+      // keep default (empty = default avatar)
+    }
   }
 
   aboutToDisappear(): void {
@@ -1241,32 +1252,63 @@ struct XinglanChatPage {
   @Builder buildUserBubble(msg: XinglanChatMessage): void {
     Row() {
       Blank()
-      Text(msg.text)
-        .fontSize(Theme.FONT_BODY).fontColor(Theme.TEXT_PRIMARY_LIGHT).lineHeight(24)
-        .padding(14).backgroundColor(Theme.BG_CARD_DARK)
-        .borderRadius({ topLeft: Theme.RADIUS_MD, topRight: Theme.RADIUS_MD, bottomLeft: Theme.RADIUS_MD, bottomRight: 4 })
-        .constraintSize({ maxWidth: '78%' })
+      // 用户气泡
+      Column() {
+        Text(msg.text)
+          .fontSize(Theme.FONT_BODY).fontColor(Theme.TEXT_PRIMARY_LIGHT).lineHeight(24)
+          .padding(14).backgroundColor(Theme.BG_CARD_DARK)
+          .border({ width: 1, color: 'rgba(202, 138, 4, 0.12)' })
+          .borderRadius({ topLeft: Theme.RADIUS_MD, topRight: Theme.RADIUS_MD, bottomLeft: Theme.RADIUS_MD, bottomRight: 4 })
+          .constraintSize({ maxWidth: '64%' })
+      }
+      .alignItems(HorizontalAlign.End)
+
+      // 用户头像（圆形，右侧）
+      if (this.userAvatarUri.length > 0) {
+        Image(this.userAvatarUri)
+          .width(Theme.AVATAR_CHAT_DIAMETER)
+          .height(Theme.AVATAR_CHAT_DIAMETER)
+          .borderRadius(Theme.AVATAR_CHAT_DIAMETER / 2)
+          .border({ width: Theme.AVATAR_BORDER_WIDTH, color: Theme.AVATAR_BORDER })
+          .shadow(Theme.SHADOW_AVATAR_GLOW)
+          .objectFit(ImageFit.Cover)
+          .clip(true)
+          .margin({ left: 10 })
+      } else {
+        Image($r('app.media.app_icon3'))
+          .width(Theme.AVATAR_CHAT_DIAMETER)
+          .height(Theme.AVATAR_CHAT_DIAMETER)
+          .borderRadius(Theme.AVATAR_CHAT_DIAMETER / 2)
+          .border({ width: Theme.AVATAR_BORDER_WIDTH, color: Theme.AVATAR_BORDER })
+          .shadow(Theme.SHADOW_AVATAR_GLOW)
+          .objectFit(ImageFit.Cover)
+          .clip(true)
+          .opacity(0.8)
+          .margin({ left: 10 })
+      }
     }
     .width('100%')
   }
 
   @Builder buildXinglanBubble(msg: XinglanChatMessage): void {
     Row() {
+      // 星澜头像（圆形，左侧，38vp）
+      Image($r('app.media.app_icon5'))
+        .width(Theme.AVATAR_CHAT_DIAMETER)
+        .height(Theme.AVATAR_CHAT_DIAMETER)
+        .borderRadius(Theme.AVATAR_CHAT_DIAMETER / 2)
+        .border({ width: Theme.AVATAR_BORDER_WIDTH, color: Theme.AVATAR_BORDER })
+        .shadow(Theme.SHADOW_AVATAR_GLOW)
+        .objectFit(ImageFit.Cover)
+        .margin({ right: 10 })
+
       Column() {
-        // 星澜头像 — 每句消息上方显示，替换月亮 emoji
-        Image($r('app.media.app_icon5'))
-          .width(28)
-          .height(28)
-          .borderRadius(14)
-          .border({ width: 1, color: 'rgba(232, 184, 61, 0.45)' })
-          .objectFit(ImageFit.Cover)
-          .margin({ bottom: 6 })
         Text(msg.text)
           .fontSize(Theme.FONT_BODY).fontColor('#F6E6B8').lineHeight(24)
           .padding(14).backgroundColor('#17172F')
           .border({ width: 1, color: 'rgba(202, 138, 4, 0.15)' })
           .borderRadius({ topLeft: 4, topRight: Theme.RADIUS_MD, bottomLeft: Theme.RADIUS_MD, bottomRight: Theme.RADIUS_MD })
-          .constraintSize({ maxWidth: '78%' })
+          .constraintSize({ maxWidth: '64%' })
       }
       .alignItems(HorizontalAlign.Start)
       Blank()
@@ -1276,15 +1318,16 @@ struct XinglanChatPage {
 
   @Builder buildListeningHint(): void {
     Row() {
+      // 星澜头像 — typing 状态也显示头像
+      Image($r('app.media.app_icon5'))
+        .width(Theme.AVATAR_CHAT_DIAMETER)
+        .height(Theme.AVATAR_CHAT_DIAMETER)
+        .borderRadius(Theme.AVATAR_CHAT_DIAMETER / 2)
+        .border({ width: Theme.AVATAR_BORDER_WIDTH, color: Theme.AVATAR_BORDER })
+        .shadow(Theme.SHADOW_AVATAR_GLOW)
+        .objectFit(ImageFit.Cover)
+        .margin({ right: 10 })
       Column() {
-        // 星澜头像 — typing 状态也显示头像
-        Image($r('app.media.app_icon5'))
-          .width(28)
-          .height(28)
-          .borderRadius(14)
-          .border({ width: 1, color: 'rgba(232, 184, 61, 0.45)' })
-          .objectFit(ImageFit.Cover)
-          .margin({ bottom: 6 })
         Text(XINGLAN_LISTENING_TEXT)
           .fontSize(14).fontColor(Theme.MOON_MUTED).fontStyle(FontStyle.Italic)
           .padding(12).backgroundColor('rgba(23, 23, 47, 0.6)')

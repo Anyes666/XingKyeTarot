@@ -1,0 +1,3 @@
+> hvigor [32mhvigor client: The argument passed to Node.js or hvigor version have changed and a new daemon will be created to replace the existing daemon. Reason:{isHvigorVersionChanged: false, isNodeEnvChanged: true, isCachePathChanged: false}[39m
+> hvigor [32mhvigor client: Starting hvigor daemon.[39m
+> hvigor [32mHvigor Daemon started in 796 ms[39m

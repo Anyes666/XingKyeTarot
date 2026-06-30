@@ -48,4 +48,7 @@ export class Routes {
   // ── 旋转牌轮抽牌 ──
   static readonly CARD_WHEEL_MODE: string = 'pages/CardWheelModePage';
   static readonly CARD_WHEEL_DRAW: string = 'pages/CardWheelDrawPage';
+
+  // ── 头像裁剪 ──
+  static readonly AVATAR_CROP: string = 'pages/AvatarCropPage';
 }

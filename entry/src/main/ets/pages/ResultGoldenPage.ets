@@ -22,6 +22,7 @@ import {
 } from '../model/DivinationHistoryRecord';
 import { TarotCardRepository } from '../data/TarotCardRepository';
 import { COMPANION_RESULT_LINES } from '../data/CompanionResultLines';
+import { EmotionStarStorage, EmotionStarRecord, StarKeyLevel, NextLevelInfo } from '../common/EmotionStarStorage';
 
 /**
  * 结果页路由入参（P0.2 扩展）
@@ -63,6 +64,10 @@ interface ShareCardRouteParams {
 interface EmotionStarRouteParams {
   emotionTag: string
   heartOptionIndex: number
+  cardName: string
+  cardId: string
+  totalLightDays: number
+  currentLevelTitle: string
 }
 
 /**
@@ -100,6 +105,11 @@ struct ResultGoldenPage {
   @State private companionResultLine: string = '';
   @State private isPositiveMode: boolean = false;
 
+  // ── 情绪星点亮状态 ──
+  @State private isTodayLit: boolean = false;
+  @State private totalLightDays: number = 0;
+  @State private currentLevelTitle: string = '初见';
+
   async aboutToAppear(): Promise<void> {
     const rawParams: Object | undefined = router.getParams();
     if (rawParams) {
@@ -128,6 +138,24 @@ struct ResultGoldenPage {
 
     // 异步保存历史记录
     await this.saveHistory();
+
+    // 检查今日情绪星点亮状态（仅在每日一占入口时）
+    await this.checkTodayLightStatus();
+  }
+
+  /**
+   * 检查今日情绪星是否已点亮，并计算累计天数和当前等级
+   */
+  private async checkTodayLightStatus(): Promise<void> {
+    try {
+      this.isTodayLit = await EmotionStarStorage.hasLightedToday(getContext(this));
+      const records: EmotionStarRecord[] = await EmotionStarStorage.getRecords(getContext(this));
+      this.totalLightDays = EmotionStarStorage.getTotalLightDays(records);
+      const level: StarKeyLevel = EmotionStarStorage.getLevelByTotalDays(this.totalLightDays);
+      this.currentLevelTitle = level.title;
+    } catch (_err) {
+      // ignore
+    }
   }
 
   /**
@@ -192,7 +220,7 @@ struct ResultGoldenPage {
 
       // 根据 entryMode 决定 spreadType：来自牌轮的单牌也标记为 CARD_WHEEL
       let actualSpreadType: SpreadType = SpreadType.SINGLE;
-      let modeTitle: string = '单牌快占';
+      let modeTitle: string = '每日一占';
       if (this.entryMode === 'FIRST_EXPERIENCE') {
         modeTitle = '首次体验';
       } else if (this.entryMode === 'CARD_WHEEL') {
@@ -610,39 +638,104 @@ struct ResultGoldenPage {
   @Builder
   buildBottomEntry(): void {
     Column() {
-      Button('⭐ 点亮情绪星')
-        .type(ButtonType.Normal)
-        .width('100%')
-        .height(52)
-        .borderRadius(26)
-        .backgroundColor('#17172F')
-        .fontColor('#D99A00')
-        .fontSize(19)
-        .fontWeight(FontWeight.Bold)
-        .border({ width: 1, color: '#D99A00' })
-        .onClick(() => {
-          const emotionStarParams: EmotionStarRouteParams = {
-            emotionTag: this.emotionTag || '',
-            heartOptionIndex: this.heartOptionIndex
-          };
-          try {
-            router.pushUrl({
-              url: Routes.EMOTION_STAR,
-              params: emotionStarParams
-            });
-          } catch (err) {
-            console.error('pushUrl to EmotionStar failed: ' + JSON.stringify(err));
-          }
-        })
+      if (this.isTodayLit) {
+        // ── 已点亮状态 ──
+        Button('⭐ 今日已点亮')
+          .type(ButtonType.Normal)
+          .width('100%')
+          .height(52)
+          .borderRadius(26)
+          .backgroundColor('rgba(217, 154, 0, 0.12)')
+          .fontColor('#D99A00')
+          .fontSize(19)
+          .fontWeight(FontWeight.Bold)
+          .border({ width: 1, color: 'rgba(217, 154, 0, 0.3)' })
+          .onClick(() => {
+            try {
+              this.getUIContext().getPromptAction().showToast({
+                message: '今天的星星已经亮着了，明天再来看看自己吧。',
+                duration: 2000,
+              });
+            } catch (_err) {
+              // ignore
+            }
+          })
 
-      Text('记录今天的心事，让星澜陪你看见最近的自己。')
-        .fontSize(Theme.FONT_CAPTION)
-        .fontColor(Theme.MOON_MUTED)
-        .textAlign(TextAlign.Center)
-        .margin({ top: 8 })
+        Text('今天的星星已经亮着了，明天再来看看自己吧。')
+          .fontSize(Theme.FONT_CAPTION)
+          .fontColor(Theme.MOON_MUTED)
+          .textAlign(TextAlign.Center)
+          .margin({ top: 8 })
+      } else {
+        // ── 未点亮状态 ──
+        Button('⭐ 点亮情绪星')
+          .type(ButtonType.Normal)
+          .width('100%')
+          .height(52)
+          .borderRadius(26)
+          .backgroundColor('#17172F')
+          .fontColor('#D99A00')
+          .fontSize(19)
+          .fontWeight(FontWeight.Bold)
+          .border({ width: 1, color: '#D99A00' })
+          .onClick(() => {
+            this.handleLightEmotionStar();
+          })
+
+        Text('记录今天的心事，让星澜陪你看见最近的自己。')
+          .fontSize(Theme.FONT_CAPTION)
+          .fontColor(Theme.MOON_MUTED)
+          .textAlign(TextAlign.Center)
+          .margin({ top: 8 })
+      }
     }
     .width('100%')
     .margin({ top: Theme.SPACE_LG, bottom: Theme.SPACE_SM })
+  }
+
+  /**
+   * 处理点亮情绪星：写入记录 → 跳转点亮成功页
+   */
+  private async handleLightEmotionStar(): Promise<void> {
+    try {
+      const record: EmotionStarRecord = {
+        date: EmotionStarStorage.todayString(),
+        starName: this.emotionTag || '',
+        sourceType: 'daily_card',
+        cardName: this.cardName,
+        createdAt: Date.now(),
+      };
+
+      const success: boolean = await EmotionStarStorage.lightToday(getContext(this), record);
+      if (!success) {
+        // 已点亮（极端并发情况防护）
+        this.isTodayLit = true;
+        return;
+      }
+
+      // 重新读取累计数据
+      const records: EmotionStarRecord[] = await EmotionStarStorage.getRecords(getContext(this));
+      this.totalLightDays = EmotionStarStorage.getTotalLightDays(records);
+      const level: StarKeyLevel = EmotionStarStorage.getLevelByTotalDays(this.totalLightDays);
+      this.currentLevelTitle = level.title;
+      this.isTodayLit = true;
+
+      // 跳转到点亮成功页
+      const emotionStarParams: EmotionStarRouteParams = {
+        emotionTag: this.emotionTag || '',
+        heartOptionIndex: this.heartOptionIndex,
+        cardName: this.cardName,
+        cardId: this.cardId,
+        totalLightDays: this.totalLightDays,
+        currentLevelTitle: this.currentLevelTitle,
+      };
+      router.pushUrl({
+        url: Routes.EMOTION_STAR,
+        params: emotionStarParams,
+      });
+    } catch (err) {
+      console.error('lightToday failed: ' + JSON.stringify(err));
+    }
   }
 
   /**

@@ -23,7 +23,7 @@ interface FeatureEntry {
 }
 
 const FEATURE_ENTRIES: FeatureEntry[] = [
-  { id: 'single', title: '单牌快占', subtitle: '快速获得此刻指引', spreadId: 'single_card', enabled: true },
+  { id: 'single', title: '每日一占', subtitle: '快速获得此刻指引', spreadId: 'single_card', enabled: true },
   { id: 'triangle', title: '圣三角', subtitle: '过去 · 现在 · 未来', spreadId: 'sacred_triangle', enabled: true },
   { id: 'relationship', title: '关系探索', subtitle: '我 · 对方 · 走向', spreadId: 'relationship', enabled: true },
   { id: 'decision', title: '决策牌阵', subtitle: '即将上线', spreadId: 'decision', enabled: false }

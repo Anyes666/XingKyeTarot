@@ -202,7 +202,7 @@ struct HistoryPage {
     if (this.filterType === '牌轮') {
       return '去旋转牌轮';
     }
-    return '去单牌快占';
+    return '去每日一占';
   }
 
   /**
@@ -456,15 +456,10 @@ struct HistoryPage {
       .padding({ top: 18, bottom: 18, left: 20, right: 20 })
     }
     .width('100%')
-    .backgroundColor(Theme.BG_CARD_DARK)
-    .borderRadius(18)
-    .border({ width: 1, color: 'rgba(202, 138, 4, 0.12)' })
-    .shadow({
-      radius: 8,
-      color: 'rgba(0, 0, 0, 0.3)',
-      offsetX: 0,
-      offsetY: 2
-    })
+    .backgroundColor(Theme.STARKEY_CARD_BG)
+    .borderRadius(Theme.STARKEY_CARD_RADIUS)
+    .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
+    .shadow(Theme.SHADOW_CARD_SUBTLE)
     .onClick(() => {
       const detailParams: HistoryDetailRouteParams = {
         recordId: record.id,
