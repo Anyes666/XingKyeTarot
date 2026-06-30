@@ -2,6 +2,7 @@ import { router } from '@kit.ArkUI';
 import { Theme } from '../common/Theme';
 import { Routes } from '../common/Routes';
 import { AppBackButton } from '../components/AppBackButton';
+import { TarotCardImage } from '../components/TarotCardImage';
 import { TarotCardRepository, DrawCardResult } from '../data/TarotCardRepository';
 import { MVP8_CARD_IMAGES, MVP8_CARD_NAMES, getMVP8CardData, getScenarioContent } from '../data/MVP8CardsData';
 import { EmotionTag } from '../model/TarotCard';
@@ -185,16 +186,19 @@ struct RelationDrawPage {
               .fontWeight(FontWeight.Bold)
               .margin({ bottom: Theme.SPACE_SM })
 
-            Image(this.revealedSlots[index]
-              ? (MVP8_CARD_IMAGES[slot.cardId] ?? $r('app.media.tarot_major_18_moon'))
-              : $r('app.media.card_back'))
-              .width('100%')
-              .height('100%')
-              .objectFit(ImageFit.Contain)
-              .borderRadius(Theme.RADIUS_SM)
-              .border({ width: 1, color: 'rgba(202, 138, 4, 0.2)' })
-              .opacity(this.revealedSlots[index] ? 1.0 : 0.6)
-              .constraintSize({ maxWidth: 130, maxHeight: 210 })
+            if (this.revealedSlots[index]) {
+              TarotCardImage({
+                cardId: slot.cardId,
+                cardWidth: Theme.CARD_SIZE_TRIO_DRAW.width,
+                cardHeight: Theme.CARD_SIZE_TRIO_DRAW.height
+              })
+            } else {
+              TarotCardImage({
+                cardId: '',
+                cardWidth: Theme.CARD_SIZE_TRIO_DRAW.width,
+                cardHeight: Theme.CARD_SIZE_TRIO_DRAW.height
+              })
+            }
 
             if (this.revealedSlots[index]) {
               Text(slot.cardName)

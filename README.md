@@ -218,3 +218,4 @@ docs/design/tarot-card-style-samples/
 
 > **开发者**：杨鹏宇 · **邮箱**：3364153745@qq.com  
 > **Bundle ID**：com.xingkey.tarot · **SDK**：5.0.0(12)~6.1.1(24)
+# XingKyeTarot

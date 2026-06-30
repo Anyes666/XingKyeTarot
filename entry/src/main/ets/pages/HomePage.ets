@@ -1263,6 +1263,24 @@ struct HomePage {
         .hitTestBehavior(HitTestMode.Transparent)
 
       // ═══════════════════════════════════════════
+      // Layer 2.5: 沉浸光感 — 金色径向光晕（顶部品牌区附近，极低透明度）
+      // ═══════════════════════════════════════════
+      Column()
+        .width('100%')
+        .height('100%')
+        .radialGradient({
+          center: ['50%', '8%'],
+          radius: '55%',
+          colors: [
+            ['rgba(202, 138, 4, 0.04)', 0.0],
+            ['rgba(202, 138, 4, 0.025)', 0.25],
+            ['rgba(202, 138, 4, 0.01)', 0.55],
+            ['rgba(0, 0, 0, 0)', 1.0]
+          ]
+        })
+        .hitTestBehavior(HitTestMode.Transparent)
+
+      // ═══════════════════════════════════════════
       // Layer 3: 主内容 Column（比例布局 14/59/27）
       // 点击星澜背景追加文案
       // 底部导航已由 MainFramePage 统一管理，不再在此页面渲染

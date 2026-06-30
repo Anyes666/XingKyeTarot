@@ -56,6 +56,7 @@ interface WheelTriangleResultParams {
   questionText: string;
   scenarioTag: string;
   cards: WheelCardSlotInfo[];
+  source?: string;
 }
 
 interface WheelCardSlotInfo {
@@ -91,11 +92,33 @@ const FRAME_WIDTH: number = CARD_WIDTH + 8;
 /** 中心选择框高度（略大于牌高） */
 const FRAME_HEIGHT: number = CARD_HEIGHT + 8;
 /** 吸附动画时长（ms） */
-const SNAP_DURATION: number = 220;
+const SNAP_DURATION: number = 280;
 /** 可见牌范围：中心左右各 VISIBLE_RANGE 张 */
-const VISIBLE_RANGE: number = 4;
+const VISIBLE_RANGE: number = 5;
 /** 吸附阈值：拖动超过此距离至少切 1 张 */
-const SNAP_THRESHOLD: number = ITEM_STEP * 0.35;
+const SNAP_THRESHOLD: number = ITEM_STEP * 0.28;
+/** 惯性摩擦系数（每帧速度衰减比例，越大衰减越快） */
+const FRICTION: number = 0.94;
+/** 惯性动画帧间隔（ms） */
+const INERTIA_FRAME_MS: number = 16;
+/** 惯性最小速度：低于此值直接吸附 */
+const MIN_VELOCITY: number = 0.8;
+/** 中心牌缩放倍率 */
+const CENTER_SCALE: number = 1.0;
+/** 边缘牌最小缩放 */
+const MIN_SCALE: number = 0.42;
+/** 中心牌透明度 */
+const CENTER_OPACITY: number = 1.0;
+/** 边缘牌最小透明度 */
+const MIN_OPACITY: number = 0.08;
+/** 中心牌亮度偏移（0=不变） */
+const CENTER_BRIGHTNESS: number = 1.0;
+/** 边缘牌亮度偏移 */
+const EDGE_BRIGHTNESS: number = 0.35;
+/** 悬浮高度（vp）— 中心牌上浮 */
+const CENTER_LIFT: number = 3;
+/** 中心光晕渐显时长（ms） */
+const GLOW_FADE_DURATION: number = 200;
 
 /** 三牌位置 */
 const THREE_POSITIONS: PositionDef[] = [
@@ -138,6 +161,14 @@ struct CardWheelDrawPage {
   @State private isSnapping: boolean = false;
   /** 确认按钮是否可点击（显式 @State，确保 UI 刷新） */
   @State private confirmBtnEnabled: boolean = true;
+  /** 中心光晕透明度（0-1，吸附后渐显） */
+  @State private centerGlowAlpha: number = 0;
+  /** 惯性速度（vp/frame，仅在惯性阶段有效） */
+  private inertiaVelocity: number = 0;
+  /** 惯性动画定时器 ID */
+  private inertiaTimerId: number = -1;
+  /** 吸附完成回调定时器 ID（snapToNearest 中的 setTimeout） */
+  private snapFinishTimerId: number = -1;
 
   // ── 可见牌偏移列表 ──
   @State private visibleOffsets: number[] = [];
@@ -157,6 +188,13 @@ struct CardWheelDrawPage {
     this.initVisibleOffsets();
     this.updateConfirmBtnEnabled();
     this.updateUITexts();
+  }
+
+  /**
+   * 页面即将销毁：清理所有未完成的定时器，防止销毁后继续 setState
+   */
+  aboutToDisappear(): void {
+    this.stopInertia();
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -328,42 +366,129 @@ struct CardWheelDrawPage {
   }
 
   // ═══════════════════════════════════════════════════════════
-  // 手势处理 — 跟手拖动 + 松手吸附
+  // 手势处理 — 跟手拖动 + 惯性滚动 + 弹性吸附（物理动力学）
   // ═══════════════════════════════════════════════════════════
 
   /**
-   * 松手后计算吸附目标并执行动画
+   * 松手：根据手势速度决定惯性滚动还是直接吸附
+   * 如果拖拽速度足够大 → 进入惯性阶段
+   * 否则 → 直接吸附到最近的牌
    */
   private finishDrag(): void {
-    // 计算拖动跨越了多少"格"
-    let moveSteps: number = Math.round(-this.dragOffsetX / ITEM_STEP);
+    // 停止任何还在运行的惯性定时器
+    this.stopInertia();
 
+    // 计算拖拽速度（vp/frame，负值=右滑，正值=左滑）
+    const velocity: number = this.inertiaVelocity;
+    const absVelocity: number = Math.abs(velocity);
+
+    // 速度足够大 → 进入惯性滚动
+    if (absVelocity > MIN_VELOCITY) {
+      this.startInertia(velocity);
+    } else {
+      // 速度太小 → 直接吸附
+      this.snapToNearest();
+    }
+  }
+
+  /**
+   * 启动惯性滚动动画
+   * 每帧：velocity *= FRICTION，dragOffsetX += velocity
+   * 当速度衰减到阈值以下 → 吸附
+   */
+  private startInertia(initialVelocity: number): void {
+    this.inertiaVelocity = initialVelocity;
+    this.isDragging = false;
+    this.isSnapping = true;
+    this.updateConfirmBtnEnabled();
+    this.centerGlowAlpha = 0;
+
+    const tick = (): void => {
+      // 应用速度
+      this.dragOffsetX += this.inertiaVelocity;
+
+      // 当拖动偏移超过一张牌的范围时，提交 virtualIndex 更新并重置偏移
+      while (this.dragOffsetX > ITEM_STEP) {
+        this.virtualIndex -= 1;
+        this.dragOffsetX -= ITEM_STEP;
+      }
+      while (this.dragOffsetX < -ITEM_STEP) {
+        this.virtualIndex += 1;
+        this.dragOffsetX += ITEM_STEP;
+      }
+
+      // 摩擦衰减
+      this.inertiaVelocity *= FRICTION;
+
+      // 检查是否该停止了
+      if (Math.abs(this.inertiaVelocity) < MIN_VELOCITY) {
+        this.stopInertia();
+        this.snapToNearest();
+      } else {
+        // 继续下一帧
+        this.inertiaTimerId = setTimeout(tick, INERTIA_FRAME_MS);
+      }
+    };
+
+    this.inertiaTimerId = setTimeout(tick, INERTIA_FRAME_MS);
+  }
+
+  /**
+   * 停止惯性滚动（同时清理所有相关定时器）
+   */
+  private stopInertia(): void {
+    if (this.inertiaTimerId >= 0) {
+      clearTimeout(this.inertiaTimerId);
+      this.inertiaTimerId = -1;
+    }
+    if (this.snapFinishTimerId >= 0) {
+      clearTimeout(this.snapFinishTimerId);
+      this.snapFinishTimerId = -1;
+    }
+    this.inertiaVelocity = 0;
+  }
+
+  /**
+   * 吸附到最近的牌位（弹性吸附）
+   * 计算当前偏移最接近的整数牌位，执行 EaseOut 动画
+   */
+  private snapToNearest(): void {
+    // 计算最接近的整步
+    let steps: number = Math.round(-this.dragOffsetX / ITEM_STEP);
     // 确保小幅拖动也至少切换一张（如果超过阈值）
-    if (moveSteps === 0 && Math.abs(this.dragOffsetX) > SNAP_THRESHOLD) {
-      moveSteps = this.dragOffsetX < 0 ? 1 : -1;
+    if (steps === 0 && Math.abs(this.dragOffsetX) > SNAP_THRESHOLD) {
+      steps = this.dragOffsetX < 0 ? 1 : -1;
     }
 
-    const newVirtualIndex: number = this.virtualIndex + moveSteps;
+    const newVirtualIndex: number = this.virtualIndex + steps;
 
     this.isSnapping = true;
     this.isDragging = false;
     this.updateConfirmBtnEnabled();
+    this.centerGlowAlpha = 0;
 
-    // 动画吸附
+    // EaseOut 弹性吸附动画
     animateTo({
       duration: SNAP_DURATION,
       curve: Curve.EaseOut,
     }, () => {
       this.virtualIndex = newVirtualIndex;
       this.dragOffsetX = 0;
-      // 动画中保持禁用
       this.updateConfirmBtnEnabled();
     });
 
-    // 动画结束后恢复按钮
-    setTimeout(() => {
+    // 吸附完成后：中心光晕渐显（吸引感）
+    this.snapFinishTimerId = setTimeout(() => {
+      this.snapFinishTimerId = -1;
       this.isSnapping = false;
       this.updateConfirmBtnEnabled();
+      // 渐显中心光晕
+      animateTo({
+        duration: GLOW_FADE_DURATION,
+        curve: Curve.EaseIn,
+      }, () => {
+        this.centerGlowAlpha = 1.0;
+      });
     }, SNAP_DURATION + 50);
   }
 
@@ -424,32 +549,61 @@ struct CardWheelDrawPage {
         .hitTestBehavior(HitTestMode.None)
         .alignContent(Alignment.Center)
 
-        // 中心金色选择框（固定，不随牌移动）
-        Column()
-          .width(FRAME_WIDTH)
-          .height(FRAME_HEIGHT)
-          .borderRadius(Theme.TAROT_CARD_RADIUS + 2)
-          .border({ width: 2, color: Theme.GOLD_LIGHT })
-          .backgroundColor('rgba(229, 165, 10, 0.06)')
-          .hitTestBehavior(HitTestMode.None)
+        // 中心金色选择框（固定，不随牌移动）+ 光晕吸引层
+        Stack() {
+          // 外层光晕（吸附后渐显，模拟金色漫反射）
+          Column()
+            .width(FRAME_WIDTH + 24)
+            .height(FRAME_HEIGHT + 24)
+            .borderRadius(Theme.TAROT_CARD_RADIUS + 12)
+            .radialGradient({
+              center: ['50%', '50%'],
+              radius: '50%',
+              colors: [
+                ['rgba(229, 165, 10, 0.15)', 0.0],
+                ['rgba(229, 165, 10, 0.06)', 0.4],
+                ['rgba(229, 165, 10, 0)', 1.0]
+              ]
+            })
+            .opacity(this.centerGlowAlpha)
+            .hitTestBehavior(HitTestMode.None)
+
+          // 内层选择框
+          Column()
+            .width(FRAME_WIDTH)
+            .height(FRAME_HEIGHT)
+            .borderRadius(Theme.TAROT_CARD_RADIUS + 2)
+            .border({ width: 2, color: Theme.GOLD_LIGHT })
+            .backgroundColor('rgba(229, 165, 10, 0.06)')
+            .hitTestBehavior(HitTestMode.None)
+        }
+        .hitTestBehavior(HitTestMode.None)
       }
       .width('100%')
       .height(FRAME_HEIGHT + 60)
       .alignContent(Alignment.Center)
       .margin({ top: Theme.SPACE_LG })
-      // 手势层
+      // 手势层 — 捕获速度用于惯性计算
       .gesture(
         PanGesture({ direction: PanDirection.Horizontal, distance: 8 })
           .onActionStart(() => {
             this.isDragging = true;
             this.updateConfirmBtnEnabled();
+            this.centerGlowAlpha = 0;
+            // 重置惯性速度记录
+            this.inertiaVelocity = 0;
+            this.stopInertia();
           })
           .onActionUpdate((event: GestureEvent) => {
             // 实时更新拖动偏移
             this.dragOffsetX = event.offsetX;
+            // 记录手势速度（用于松手后的惯性计算）
+            if (event.velocityX !== undefined) {
+              this.inertiaVelocity = -event.velocityX / 60; // 转换为 vp/frame
+            }
           })
           .onActionEnd(() => {
-            // 松手 → 计算吸附
+            // 松手 → 惯性滚动或直接吸附
             this.finishDrag();
           })
       )
@@ -474,6 +628,8 @@ struct CardWheelDrawPage {
   // ═══════════════════════════════════════════════════════════
 
   private navigateToResult(): void {
+    // 确保跳转前清理所有定时器（惯性/吸附回调）
+    this.stopInertia();
     if (this.drawCount === 1) {
       this.navigateToSingleResult();
     } else {
@@ -491,7 +647,7 @@ struct CardWheelDrawPage {
 
     try {
       const params: WheelSingleResultParams = {
-        entryMode: 'NORMAL_SINGLE',
+        entryMode: 'CARD_WHEEL',
         recordId: recordId,
         cardId: card.cardId,
         cardName: card.cardName,
@@ -539,6 +695,7 @@ struct CardWheelDrawPage {
         questionText: '',
         scenarioTag: '综合',
         cards: resultCards,
+        source: 'card_wheel',
       };
       router.replaceUrl({ url: Routes.TRIANGLE_RESULT, params: params });
     } catch (_err) {
@@ -557,6 +714,21 @@ struct CardWheelDrawPage {
         .width('100%')
         .height('100%')
         .backgroundColor(Theme.BG_DEEP_INDIGO)
+
+      // 沉浸光感层：中心轻微金色径向渐变（透明度 4-6%）
+      Column()
+        .width('100%')
+        .height('100%')
+        .radialGradient({
+          center: ['50%', '48%'],
+          radius: '60%',
+          colors: [
+            ['rgba(229, 165, 10, 0.05)', 0.0],
+            ['rgba(229, 165, 10, 0.015)', 0.5],
+            ['rgba(15, 15, 35, 0)', 1.0]
+          ]
+        })
+        .hitTestBehavior(HitTestMode.None)
 
       // 主内容
       Column() {
@@ -654,12 +826,14 @@ struct WheelCardItemContent {
 
   build() {
     Column() {
+      // 牌背图片（支持中心亮度提升 + 边缘暗化）
       Image($r('app.media.card_back'))
         .width(CARD_WIDTH * this.getCardScale())
         .height(CARD_HEIGHT * this.getCardScale())
         .objectFit(ImageFit.Cover)
         .borderRadius(Theme.TAROT_CARD_RADIUS)
         .opacity(this.getCardOpacity())
+        .brightness(this.getCardBrightness())
         .rotate({
           angle: this.getCardRotate(),
           centerX: '50%',
@@ -670,33 +844,58 @@ struct WheelCardItemContent {
     .height(CARD_HEIGHT)
     .justifyContent(FlexAlign.Center)
     .zIndex(this.getCardZIndex())
-    .translate({ x: this.getCardTranslateX(), y: 0 })
+    .translate({ x: this.getCardTranslateX(), y: this.getCardLift() })
   }
 
   private visualPosition(): number {
     return this.offsetFromCenter + (this.dragOffsetX / ITEM_STEP);
   }
 
+  /** 平滑缩放：中心 1.0 → 边缘 MIN_SCALE（柔和衰减） */
   private getCardScale(): number {
     const distance: number = Math.abs(this.visualPosition());
-    return Math.max(0.48, 1.0 - distance * 0.16);
+    // 使用平滑曲线：1 - distance² * k，使得边缘衰减更柔和
+    const scale: number = CENTER_SCALE - (distance * distance * 0.045);
+    return Math.max(MIN_SCALE, scale);
   }
 
+  /** 透明度：中心 1.0 → 边缘 MIN_OPACITY（柔和淡出） */
   private getCardOpacity(): number {
     const distance: number = Math.abs(this.visualPosition());
-    return Math.max(0.12, 1.0 - distance * 0.23);
+    const opacity: number = CENTER_OPACITY - (distance * distance * 0.055);
+    return Math.max(MIN_OPACITY, opacity);
   }
 
+  /** 亮度：中心亮 → 边缘暗（模拟聚焦光感） */
+  private getCardBrightness(): number {
+    const distance: number = Math.abs(this.visualPosition());
+    const brightness: number = CENTER_BRIGHTNESS - (distance * 0.18);
+    return Math.max(EDGE_BRIGHTNESS, brightness);
+  }
+
+  /** 轻微旋转（Y轴透视感），中心 0° → 边缘 ±15° */
   private getCardRotate(): number {
-    return this.visualPosition() * -6;
+    return this.visualPosition() * -8;
   }
 
+  /** Z轴层级：中心最高 → 边缘递减 */
   private getCardZIndex(): number {
     const distance: number = Math.abs(this.visualPosition());
-    return Math.round(100 - distance * 10);
+    return Math.round(100 - distance * 12);
   }
 
+  /** 水平位移 */
   private getCardTranslateX(): number {
     return this.visualPosition() * ITEM_STEP;
+  }
+
+  /** 垂直悬浮：中心牌微微上浮（悬浮感），边缘归零 */
+  private getCardLift(): number {
+    const distance: number = Math.abs(this.visualPosition());
+    if (distance < 0.5) {
+      return -CENTER_LIFT;
+    }
+    const lift: number = -CENTER_LIFT * Math.max(0, 1 - distance * 0.5);
+    return Math.round(lift * 10) / 10;
   }
 }

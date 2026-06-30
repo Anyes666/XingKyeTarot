@@ -7,6 +7,8 @@ import { PreferenceStore } from '../data/PreferenceStore';
 import { TAROT_CARDS } from '../data/TarotCardData';
 import { TarotCard, ArcanaType, TarotSuit } from '../model/TarotCard';
 import { hilog } from '@kit.PerformanceAnalysisKit';
+import { GlobalBgmManager } from '../common/GlobalBgmManager';
+import { common } from '@kit.AbilityKit';
 
 /**
  * Phase 6.8：主框架页面 — 底部导航容器
@@ -45,6 +47,48 @@ struct MainFramePage {
       }
     } catch (_err) {
       // ignore, keep default tab 2
+    }
+
+    // 初始化并开始播放全局背景音乐（单例，幂等）
+    this.initAndPlayBgm();
+  }
+
+  /**
+   * 初始化全局背景音乐管理器并开始播放
+   * 使用 getContext 获取 UIAbilityContext，传递 rawfile 文件描述符
+   * 尊重 bgm_enabled 持久化偏好
+   */
+  private initAndPlayBgm(): void {
+    try {
+      const bgmManager: GlobalBgmManager = GlobalBgmManager.getInstance();
+      const ctx: common.UIAbilityContext = getContext(this) as common.UIAbilityContext;
+
+      // 先读取持久化的 bgm 开关状态
+      PreferenceStore.getBoolean('bgm_enabled', true, ctx).then((enabled: boolean) => {
+        bgmManager.setMusicEnabled(enabled);
+
+        // 初始化（仅首次创建 AVPlayer）
+        bgmManager.init(ctx).then(() => {
+          // 初始化完成后播放（内部会检查 isMusicEnabled）
+          bgmManager.play().catch((_err: Error) => {
+            hilog.warn(0x0000, 'MainFramePage', 'BGM play failed');
+          });
+        }).catch((_err: Error) => {
+          hilog.warn(0x0000, 'MainFramePage', 'BGM init failed');
+        });
+      }).catch((_err: Error) => {
+        // 读取失败，默认开启
+        hilog.warn(0x0000, 'MainFramePage', 'BGM pref read failed, using default');
+        bgmManager.init(ctx).then(() => {
+          bgmManager.play().catch((_err2: Error) => {
+            hilog.warn(0x0000, 'MainFramePage', 'BGM play failed');
+          });
+        }).catch((_err2: Error) => {
+          hilog.warn(0x0000, 'MainFramePage', 'BGM init failed');
+        });
+      });
+    } catch (_err) {
+      hilog.warn(0x0000, 'MainFramePage', 'BGM setup failed');
     }
   }
 
@@ -867,6 +911,45 @@ struct TarotCardsTabContent {
 @Component
 struct SettingsTabContent {
   @State isResetting: boolean = false;
+  @State bgmEnabled: boolean = true;
+  /** 用于抑制 loadBgmEnabled 中程序化 @State 更新触发的 Toggle.onChange */
+  private isLoadingBgmState: boolean = false;
+
+  aboutToAppear(): void {
+    this.loadBgmEnabled();
+  }
+
+  private async loadBgmEnabled(): Promise<void> {
+    try {
+      const enabled: boolean = await PreferenceStore.getBoolean('bgm_enabled', true, getContext(this));
+      // 抑制 onChange 触发：先设 flag，再更新 @State，防止 Toggle 误认为用户操作
+      this.isLoadingBgmState = true;
+      this.bgmEnabled = enabled;
+      this.isLoadingBgmState = false;
+    } catch (_err) {
+      // 读取失败时保守保留当前 UI 状态，不覆盖为 true
+      this.bgmEnabled = GlobalBgmManager.getInstance().getMusicEnabled();
+    }
+  }
+
+  private async toggleBgm(isOn: boolean): Promise<void> {
+    // 防止 onChange 在程序更新 @State 时触发（loadBgmEnabled 中的赋值）
+    if (this.isLoadingBgmState) {
+      return;
+    }
+    // 防止重复触发（@State 已与 isOn 一致）
+    if (this.bgmEnabled === isOn) {
+      return;
+    }
+    this.bgmEnabled = isOn;
+    const bgmManager: GlobalBgmManager = GlobalBgmManager.getInstance();
+    bgmManager.setMusicEnabled(isOn);
+    try {
+      await PreferenceStore.putBoolean('bgm_enabled', isOn, getContext(this));
+    } catch (_err) {
+      // ignore
+    }
+  }
 
   private async resetAllGuides(): Promise<void> {
     if (this.isResetting) {
@@ -949,6 +1032,65 @@ struct SettingsTabContent {
         .borderRadius(Theme.RADIUS_MD)
         .margin({ bottom: Theme.SPACE_MD })
         .onClick(() => { this.resetAllGuides(); })
+
+        // 背景音乐开关
+        Column() {
+          Row() {
+            Column() {
+              Text('背景音乐')
+                .fontSize(Theme.FONT_BODY)
+                .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                .width('100%')
+
+              Text('开启后，星钥塔罗会播放一首低音量的全局主旋律。')
+                .fontSize(13)
+                .fontColor(Theme.MOON_MUTED)
+                .width('100%')
+                .margin({ top: 4 })
+            }
+            .layoutWeight(1)
+
+            Toggle({ type: ToggleType.Switch, isOn: this.bgmEnabled })
+              .selectedColor('#E8B83D')
+              .onChange((isOn: boolean) => {
+                this.toggleBgm(isOn);
+              })
+          }
+          .width('100%')
+          .alignItems(VerticalAlign.Center)
+          .padding({ top: 16, bottom: 16, left: 20, right: 20 })
+        }
+        .width('92%')
+        .backgroundColor('rgba(27, 27, 48, 0.68)')
+        .borderRadius(Theme.RADIUS_MD)
+        .margin({ bottom: Theme.SPACE_MD })
+
+        // 使用说明
+        Column() {
+          Text('使用说明')
+            .fontSize(Theme.FONT_BODY)
+            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+            .width('100%')
+            .padding({ top: 16, bottom: 16, left: 20, right: 20 })
+
+          Text('了解星钥塔罗每个板块的用法和设计初衷。')
+            .fontSize(13)
+            .fontColor(Theme.MOON_MUTED)
+            .width('100%')
+            .padding({ left: 20, right: 20, bottom: 16 })
+        }
+        .width('92%')
+        .backgroundColor('rgba(27, 27, 48, 0.68)')
+        .borderRadius(Theme.RADIUS_MD)
+        .margin({ bottom: Theme.SPACE_MD })
+        .onClick(() => {
+          try {
+            const options: router.RouterOptions = { url: Routes.USAGE_GUIDE };
+            router.pushUrl(options);
+          } catch (_err) {
+            // ignore
+          }
+        })
 
         // 设置项：关于星钥塔罗
         Column() {

@@ -2,6 +2,13 @@
  * 星钥塔罗 — 全局主题 Token
  * 新中式星空风格：深蓝紫底色 + 温润金色点缀 + 青绿极光辅助
  */
+
+/** 卡片尺寸描述接口 */
+interface CardSize {
+  width: number;
+  height: number;
+}
+
 export class Theme {
   // ── 背景色 ──
   static readonly BG_PRIMARY: string = '#10172F';
@@ -88,6 +95,20 @@ export class Theme {
   static readonly TAROT_CARD_HEIGHT: number = 160;
   static readonly TAROT_CARD_RADIUS: number = 10;
   static readonly TAROT_CARD_ASPECT_RATIO: number = 1.6; // height / width
+
+  // ── 统一卡片尺寸常量（P0.3 整改）──
+  /** 单牌结果页大卡 */
+  static readonly CARD_SIZE_SINGLE_RESULT: CardSize = { width: 140, height: 224 };
+  /** 三牌结果页/分享卡/历史详情统一尺寸 */
+  static readonly CARD_SIZE_TRIO: CardSize = { width: 90, height: 144 };
+  /** 牌轮抽牌阶段牌背尺寸 */
+  static readonly CARD_SIZE_WHEEL: CardSize = { width: 80, height: 128 };
+  /** 卡牌详情页中等预览尺寸 */
+  static readonly CARD_SIZE_DETAIL: CardSize = { width: 0, height: 320 };
+  /** 抽牌动画阶段牌面尺寸 */
+  static readonly CARD_SIZE_DRAW_STAGE: CardSize = { width: 200, height: 320 };
+  /** 三牌抽牌阶段小卡 */
+  static readonly CARD_SIZE_TRIO_DRAW: CardSize = { width: 130, height: 210 };
 
   // ── 响应式断点（vp）──
   static readonly BREAKPOINT_SM: number = 320;

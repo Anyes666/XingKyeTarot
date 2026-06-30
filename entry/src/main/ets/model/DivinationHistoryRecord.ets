@@ -10,12 +10,14 @@ export enum SpreadType {
   SINGLE = 'SINGLE',
   TRIANGLE = 'TRIANGLE',
   RELATION = 'RELATION',
+  CARD_WHEEL = 'CARD_WHEEL',
 }
 
 /** 入口模式 */
 export enum EntryMode {
   FIRST_EXPERIENCE = 'FIRST_EXPERIENCE',
   NORMAL_SINGLE = 'NORMAL_SINGLE',
+  CARD_WHEEL = 'CARD_WHEEL',
 }
 
 /** 单张已抽牌记录 */

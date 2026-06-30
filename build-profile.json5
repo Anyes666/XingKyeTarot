@@ -27,13 +27,13 @@
         "name": "666",
         "type": "HarmonyOS",
         "material": {
-          "certpath": "C:\\Users\\pc\\.ohos\\config\\666_XingKeyTarot_7b6Qe0V1i69Dfz1gQdk6527UNfWOdcDTduVdWk55zFw=.cer",
+          "storeFile": "D:/XingKeyTarot/signing/xingkeyCSR.p12",
+          "storePassword": "0000001B1884EC033E92CBED5D623982D72839462ED3D5CBFF36C2EA919E473AD8AD7130D33460B18F38B0",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001BB62B5F4AB6FD7455794453567B46DEA30362CC898614B4DC4830DC2974C2BF1E2692FC783273BD",
-          "profile": "C:\\Users\\pc\\.ohos\\config\\666_XingKeyTarot_7b6Qe0V1i69Dfz1gQdk6527UNfWOdcDTduVdWk55zFw=.p7b",
+          "keyPassword": "0000001B797A6761F9470889ED5C2CAFA8458DFAEE68C9AE71CB707FA1EC428FA682A768F9F5C5031B707E",
           "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\pc\\.ohos\\config\\666_XingKeyTarot_7b6Qe0V1i69Dfz1gQdk6527UNfWOdcDTduVdWk55zFw=.p12",
-          "storePassword": "0000001B14E96EB69A8B140DDE13ECDB7D4C23B6D48CDAF4E91C288C3DE3A1444444FA9DE9703B80AE4637"
+          "profile": "D:/XingKeyTarot/signing/xingkeyRelease.p7b",
+          "certpath": "D:/XingKeyTarot/signing/xingkey.cer"
         }
       }
     ]

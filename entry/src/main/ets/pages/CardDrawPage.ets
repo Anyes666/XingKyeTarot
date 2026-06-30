@@ -4,6 +4,7 @@ import { Routes } from '../common/Routes';
 import { AppBackButton } from '../components/AppBackButton';
 import { MVP8_CARD_IMAGES, MVP8_CARD_NAMES, getGoldenSentence } from '../data/MVP8CardsData';
 import { drawCardByWeight } from '../data/HeartOptionsData';
+import { drawCardByPositiveWeight, getPositiveGoldenSentence, PositiveEmotionTag } from '../data/PositiveHeartOptions';
 import { generateRecordId } from '../model/MvpDivinationRecord';
 import { EmotionTag } from '../model/TarotCard';
 
@@ -54,6 +55,7 @@ struct CardDrawPage {
   @State private entryMode: string = 'NORMAL_SINGLE';
   @State private spreadType: string = 'SINGLE';
   @State private questionText: string = '';
+  @State private isPositiveMode: boolean = false;
 
   // 动画阶段：'loading' | 'fadeIn' | 'flipping' | 'revealed' | 'particles' | 'done'
   @State private animPhase: string = 'loading';
@@ -70,12 +72,15 @@ struct CardDrawPage {
       this.entryMode = params.entryMode ?? 'NORMAL_SINGLE';
       this.spreadType = params.spreadType ?? 'SINGLE';
       this.questionText = params.questionText ?? '';
+      // 判断是否为积极方向（通过 emotionTag 是否匹配积极标签）
+      this.isPositiveMode = this.isPositiveEmotionTag(this.emotionTag);
     } else {
       this.emotionTag = '寻求安慰';
       this.heartOptionIndex = 0;
       this.entryMode = 'NORMAL_SINGLE';
       this.spreadType = 'SINGLE';
       this.questionText = '';
+      this.isPositiveMode = false;
     }
   }
 
@@ -85,13 +90,28 @@ struct CardDrawPage {
   }
 
   /**
+   * 判断是否为积极方向标签
+   */
+  private isPositiveEmotionTag(tag: string): boolean {
+    const positiveTags: string[] = ['给我鼓励', '今日微光', '找回力量', '一点勇气', '积极一面', '一句提醒'];
+    return positiveTags.includes(tag);
+  }
+
+  /**
    * 执行加权随机抽牌并启动动画序列
    */
   private performDraw(): void {
-    const result = drawCardByWeight(this.emotionTag as EmotionTag);
-    this.cardId = result.cardId;
-    this.isReversed = result.isReversed;
-    this.goldenSentence = getGoldenSentence(this.cardId, this.emotionTag as EmotionTag);
+    if (this.isPositiveMode) {
+      const result = drawCardByPositiveWeight(this.emotionTag as PositiveEmotionTag);
+      this.cardId = result.cardId;
+      this.isReversed = result.isReversed;
+      this.goldenSentence = getPositiveGoldenSentence(this.cardId, this.emotionTag as PositiveEmotionTag);
+    } else {
+      const result = drawCardByWeight(this.emotionTag as EmotionTag);
+      this.cardId = result.cardId;
+      this.isReversed = result.isReversed;
+      this.goldenSentence = getGoldenSentence(this.cardId, this.emotionTag as EmotionTag);
+    }
 
     // 启动动画序列
     this.startAnimation();
@@ -219,8 +239,8 @@ struct CardDrawPage {
             )
               .width('46%')
               .height('100%')
-              .objectFit(ImageFit.Contain)
-              .borderRadius(Theme.RADIUS_MD)
+              .objectFit(ImageFit.Cover)
+              .borderRadius(Theme.TAROT_CARD_RADIUS)
               .rotate({
                 y: this.flipAngle,
                 centerX: '50%',
@@ -230,7 +250,7 @@ struct CardDrawPage {
                 duration: Theme.ANIM_FLIP_DURATION,
                 curve: Curve.EaseInOut,
               })
-              .constraintSize({ maxWidth: 200, maxHeight: 320 })
+              .constraintSize({ maxWidth: Theme.CARD_SIZE_DRAW_STAGE.width, maxHeight: Theme.CARD_SIZE_DRAW_STAGE.height })
           }
         }
         .width('100%')

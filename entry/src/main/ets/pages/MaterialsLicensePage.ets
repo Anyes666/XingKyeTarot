@@ -21,36 +21,12 @@ struct MaterialsLicensePage {
     {
       title: '一、背景音乐',
       content:
-        '感谢以下创作者与平台提供音乐素材支持。\n「星钥塔罗」App 中使用的背景音乐、音效及其他素材，均依据其对应授权协议使用。\n\n' +
+        '感谢以下创作者与平台提供音乐素材支持。\n「星钥塔罗」App 中使用的背景音乐依据其对应授权协议使用。\n\n' +
         '1. Calm Ambient\n' +
         '作者：leberch\n' +
         '来源：Pixabay\n' +
         '授权：Pixabay Content License\n' +
-        '用途：首页 / 今日星钥 / 星澜相关页面背景音乐\n' +
-        '修改说明：已根据 App 使用场景进行音量调整与循环适配。\n\n' +
-        '2. Reminiscing\n' +
-        '作者：Kevin MacLeod\n' +
-        '来源：Incompetech\n' +
-        '授权：Creative Commons Attribution 4.0 International\n' +
-        '用途：星澜聊天 / 情绪陪伴 / 关系探索页面背景音乐\n' +
-        '修改说明：已根据 App 使用场景进行音量调整与循环适配。\n\n' +
-        '3. Midsummer Sky\n' +
-        '作者：Kevin MacLeod\n' +
-        '来源：Incompetech\n' +
-        '授权：Creative Commons Attribution 4.0 International\n' +
-        '用途：今日星钥 / 分享卡 / 轻陪伴页面背景音乐\n' +
-        '修改说明：已根据 App 使用场景进行音量调整与循环适配。\n\n' +
-        '4. Friday Morning\n' +
-        '作者：Kevin MacLeod\n' +
-        '来源：Incompetech\n' +
-        '授权：Creative Commons Attribution 4.0 International\n' +
-        '用途：首页 / 关系探索 / 低压力陪伴页面背景音乐\n' +
-        '修改说明：已根据 App 使用场景进行音量调整与循环适配。\n\n' +
-        '5. Touching Story\n' +
-        '作者：Kevin MacLeod\n' +
-        '来源：Incompetech\n' +
-        '授权：Creative Commons Attribution 4.0 International\n' +
-        '用途：分享卡生成 / 情绪提示 / 短时过场背景音乐\n' +
+        '用途：「星钥塔罗」App 全局背景音乐，包括启动页、星澜语录、占卜、星澜聊天、卡牌结果、历史记录与设置等页面。\n' +
         '修改说明：已根据 App 使用场景进行音量调整与循环适配。'
     },
     {
@@ -84,15 +60,15 @@ struct MaterialsLicensePage {
       title: '七、授权说明',
       content:
         'Pixabay 素材依据 Pixabay Content License 使用。\n该授权允许在符合许可条款的前提下免费使用、修改和适配素材。\n\n' +
-        'Kevin MacLeod / Incompetech 音乐依据 Creative Commons Attribution 4.0 International 授权使用。\n' +
-        '根据该授权要求，本应用对相关音乐进行作者署名，并标明来源、授权协议及修改情况。\n\n' +
+        '当前版本仅使用 Calm Ambient 作为 App 全局背景音乐。\n如后续新增其他背景音乐、音效或第三方素材，将在本页面补充作者、来源、授权协议及修改说明。\n\n' +
         '上线前请人工核验每首音乐对应页面的署名要求和授权说明。\n本页面不构成法律意见。'
     },
     {
       title: '八、使用说明',
       content:
-        '上述音乐仅作为「星钥塔罗」App 内的背景音乐、页面氛围音乐或过场音乐使用。\n' +
-        '本应用不会将上述音乐作为独立音频素材进行售卖、转售、下载分发或曲库形式提供。'
+        '上述音乐仅作为「星钥塔罗」App 内的全局背景音乐使用。\n' +
+        '本应用不会将上述音乐作为独立音频素材进行售卖、转售、下载分发或曲库形式提供。\n' +
+        '用户可在设置页关闭背景音乐。'
     },
     {
       title: '九、联系方式',

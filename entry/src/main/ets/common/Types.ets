@@ -19,6 +19,14 @@ export type { MvpDivinationRecord } from '../model/MvpDivinationRecord';
 export { generateRecordId } from '../model/MvpDivinationRecord';
 export type { HeartOption } from '../data/HeartOptionsData';
 export { HEART_OPTIONS, CARD_WEIGHTS, drawCardByWeight } from '../data/HeartOptionsData';
+export type { PositiveHeartOption, PositiveEmotionTag } from '../data/PositiveHeartOptions';
+export {
+  POSITIVE_HEART_OPTIONS,
+  POSITIVE_CARD_WEIGHTS,
+  getPositiveScenarioContent,
+  getPositiveGoldenSentence,
+  drawCardByPositiveWeight,
+} from '../data/PositiveHeartOptions';
 export {
   MVP8_CARD_IDS,
   MVP8_CARD_NAMES,

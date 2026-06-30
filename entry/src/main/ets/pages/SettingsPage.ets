@@ -6,10 +6,12 @@ import { Routes } from '../common/Routes';
 import { AppBackButton } from '../components/AppBackButton';
 import { PreferenceStore } from '../data/PreferenceStore';
 import { ENABLE_XINGLAN_CHAT_MVP } from '../xinglan/data/XinglanTemplates';
+import { GlobalBgmManager } from '../common/GlobalBgmManager';
 
 /**
  * 阶段6：设置页（最小化版本）
- * - 仅含"重新听听星澜的介绍"一个入口
+ * - 含"重新听听星澜的介绍"入口
+ * - 含"背景音乐"开关
  * - 点击后重置 7 个引导标志位，AlertDialog 反馈
  * - 返回按钮回首页
  */
@@ -17,6 +19,46 @@ import { ENABLE_XINGLAN_CHAT_MVP } from '../xinglan/data/XinglanTemplates';
 @Component
 struct SettingsPage {
   @State isResetting: boolean = false;
+  @State bgmEnabled: boolean = true;
+  /** 用于抑制 loadBgmEnabled 中程序化 @State 更新触发的 Toggle.onChange */
+  private isLoadingBgmState: boolean = false;
+
+  aboutToAppear(): void {
+    this.loadBgmEnabled();
+  }
+
+  private async loadBgmEnabled(): Promise<void> {
+    try {
+      const enabled: boolean = await PreferenceStore.getBoolean('bgm_enabled', true, getContext(this));
+      // 抑制 onChange 触发：先设 flag，再更新 @State，防止 Toggle 误认为用户操作
+      this.isLoadingBgmState = true;
+      this.bgmEnabled = enabled;
+      this.isLoadingBgmState = false;
+    } catch (_err) {
+      // 读取失败时保守保留当前 UI 状态，不覆盖为 true
+      // 从 GlobalBgmManager 取当前内存状态作为兜底
+      this.bgmEnabled = GlobalBgmManager.getInstance().getMusicEnabled();
+    }
+  }
+
+  private async toggleBgm(isOn: boolean): Promise<void> {
+    // 防止 onChange 在程序更新 @State 时触发（loadBgmEnabled 中的赋值）
+    if (this.isLoadingBgmState) {
+      return;
+    }
+    // 防止重复触发（@State 已与 isOn 一致）
+    if (this.bgmEnabled === isOn) {
+      return;
+    }
+    this.bgmEnabled = isOn;
+    const bgmManager: GlobalBgmManager = GlobalBgmManager.getInstance();
+    bgmManager.setMusicEnabled(isOn);
+    try {
+      await PreferenceStore.putBoolean('bgm_enabled', isOn, getContext(this));
+    } catch (_err) {
+      // ignore
+    }
+  }
 
   /**
    * 重置全部引导标志位（7 个键）
@@ -140,6 +182,65 @@ struct SettingsPage {
         .borderRadius(Theme.RADIUS_MD)
         .margin({ bottom: Theme.SPACE_MD })
         .onClick(() => { this.resetAllGuides(); })
+
+        // 背景音乐开关
+        Column() {
+          Row() {
+            Column() {
+              Text('背景音乐')
+                .fontSize(Theme.FONT_BODY)
+                .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                .width('100%')
+
+              Text('开启后，星钥塔罗会播放一首低音量的全局主旋律。')
+                .fontSize(13)
+                .fontColor(Theme.MOON_MUTED)
+                .width('100%')
+                .margin({ top: 4 })
+            }
+            .layoutWeight(1)
+
+            Toggle({ type: ToggleType.Switch, isOn: this.bgmEnabled })
+              .selectedColor('#E8B83D')
+              .onChange((isOn: boolean) => {
+                this.toggleBgm(isOn);
+              })
+          }
+          .width('100%')
+          .alignItems(VerticalAlign.Center)
+          .padding({ top: 16, bottom: 16, left: 20, right: 20 })
+        }
+        .width('92%')
+        .backgroundColor('rgba(27, 27, 48, 0.68)')
+        .borderRadius(Theme.RADIUS_MD)
+        .margin({ bottom: Theme.SPACE_MD })
+
+        // 使用说明
+        Column() {
+          Text('使用说明')
+            .fontSize(Theme.FONT_BODY)
+            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+            .width('100%')
+            .padding({ top: 16, bottom: 16, left: 20, right: 20 })
+
+          Text('了解星钥塔罗每个板块的用法和设计初衷。')
+            .fontSize(13)
+            .fontColor(Theme.MOON_MUTED)
+            .width('100%')
+            .padding({ left: 20, right: 20, bottom: 16 })
+        }
+        .width('92%')
+        .backgroundColor('rgba(27, 27, 48, 0.68)')
+        .borderRadius(Theme.RADIUS_MD)
+        .margin({ bottom: Theme.SPACE_MD })
+        .onClick(() => {
+          try {
+            const options: router.RouterOptions = { url: Routes.USAGE_GUIDE };
+            router.pushUrl(options);
+          } catch (_err) {
+            // ignore
+          }
+        })
 
         // ── 星澜聊天 · 测试入口（MVP，正式发布前可关闭）──
         if (ENABLE_XINGLAN_CHAT_MVP) {

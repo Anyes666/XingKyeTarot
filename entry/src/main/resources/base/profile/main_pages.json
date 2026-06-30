@@ -35,6 +35,7 @@
     "pages/VersionInfoPage",
     "pages/MaterialsLicensePage",
     "pages/CardWheelModePage",
-    "pages/CardWheelDrawPage"
+    "pages/CardWheelDrawPage",
+    "pages/UsageGuidePage"
   ]
 }

@@ -43,6 +43,7 @@ export class Routes {
   static readonly ABOUT: string = 'pages/AboutPage';
   static readonly VERSION_INFO: string = 'pages/VersionInfoPage';
   static readonly MATERIALS_LICENSE: string = 'pages/MaterialsLicensePage';
+  static readonly USAGE_GUIDE: string = 'pages/UsageGuidePage';
 
   // ── 旋转牌轮抽牌 ──
   static readonly CARD_WHEEL_MODE: string = 'pages/CardWheelModePage';

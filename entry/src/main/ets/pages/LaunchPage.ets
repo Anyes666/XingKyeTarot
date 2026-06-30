@@ -141,6 +141,7 @@ struct LaunchPage {
       // ── 加载中 / 品牌展示 ──
       if (!this.showPrivacyGate) {
         Column() {
+          // 极轻金色光晕（星钥标题上方）
           Text(Constants.APP_NAME)
             .fontSize(Theme.FONT_HEADLINE)
             .fontColor(Theme.GOLD_LIGHT)
@@ -160,6 +161,16 @@ struct LaunchPage {
         .width('100%')
         .height('100%')
         .justifyContent(FlexAlign.Center)
+        // 沉浸光感：标题区域极轻金色径向渐变背景
+        .radialGradient({
+          center: ['50%', '48%'],
+          radius: '35%',
+          colors: [
+            ['rgba(229, 165, 10, 0.04)', 0.0],
+            ['rgba(229, 165, 10, 0.012)', 0.6],
+            ['rgba(15, 15, 35, 0)', 1.0]
+          ]
+        })
       }
 
       // ── 隐私门禁弹窗（内联条件渲染，非 CustomDialog）──

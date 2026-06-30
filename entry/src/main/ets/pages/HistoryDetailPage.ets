@@ -165,7 +165,7 @@ struct HistoryDetailPage {
 
               Blank()
 
-              Text('📋 历史详情')
+              Text('历史详情')
                 .fontSize(Theme.FONT_SUBTITLE)
                 .fontColor(Theme.TEXT_PRIMARY_LIGHT)
                 .fontWeight(FontWeight.Bold)
@@ -190,7 +190,17 @@ struct HistoryDetailPage {
               Text(this.formatDate(this.record!.timestamp))
                 .fontSize(Theme.FONT_CAPTION)
                 .fontColor(Theme.MOON_MUTED)
-                .margin({ bottom: Theme.SPACE_MD })
+                .margin({ bottom: 4 })
+
+              // 展示用户选择的情绪方向
+              if (this.record!.questionText && this.record!.questionText.length > 0) {
+                Text(this.record!.questionText)
+                  .fontSize(Theme.FONT_CAPTION)
+                  .fontColor(Theme.TEXT_SECONDARY)
+                  .maxLines(1)
+                  .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  .margin({ bottom: Theme.SPACE_SM })
+              }
             }
             .width('90%')
             .padding(Theme.SPACE_LG)
@@ -248,13 +258,13 @@ struct HistoryDetailPage {
               .margin({ bottom: Theme.SPACE_MD })
             }
 
-            // ── 删除按钮（P0.3 整改）──
+            // ── 删除按钮 ──
             Button('删除这条记录')
               .type(ButtonType.Normal)
               .fontSize(Theme.FONT_BODY)
-              .fontColor('#EF4444')
-              .backgroundColor('rgba(239, 68, 68, 0.08)')
-              .border({ width: 1, color: '#EF4444' })
+              .fontColor('#E5998A')
+              .backgroundColor('rgba(229, 153, 138, 0.08)')
+              .border({ width: 1, color: '#E5998A' })
               .borderRadius(Theme.RADIUS_FULL)
               .width('70%')
               .height(44)
@@ -272,7 +282,7 @@ struct HistoryDetailPage {
           }
           .width('100%')
           .alignItems(HorizontalAlign.Center)
-          .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: 36 })
+          .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: 128 })
         }
         .width('100%')
         .layoutWeight(1)

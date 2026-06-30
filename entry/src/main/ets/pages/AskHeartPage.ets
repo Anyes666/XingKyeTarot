@@ -4,6 +4,7 @@ import { Routes } from '../common/Routes';
 import { ComplianceFooter } from '../components/ComplianceFooter';
 import { AppBackButton } from '../components/AppBackButton';
 import { HEART_OPTIONS, HeartOption } from '../data/HeartOptionsData';
+import { POSITIVE_HEART_OPTIONS, PositiveHeartOption } from '../data/PositiveHeartOptions';
 import { AppStateStore } from '../common/AppStateStore';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { PreferenceStore } from '../data/PreferenceStore';
@@ -43,6 +44,8 @@ struct AskHeartPage {
   @State private isTransitioning: boolean = false;
   @State private entryMode: string = 'NORMAL_SINGLE';
   @State private showFirstGuide: boolean = false;
+  // 积极方向模式：false=原6选项（接住模式），true=新6选项（看见光模式）
+  @State private isPositiveMode: boolean = false;
 
   aboutToAppear(): void {
     this.prepareFirstGuide();
@@ -77,6 +80,9 @@ struct AskHeartPage {
     if (this.entryMode === 'FIRST_EXPERIENCE') {
       return '此刻，你的心是什么颜色？';
     }
+    if (this.isPositiveMode) {
+      return '今天，你想看见什么？';
+    }
     return '你现在，最想被哪件事接住？';
   }
 
@@ -86,6 +92,9 @@ struct AskHeartPage {
   private getSubtitle(): string {
     if (this.entryMode === 'FIRST_EXPERIENCE') {
       return '第一次见面，星澜想先为你抽一张牌。';
+    }
+    if (this.isPositiveMode) {
+      return '选一个你此刻需要的方向，让一张牌给你温柔的提醒。';
     }
     return '不用想太久，选最像你此刻的那一句。';
   }
@@ -139,12 +148,23 @@ struct AskHeartPage {
           .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: Theme.SPACE_SM })
       }
 
+      // ── 模式切换 Tab（仅 NORMAL_SINGLE 显示）──
+      if (this.entryMode !== 'FIRST_EXPERIENCE') {
+        this.buildModeTabs()
+      }
+
       // ── 6 个问心选项 ──
       Scroll() {
         Column({ space: Theme.SPACE_MD }) {
-          ForEach(HEART_OPTIONS, (option: HeartOption, index: number) => {
-            this.buildHeartOption(option, index)
-          }, (option: HeartOption) => option.index.toString())
+          if (this.isPositiveMode) {
+            ForEach(POSITIVE_HEART_OPTIONS, (option: PositiveHeartOption, index: number) => {
+              this.buildPositiveHeartOption(option, index)
+            }, (option: PositiveHeartOption) => option.index.toString())
+          } else {
+            ForEach(HEART_OPTIONS, (option: HeartOption, index: number) => {
+              this.buildHeartOption(option, index)
+            }, (option: HeartOption) => option.index.toString())
+          }
         }
         .width('100%')
         .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: Theme.SPACE_MD })
@@ -207,6 +227,96 @@ struct AskHeartPage {
   }
 
   /**
+   * 构建模式切换 Tab（"今天我想被接住" / "今天我想看见光"）
+   */
+  @Builder
+  buildModeTabs(): void {
+    Row() {
+      Button('今天我想被接住')
+        .fontSize(13)
+        .fontColor(this.isPositiveMode ? Theme.MOON_MUTED : Color.White)
+        .fontWeight(this.isPositiveMode ? FontWeight.Normal : FontWeight.Bold)
+        .backgroundColor(this.isPositiveMode ? Color.Transparent : Theme.GOLD_AMBER)
+        .borderRadius(Theme.RADIUS_FULL)
+        .height(36)
+        .padding({ left: 16, right: 16 })
+        .border({ width: 1, color: this.isPositiveMode ? 'rgba(148,163,184,0.3)' : Theme.GOLD_AMBER })
+        .onClick(() => {
+          this.isPositiveMode = false;
+          this.selectedIndex = -1;
+        })
+
+      Button('今天我想看见光')
+        .fontSize(13)
+        .fontColor(this.isPositiveMode ? Color.White : Theme.MOON_MUTED)
+        .fontWeight(this.isPositiveMode ? FontWeight.Bold : FontWeight.Normal)
+        .backgroundColor(this.isPositiveMode ? Theme.GOLD_AMBER : Color.Transparent)
+        .borderRadius(Theme.RADIUS_FULL)
+        .height(36)
+        .padding({ left: 16, right: 16 })
+        .margin({ left: Theme.SPACE_SM })
+        .border({ width: 1, color: this.isPositiveMode ? Theme.GOLD_AMBER : 'rgba(148,163,184,0.3)' })
+        .onClick(() => {
+          this.isPositiveMode = true;
+          this.selectedIndex = -1;
+        })
+    }
+    .width('100%')
+    .justifyContent(FlexAlign.Center)
+    .padding({ top: Theme.SPACE_SM, bottom: Theme.SPACE_MD })
+  }
+
+  /**
+   * 构建积极方向选项卡片
+   */
+  @Builder
+  buildPositiveHeartOption(option: PositiveHeartOption, index: number): void {
+    Column() {
+      Row() {
+        Text(option.emoji)
+          .fontSize(22)
+          .margin({ right: Theme.SPACE_MD })
+
+        Column() {
+          Text(option.label)
+            .fontSize(Theme.FONT_BODY)
+            .fontColor(this.selectedIndex === index ? Theme.TEXT_PRIMARY_LIGHT : Theme.MOON_MUTED)
+            .fontWeight(this.selectedIndex === index ? FontWeight.Bold : FontWeight.Normal)
+            .textAlign(TextAlign.Start)
+            .width('100%')
+
+          Text(option.description)
+            .fontSize(12)
+            .fontColor(this.selectedIndex === index ? 'rgba(202, 138, 4, 0.7)' : Theme.TEXT_MUTED)
+            .textAlign(TextAlign.Start)
+            .width('100%')
+            .margin({ top: 4 })
+            .maxLines(2)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+        }
+        .layoutWeight(1)
+      }
+      .width('100%')
+    }
+    .width('100%')
+    .padding({ left: Theme.SPACE_LG, right: Theme.SPACE_LG, top: 14, bottom: 14 })
+    .backgroundColor(this.selectedIndex === index ? Theme.BG_CARD_LIGHTER : Theme.BG_CARD_DARK)
+    .borderRadius(Theme.RADIUS_MD)
+    .border({
+      width: this.selectedIndex === index ? 2 : 0,
+      color: this.selectedIndex === index ? Theme.GOLD_AMBER : Color.Transparent,
+      style: BorderStyle.Solid,
+    })
+    .onClick(() => {
+      this.selectedIndex = index;
+    })
+    .animation({
+      duration: 200,
+      curve: Curve.EaseOut,
+    })
+  }
+
+  /**
    * 构建单个问心选项卡片
    */
   @Builder
@@ -251,13 +361,25 @@ struct AskHeartPage {
     }
     this.isTransitioning = true;
 
-    const option: HeartOption = HEART_OPTIONS[this.selectedIndex];
+    let emotionTag: string;
+    let questionText: string;
+
+    if (this.isPositiveMode) {
+      const option: PositiveHeartOption = POSITIVE_HEART_OPTIONS[this.selectedIndex];
+      emotionTag = option.emotionTag;
+      questionText = option.label;
+    } else {
+      const option: HeartOption = HEART_OPTIONS[this.selectedIndex];
+      emotionTag = option.emotionTag;
+      questionText = option.label;
+    }
+
     const routeParams: CardDrawRouteParams = {
       entryMode: this.entryMode,
       spreadType: 'SINGLE',
-      heartOptionIndex: option.index,
-      emotionTag: option.emotionTag,
-      questionText: option.label,
+      heartOptionIndex: this.selectedIndex,
+      emotionTag: emotionTag,
+      questionText: questionText,
     };
 
     const routeOptions: router.RouterOptions = {

@@ -419,6 +419,16 @@ struct TarotCardDetailPage {
         .width('100%')
         .height('100%')
         .backgroundColor('rgba(5, 7, 20, 0.96)')
+        // 沉浸光感：全屏预览背景深蓝径向渐变
+        .radialGradient({
+          center: ['50%', '50%'],
+          radius: '70%',
+          colors: [
+            ['rgba(20, 25, 55, 0.5)', 0.0],
+            ['rgba(10, 12, 30, 0.3)', 0.5],
+            ['rgba(5, 7, 20, 0.96)', 1.0]
+          ]
+        })
         .zIndex(100)
       }
     }

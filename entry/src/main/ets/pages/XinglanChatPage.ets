@@ -1561,7 +1561,7 @@ struct XinglanChatPage {
       Text('↑')
         .fontSize(20).fontColor('#111426').width(46).height(46)
         .borderRadius(23).backgroundColor(Theme.GOLD_AMBER).textAlign(TextAlign.Center)
-        .shadow({ radius: 8, color: 'rgba(202, 138, 4, 0.3)', offsetX: 0, offsetY: 2 })
+        .shadow({ radius: 10, color: 'rgba(202, 138, 4, 0.4)', offsetX: 0, offsetY: 2 })
         .margin({ left: 10 })
         .onClick(() => { this.sendMessage(); })
     }

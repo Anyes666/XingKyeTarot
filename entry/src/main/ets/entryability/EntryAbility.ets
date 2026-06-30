@@ -9,6 +9,7 @@ import { PreferenceStore } from '../data/PreferenceStore';
 import { Routes } from '../common/Routes';
 import { Constants } from '../common/Constants';
 import { AppStateStore } from '../common/AppStateStore';
+import { GlobalBgmManager } from '../common/GlobalBgmManager';
 
 const TAG: string = 'XingKeyTarot';
 const FORM_IDS_KEY: string = 'widget_form_ids';
@@ -153,10 +154,18 @@ export default class EntryAbility extends UIAbility {
   onForeground(): void {
     hilog.info(0x0000, TAG, 'Ability onForeground');
     this.refreshWidgetOnForeground();
+    // 回到前台恢复背景音乐
+    GlobalBgmManager.getInstance().resume().catch((_err: Error) => {
+      hilog.warn(0x0000, TAG, 'BGM resume failed');
+    });
   }
 
   onBackground(): void {
     hilog.info(0x0000, TAG, 'Ability onBackground');
+    // 进入后台暂停背景音乐
+    GlobalBgmManager.getInstance().pause().catch((_err: Error) => {
+      hilog.warn(0x0000, TAG, 'BGM pause failed');
+    });
   }
 
   private async refreshWidgetData(userId: string, context: Context): Promise<void> {

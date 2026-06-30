@@ -21,6 +21,8 @@ interface TriangleResultInParams {
   questionText: string;
   scenarioTag: string;
   cards: CardResultSlotInfo[];
+  /** 来源（card_wheel 等，用于标记历史记录牌阵类型） */
+  source?: string;
 }
 
 interface CardResultSlotInfo {
@@ -56,6 +58,7 @@ struct TriangleResultPage {
   @State cards: CardResultSlotInfo[] = [];
   @State historyRecordId: string = '';
   @State isSummaryExpanded: boolean = false;
+  @State private source: string = '';
   @State private hasHeardCompanionResult: boolean = false;
   @State private companionResultLine: string = '';
 
@@ -66,6 +69,7 @@ struct TriangleResultPage {
       this.questionText = params.questionText ?? '';
       this.scenarioTag = params.scenarioTag ?? '综合';
       this.cards = params.cards ?? [];
+      this.source = params.source ?? '';
     }
 
     await this.saveHistory();
@@ -99,11 +103,15 @@ struct TriangleResultPage {
     const summaryText: string = this.buildSummaryText();
     const adviceText: string = this.buildAdviceText();
 
+    // 根据 source 决定 spreadType：来自牌轮的三牌也标记为 CARD_WHEEL
+    const actualSpreadType: SpreadType = (this.source === 'card_wheel') ? SpreadType.CARD_WHEEL : SpreadType.TRIANGLE;
+    const actualModeTitle: string = (this.source === 'card_wheel') ? '旋转牌轮' : '圣三角';
+
     const record: DivinationHistoryRecord = {
       id: newRecordId,
       timestamp: Date.now(),
-      spreadType: SpreadType.TRIANGLE,
-      modeTitle: '圣三角',
+      spreadType: actualSpreadType,
+      modeTitle: actualModeTitle,
       questionText: this.questionText,
       scenarioTag: this.scenarioTag,
       cards: drawnCards,
@@ -234,8 +242,8 @@ struct TriangleResultPage {
       Row() {
         TarotCardImage({
           cardId: card.cardId,
-          cardWidth: 80,
-          cardHeight: 128
+          cardWidth: Theme.CARD_SIZE_TRIO.width,
+          cardHeight: Theme.CARD_SIZE_TRIO.height
         })
 
         Column() {

@@ -3,6 +3,7 @@ import { Theme } from '../common/Theme';
 import { Constants } from '../common/Constants';
 import { Routes } from '../common/Routes';
 import { AppBackButton } from '../components/AppBackButton';
+import { Animator } from '@kit.ArkUI';
 
 /**
  * AskHeart 页面路由参数
@@ -28,6 +29,8 @@ interface DivinationEntry {
 @Entry
 @Component
 struct DivinationCenterPage {
+  @State private pressedIndex: number = -1;
+
   private buildEntries(): DivinationEntry[] {
     const entries: DivinationEntry[] = [
       {
@@ -108,6 +111,21 @@ struct DivinationCenterPage {
         .height('100%')
         .backgroundColor(Theme.BG_DEEP_INDIGO)
 
+      // 沉浸光感：底部金色径向光晕
+      Column()
+        .width('100%')
+        .height('100%')
+        .radialGradient({
+          center: ['50%', '85%'],
+          radius: '60%',
+          colors: [
+            ['rgba(202, 138, 4, 0.03)', 0.0],
+            ['rgba(202, 138, 4, 0.015)', 0.4],
+            ['rgba(0, 0, 0, 0)', 1.0]
+          ]
+        })
+        .hitTestBehavior(HitTestMode.Transparent)
+
       // 主内容
       Column() {
         // 顶部安全区 + 返回按钮
@@ -176,6 +194,27 @@ struct DivinationCenterPage {
               .backgroundColor('rgba(27, 27, 48, 0.68)')
               .borderRadius(Theme.RADIUS_MD)
               .border({ width: 1, color: 'rgba(216, 180, 90, 0.12)' })
+              .shadow({
+                radius: 6,
+                color: 'rgba(202, 138, 4, 0.06)',
+                offsetX: 0,
+                offsetY: 3
+              })
+              .scale({
+                x: this.pressedIndex === index ? 0.97 : 1.0,
+                y: this.pressedIndex === index ? 0.97 : 1.0
+              })
+              .animation({
+                duration: 180,
+                curve: Curve.EaseOut
+              })
+              .onTouch((event: TouchEvent) => {
+                if (event.type === TouchType.Down) {
+                  this.pressedIndex = index;
+                } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+                  this.pressedIndex = -1;
+                }
+              })
               .onClick(() => {
                 entry.routeAction();
               })

@@ -1,17 +1,19 @@
 import { MVP8_CARD_IMAGES } from '../data/MVP8CardsData';
+import { Theme } from '../common/Theme';
 
 /**
- * 统一塔罗牌图组件（P0.3 整改）
+ * 统一塔罗牌图组件（P0.3 整改 v2）
  *
- * 解决黑边问题：
- * - 使用 ImageFit.Cover（不是 Contain）确保图片填满容器
- * - 容器 clip(true) 裁切溢出
- * - 统一圆角 8vp
- * - 暗色背景防透视
- * - 比例 5:8
+ * 消除黑边/多余边框：
+ * - ImageFit.Cover 确保图片填满容器
+ * - 使用 Theme.TAROT_CARD_RADIUS 统一圆角
+ * - clip(true) 裁切溢出
+ * - 移除 backgroundColor 消除暗色盒子透视
+ * - 移除所有 border/shadow
+ * - 比例 5:8（width:height = 1:1.6）
  *
  * 使用示例：
- *   TarotCardImage({ cardId: 'major_18_moon', cardWidth: 100, cardHeight: 160 })
+ *   TarotCardImage({ cardId: 'major_18_moon', cardWidth: 90, cardHeight: 144 })
  */
 @Component
 export struct TarotCardImage {
@@ -25,13 +27,12 @@ export struct TarotCardImage {
         .width('100%')
         .height('100%')
         .objectFit(ImageFit.Cover)
-        .borderRadius(8)
+        .borderRadius(Theme.TAROT_CARD_RADIUS)
     }
     .width(this.cardWidth)
     .height(this.cardHeight)
     .clip(true)
-    .borderRadius(8)
-    .backgroundColor('#1a1a2e')
+    .borderRadius(Theme.TAROT_CARD_RADIUS)
   }
 
   /**

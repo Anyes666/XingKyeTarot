@@ -9,6 +9,7 @@ import {
   getMVP8CardData,
   getScenarioContent,
 } from '../data/MVP8CardsData';
+import { getPositiveScenarioContent, PositiveEmotionTag } from '../data/PositiveHeartOptions';
 import { Routes } from '../common/Routes';
 import { EmotionTag, ScenarioContent, StructuredInterpretation } from '../model/TarotCard';
 import { HistoryStore } from '../common/HistoryStore';
@@ -97,6 +98,7 @@ struct ResultGoldenPage {
   @State private isSavingHistory: boolean = false;
   @State private hasHeardCompanionResult: boolean = false;
   @State private companionResultLine: string = '';
+  @State private isPositiveMode: boolean = false;
 
   async aboutToAppear(): Promise<void> {
     const rawParams: Object | undefined = router.getParams();
@@ -119,6 +121,9 @@ struct ResultGoldenPage {
       this.entryMode = 'NORMAL_SINGLE';
     }
 
+    // 判断是否为积极方向模式
+    this.isPositiveMode = this.isPositiveEmotionTag(this.emotionTag);
+
     this.loadData();
 
     // 异步保存历史记录
@@ -129,17 +134,31 @@ struct ResultGoldenPage {
    * 从数据层加载当前牌的内容
    */
   private loadData(): void {
-    // 场景化解读
-    const scenario: ScenarioContent | undefined = getScenarioContent(this.cardId, this.emotionTag as EmotionTag);
-    if (scenario) {
-      if (!this.goldenSentence) {
-        this.goldenSentence = scenario.goldenSentence;
+    if (this.isPositiveMode) {
+      // 积极方向：使用积极场景化文案
+      const positiveScenario: ScenarioContent | undefined = getPositiveScenarioContent(
+        this.cardId, this.emotionTag as PositiveEmotionTag
+      );
+      if (positiveScenario) {
+        if (!this.goldenSentence) {
+          this.goldenSentence = positiveScenario.goldenSentence;
+        }
+        this.emotionKeywords = positiveScenario.emotionKeywords;
+        this.todayAction = positiveScenario.todayAction;
       }
-      this.emotionKeywords = scenario.emotionKeywords;
-      this.todayAction = scenario.todayAction;
+    } else {
+      // 原有场景化解读
+      const scenario: ScenarioContent | undefined = getScenarioContent(this.cardId, this.emotionTag as EmotionTag);
+      if (scenario) {
+        if (!this.goldenSentence) {
+          this.goldenSentence = scenario.goldenSentence;
+        }
+        this.emotionKeywords = scenario.emotionKeywords;
+        this.todayAction = scenario.todayAction;
+      }
     }
 
-    // 结构化解读
+    // 结构化解读（与方向无关，始终加载）
     const cardData: StructuredInterpretation | undefined = getMVP8CardData(this.cardId);
     if (cardData) {
       this.cardMeaningBrief = cardData.cardMeaningBrief;
@@ -171,12 +190,20 @@ struct ResultGoldenPage {
         action: this.todayAction,
       };
 
-      const modeTitle: string = this.entryMode === 'FIRST_EXPERIENCE' ? '首次体验' : '单牌快占';
+      // 根据 entryMode 决定 spreadType：来自牌轮的单牌也标记为 CARD_WHEEL
+      let actualSpreadType: SpreadType = SpreadType.SINGLE;
+      let modeTitle: string = '单牌快占';
+      if (this.entryMode === 'FIRST_EXPERIENCE') {
+        modeTitle = '首次体验';
+      } else if (this.entryMode === 'CARD_WHEEL') {
+        actualSpreadType = SpreadType.CARD_WHEEL;
+        modeTitle = '旋转牌轮';
+      }
 
       const record: DivinationHistoryRecord = {
         id: newRecordId,
         timestamp: Date.now(),
-        spreadType: SpreadType.SINGLE,
+        spreadType: actualSpreadType,
         modeTitle: modeTitle,
         questionText: this.questionText,
         scenarioTag: this.emotionTag,
@@ -270,6 +297,16 @@ struct ResultGoldenPage {
     .width('100%')
     .height('100%')
     .backgroundColor(Theme.BG_DEEP_INDIGO)
+    // 沉浸光感：页面上方轻微金色漫反射
+    .radialGradient({
+      center: ['50%', '12%'],
+      radius: '55%',
+      colors: [
+        ['rgba(229, 165, 10, 0.04)', 0.0],
+        ['rgba(229, 165, 10, 0.01)', 0.6],
+        ['rgba(15, 15, 35, 0)', 1.0]
+      ]
+    })
     .scrollBar(BarState.Off)
   }
 
@@ -278,11 +315,11 @@ struct ResultGoldenPage {
   @Builder
   buildHeader(): void {
     Column() {
-      // 牌面图片（P0.3 整改：使用 TarotCardImage 统一填充，消除黑边）
+      // 牌面图片（P0.3 整改 v2：使用统一尺寸常量）
       TarotCardImage({
         cardId: this.cardId,
-        cardWidth: 140,
-        cardHeight: 224
+        cardWidth: Theme.CARD_SIZE_SINGLE_RESULT.width,
+        cardHeight: Theme.CARD_SIZE_SINGLE_RESULT.height
       })
 
       // 牌名
@@ -308,26 +345,45 @@ struct ResultGoldenPage {
 
   @Builder
   buildGoldenSentence(): void {
-    Column() {
-      Text(this.goldenSentence)
-        .fontSize(Theme.FONT_DISPLAY)
-        .fontColor(Theme.GOLD_LIGHT)
-        .fontWeight(FontWeight.Bold)
-        .lineHeight(52)
-        .textAlign(TextAlign.Center)
+    // 金色漫反射光晕层（包裹金句卡片；高度贴合内容，不撑开卡片）
+    Stack({ alignContent: Alignment.Center }) {
+      Column()
         .width('100%')
+        .borderRadius(Theme.RADIUS_LG)
+        .radialGradient({
+          center: ['50%', '50%'],
+          radius: '70%',
+          colors: [
+            ['rgba(202, 138, 4, 0.06)', 0.0],
+            ['rgba(202, 138, 4, 0.015)', 0.6],
+            ['rgba(27, 27, 48, 0)', 1.0]
+          ]
+        })
+        .hitTestBehavior(HitTestMode.None)
 
-      Text(`—— ${Constants.MOON_WATERMARK} ——`)
-        .fontSize(Theme.FONT_CAPTION)
-        .fontColor(Theme.MOON_MUTED)
-        .margin({ top: Theme.SPACE_MD })
+      Column() {
+        Text(this.goldenSentence)
+          .fontSize(Theme.FONT_DISPLAY)
+          .fontColor(Theme.GOLD_LIGHT)
+          .fontWeight(FontWeight.Bold)
+          .lineHeight(52)
+          .textAlign(TextAlign.Center)
+          .width('100%')
+
+        Text(`—— ${Constants.MOON_WATERMARK} ——`)
+          .fontSize(Theme.FONT_CAPTION)
+          .fontColor(Theme.MOON_MUTED)
+          .margin({ top: Theme.SPACE_MD })
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Center)
+      .padding({ top: Theme.SPACE_LG, bottom: Theme.SPACE_LG })
     }
     .width('100%')
-    .alignItems(HorizontalAlign.Center)
     .margin({ top: Theme.SPACE_RESULT_GAP })
-    .padding({ top: Theme.SPACE_LG, bottom: Theme.SPACE_LG })
     .backgroundColor(Theme.BG_CARD_DARK)
     .borderRadius(Theme.RADIUS_LG)
+    .border({ width: 1, color: 'rgba(202, 138, 4, 0.12)' })
   }
 
   @Builder
@@ -587,6 +643,14 @@ struct ResultGoldenPage {
     }
     .width('100%')
     .margin({ top: Theme.SPACE_LG, bottom: Theme.SPACE_SM })
+  }
+
+  /**
+   * 判断是否为积极方向标签
+   */
+  private isPositiveEmotionTag(tag: string): boolean {
+    const positiveTags: string[] = ['给我鼓励', '今日微光', '找回力量', '一点勇气', '积极一面', '一句提醒'];
+    return positiveTags.includes(tag);
   }
 
   /**

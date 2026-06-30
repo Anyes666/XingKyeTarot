@@ -215,8 +215,8 @@ struct ShareCardPage {
       Column() {
         TarotCardImage({
           cardId: this.record!.cards[0]!.cardId,
-          cardWidth: 96,
-          cardHeight: 150
+          cardWidth: Theme.CARD_SIZE_TRIO.width,
+          cardHeight: Theme.CARD_SIZE_TRIO.height
         })
         Text(this.record!.cards[0]!.cardName)
           .fontSize(Theme.FONT_CAPTION)
@@ -514,8 +514,8 @@ struct ShareCardPage {
 
             TarotCardImage({
               cardId: cardRecord.cardId,
-              cardWidth: 80,
-              cardHeight: 128
+              cardWidth: Theme.CARD_SIZE_TRIO.width,
+              cardHeight: Theme.CARD_SIZE_TRIO.height
             })
 
             Text(cardRecord.cardName)

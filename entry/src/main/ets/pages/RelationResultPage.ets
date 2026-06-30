@@ -227,8 +227,8 @@ struct RelationResultPage {
       Row() {
         TarotCardImage({
           cardId: card.cardId,
-          cardWidth: 80,
-          cardHeight: 128
+          cardWidth: Theme.CARD_SIZE_TRIO.width,
+          cardHeight: Theme.CARD_SIZE_TRIO.height
         })
 
         Column() {
