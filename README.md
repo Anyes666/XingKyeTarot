@@ -255,6 +255,7 @@ xinglan/engine/
 | 优先级 | 事项 | 说明 |
 |--------|------|------|
 | P0 | 授权页同步 | `MaterialsLicensePage` 列出 5 首音乐但仅接入 1 首，审核风险 |
+| P0 | 上架资料最终确认 | `docs/release/app-description.md` 已更新 v2.0，待人工终审 |
 | P1 | 真机回归测试 | 旋转牌轮历史保存、BGM 开关黑盒测试、聊天系统全流程 |
 | P1 | 签名部署 | 配置 release 签名 |
 | P1 | 图片映射代码去重 | `getCardImageResource` 在 3 个文件中重复定义 |
@@ -263,6 +264,37 @@ xinglan/engine/
 
 ---
 
+## 13. 工程进度
+
+| 日期 | 事项 | 状态 |
+|------|------|------|
+| 2026-06-30 | 项目结构整理 Phase 1：根目录归档 48 文件 | ✅ 完成 |
+| 2026-06-30 | 应用图标分层资源专项复查 | ✅ 通过 |
+| 2026-06-30 | 上架资料 v2.0 替换（去算命化 + 情绪陪伴定位） | ✅ 完成 |
+| 2026-06-30 | BGM 开关修复（一次性按钮 + 前后台状态丢失） | ✅ 完成 |
+| — | 上架前人工复测（29 项清单） | 🔜 待执行 |
+| — | Release 签名配置 | 🔜 待执行 |
+
+---
+
 > **开发者**：杨鹏宇 · **邮箱**：3364153745@qq.com  
 > **Bundle ID**：com.xingkey.tarot · **SDK**：5.0.0(12)~6.1.1(24)  
 > **当前版本**：v2.0.0 · **最近构建**：2026-06-30 · BUILD SUCCESSFUL · ERROR=0
+
+---
+
+## 14. 项目目录说明
+
+| 目录 | 说明 |
+|------|------|
+| `entry/` | HarmonyOS 主应用模块（ArkTS 源码、资源、配置） |
+| `AppScope/` | 应用级配置与图标资源 |
+| `docs/` | 设计文档、系统检查报告、阶段报告、上架文档、调研资料、Roadmap |
+| `deliverables/` | 交付物：截图、预览图、生成图片、音乐源文件、官网部署 |
+| `tools/` | 辅助脚本：图标生成、图片处理 |
+| `xingkey-tarot-website/` | 星钥塔罗官网 / Landing Page（待稳定后迁至 website/） |
+| `backup/` | 整理前备份或历史文件 |
+| `hvigor/` | HarmonyOS 构建工具相关（不移动） |
+| `沉浸式UI/` `Tarot-main/` `milk-main/` | 参考项目（冻结，后续统一迁 reference/） |
+
+> 根目录仅保留 HarmonyOS 必需配置文件：`build-profile.json5`、`hvigorfile.ts`、`oh-package.json5`、`oh-package-lock.json5`、`local.properties`、`.gitignore`、`README.md`

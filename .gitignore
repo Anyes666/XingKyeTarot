@@ -22,3 +22,7 @@ signing/
 *.log
 *.tmp
 .git-push.sh
+
+# Local backup and deploy temp
+backup/
+.deploy-tmp/
