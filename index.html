@@ -1,0 +1,3182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="星钥塔罗 XingKey Tarot - 塔罗式情绪陪伴与自我探索。不是预测未来，而是陪你看见此刻的自己。">
+  <title>星钥塔罗 XingKey Tarot - 塔罗式情绪陪伴</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-deep: #080B18;
+      --bg-primary: #0F0F23;
+      --bg-card: #171D3A;
+      --bg-card-light: #1B1B30;
+      --gold: #D8B45A;
+      --gold-soft: #F1DFA5;
+      --gold-dim: #8B7340;
+      --aurora: #5ED7D2;
+      --text-primary: #F8F3E7;
+      --text-secondary: #B8B0C8;
+      --text-muted: #6B6380;
+      --border-gold: rgba(216, 180, 90, 0.18);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Noto Sans SC', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      overflow-x: hidden;
+      line-height: 1.7;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Noto Serif SC', serif;
+      line-height: 1.3;
+      margin: 0;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    button {
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    #starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Aurora gradient overlay */
+    .aurora-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 40%, rgba(94, 215, 210, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 40% at 80% 60%, rgba(139, 126, 200, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 30% at 50% 100%, rgba(216, 180, 90, 0.04) 0%, transparent 40%);
+    }
+
+    /* Navigation */
+    .nav-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      transition: all 0.4s ease;
+      border-bottom: 1px solid transparent;
+    }
+
+    .nav-container.scrolled {
+      background: rgba(8, 11, 24, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-gold);
+    }
+
+    .nav-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-gold);
+      box-shadow: 0 0 20px rgba(216, 180, 90, 0.15);
+    }
+
+    .nav-logo-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .nav-brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-brand-name {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--gold-soft);
+      letter-spacing: 2px;
+    }
+
+    .nav-brand-en {
+      font-size: 10px;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+    }
+
+    .nav-link {
+      font-size: 14px;
+      color: var(--text-secondary);
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    .nav-link:hover {
+      color: var(--gold-soft);
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 0;
+      height: 1px;
+      background: var(--gold);
+      transition: width 0.3s ease;
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    .nav-cta {
+      padding: 10px 24px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
+      color: var(--bg-deep);
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(216, 180, 90, 0.2);
+    }
+
+    .nav-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 28px rgba(216, 180, 90, 0.35);
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      padding: 8px;
+      z-index: 102;
+    }
+
+    .mobile-menu-btn span {
+      width: 24px;
+      height: 1.5px;
+      background: var(--gold-soft);
+      transition: all 0.3s ease;
+      border-radius: 1px;
+    }
+
+    .mobile-menu-btn.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .mobile-menu-btn.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .mobile-menu-btn.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(8, 11, 24, 0.98);
+      backdrop-filter: blur(20px);
+      z-index: 99;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      padding: 24px;
+      transform: translateX(100%);
+      transition: transform 0.4s ease;
+    }
+
+    .mobile-menu.active {
+      transform: translateX(0);
+    }
+
+    .mobile-menu a {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 24px;
+      color: var(--text-primary);
+      transition: color 0.3s ease;
+    }
+
+    .mobile-menu a:hover {
+      color: var(--gold);
+    }
+
+    .mobile-menu .mobile-cta {
+      margin-top: 16px;
+      padding: 14px 36px;
+      border-radius: 999px;
+      background: var(--gold);
+      color: var(--bg-deep);
+      font-weight: 600;
+    }
+
+    /* Sections */
+    .section {
+      position: relative;
+      width: 100%;
+    }
+
+    .section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 100px 24px;
+    }
+
+    .section-label {
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+      font-weight: 600;
+    }
+
+    .section-title {
+      font-size: 42px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+    }
+
+    .section-subtitle {
+      font-size: 18px;
+      color: var(--text-secondary);
+      max-width: 600px;
+      line-height: 1.8;
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      padding-top: 72px;
+    }
+
+    .hero-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 60px 24px;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      width: 100%;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border-gold);
+      background: rgba(216, 180, 90, 0.08);
+      color: var(--gold-soft);
+      font-size: 13px;
+      margin-bottom: 28px;
+      width: fit-content;
+    }
+
+    .hero-title {
+      font-size: 64px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.2;
+      margin-bottom: 24px;
+      letter-spacing: 2px;
+    }
+
+    .hero-title span {
+      color: var(--gold);
+    }
+
+    .hero-subtitle {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 24px;
+      color: var(--gold-soft);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .hero-body {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 480px;
+      margin-bottom: 36px;
+      line-height: 1.9;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      padding: 16px 32px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
+      color: var(--bg-deep);
+      font-weight: 600;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 24px rgba(216, 180, 90, 0.25);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      transition: left 0.6s ease;
+    }
+
+    .btn-primary:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(216, 180, 90, 0.4);
+    }
+
+    .btn-secondary {
+      padding: 16px 32px;
+      border-radius: 999px;
+      border: 1px solid var(--border-gold);
+      color: var(--gold-soft);
+      font-weight: 500;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      background: rgba(216, 180, 90, 0.05);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(216, 180, 90, 0.12);
+      border-color: var(--gold);
+    }
+
+    .hero-visual {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 560px;
+    }
+
+    .hero-character {
+      position: relative;
+      width: 420px;
+      height: 560px;
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow:
+        0 32px 80px rgba(0, 0, 0, 0.5),
+        0 0 60px rgba(216, 180, 90, 0.12);
+      animation: float 6s ease-in-out infinite;
+      border: 1px solid var(--border-gold);
+    }
+
+    .hero-character img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center top;
+    }
+
+    .hero-character-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 30%, rgba(216, 180, 90, 0.15) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .hero-key {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      top: 40px;
+      right: 60px;
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    .hero-key svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 20px rgba(216, 180, 90, 0.6));
+    }
+
+    .hero-tip-card {
+      position: absolute;
+      bottom: 60px;
+      left: -20px;
+      width: 240px;
+      padding: 20px;
+      background: rgba(23, 29, 58, 0.9);
+      border: 1px solid var(--border-gold);
+      border-radius: 20px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+      animation: fadeInUp 1s ease-out 0.8s both;
+    }
+
+    .hero-tip-card::before {
+      content: '';
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      right: -1px;
+      height: 50%;
+      background: linear-gradient(180deg, rgba(216, 180, 90, 0.06) 0%, transparent 100%);
+      border-radius: 20px 20px 0 0;
+      pointer-events: none;
+    }
+
+    .hero-tip-label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .hero-tip-text {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .hero-orbit {
+      position: absolute;
+      width: 520px;
+      height: 520px;
+      border: 1px solid rgba(216, 180, 90, 0.08);
+      border-radius: 50%;
+      animation: rotate 40s linear infinite;
+      pointer-events: none;
+    }
+
+    .hero-orbit::before {
+      content: '';
+      position: absolute;
+      inset: 60px;
+      border: 1px solid rgba(94, 215, 210, 0.06);
+      border-radius: 50%;
+    }
+
+    /* Meet Xinglan */
+    .meet-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 60px;
+      align-items: center;
+      margin-top: 60px;
+    }
+
+    .meet-character-card {
+      position: relative;
+      padding: 32px;
+      background: linear-gradient(180deg, rgba(23, 29, 58, 0.9) 0%, rgba(15, 15, 35, 0.9) 100%);
+      border: 1px solid var(--border-gold);
+      border-radius: 28px;
+      overflow: hidden;
+    }
+
+    .meet-character-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(180deg, rgba(216, 180, 90, 0.05) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .meet-character-img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      border: 1px solid var(--border-subtle);
+      background: linear-gradient(180deg, rgba(8, 11, 24, 0.6) 0%, rgba(8, 11, 24, 0.9) 100%);
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .meet-character-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center bottom;
+    }
+
+    .meet-character-name {
+      font-size: 28px;
+      color: var(--gold-soft);
+      margin-bottom: 8px;
+      letter-spacing: 2px;
+    }
+
+    .meet-character-title {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .meet-ability-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .ability-card {
+      padding: 28px;
+      background: rgba(23, 29, 58, 0.72);
+      border: 1px solid var(--border-gold);
+      border-radius: 20px;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ability-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: linear-gradient(180deg, var(--gold) 0%, transparent 100%);
+      opacity: 0.6;
+      transition: opacity 0.3s ease;
+    }
+
+    .ability-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--gold);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(216, 180, 90, 0.08);
+    }
+
+    .ability-card:hover::before {
+      opacity: 1;
+    }
+
+    .ability-icon {
+      width: 44px;
+      height: 44px;
+      margin-bottom: 16px;
+      color: var(--gold);
+    }
+
+    .ability-title {
+      font-size: 20px;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .ability-desc {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* Bento Grid */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: minmax(200px, auto);
+      gap: 20px;
+      margin-top: 60px;
+    }
+
+    .bento-card {
+      background: rgba(23, 29, 58, 0.72);
+      border: 1px solid var(--border-gold);
+      border-radius: 24px;
+      padding: 28px;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .bento-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(180deg, rgba(216, 180, 90, 0.04) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .bento-card:hover {
+      transform: translateY(-6px) scale(1.01);
+      border-color: var(--gold);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), 0 0 40px rgba(216, 180, 90, 0.1);
+    }
+
+    .bento-card-large {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+
+    .bento-card-wide {
+      grid-column: span 2;
+    }
+
+    .bento-card-title {
+      font-size: 20px;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .bento-card-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .bento-visual {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-height: 120px;
+    }
+
+    .floating-card {
+      width: 80px;
+      height: 128px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #1a1f3a 0%, #0f1225 100%);
+      border: 1px solid var(--gold);
+      position: relative;
+      animation: float 4s ease-in-out infinite;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .floating-card::after {
+      content: '';
+      position: absolute;
+      inset: 8px;
+      border: 1px solid rgba(216, 180, 90, 0.3);
+      border-radius: 6px;
+    }
+
+    .floating-card-star {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--gold);
+    }
+
+    .triangle-cards {
+      position: relative;
+      width: 160px;
+      height: 140px;
+    }
+
+    .triangle-card {
+      position: absolute;
+      width: 60px;
+      height: 96px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #1a1f3a 0%, #0f1225 100%);
+      border: 1px solid var(--gold);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .triangle-card:nth-child(1) {
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: float 3.5s ease-in-out infinite 0s;
+    }
+
+    .triangle-card:nth-child(2) {
+      bottom: 0;
+      left: 10px;
+      animation: float 3.5s ease-in-out infinite 0.4s;
+    }
+
+    .triangle-card:nth-child(3) {
+      bottom: 0;
+      right: 10px;
+      animation: float 3.5s ease-in-out infinite 0.8s;
+    }
+
+    .triangle-lines {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .triangle-lines svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .relation-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .relation-star {
+      width: 40px;
+      height: 40px;
+      color: var(--gold);
+      animation: pulse 3s ease-in-out infinite;
+    }
+
+    .relation-line {
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--gold), transparent);
+      position: relative;
+    }
+
+    .relation-line::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 28px;
+      height: 44px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #1a1f3a 0%, #0f1225 100%);
+      border: 1px solid var(--gold);
+    }
+
+    .wheel-visual {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      animation: rotate 20s linear infinite;
+    }
+
+    .wheel-card {
+      position: absolute;
+      width: 44px;
+      height: 70px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #1a1f3a 0%, #0f1225 100%);
+      border: 1px solid var(--border-gold);
+      top: 50%;
+      left: 50%;
+      margin-top: -35px;
+      margin-left: -22px;
+      transform-origin: center 90px;
+    }
+
+    .wheel-card:nth-child(1) { transform: rotate(0deg); }
+    .wheel-card:nth-child(2) { transform: rotate(45deg); }
+    .wheel-card:nth-child(3) { transform: rotate(90deg); }
+    .wheel-card:nth-child(4) { transform: rotate(135deg); }
+    .wheel-card:nth-child(5) { transform: rotate(180deg); }
+    .wheel-card:nth-child(6) { transform: rotate(225deg); }
+    .wheel-card:nth-child(7) { transform: rotate(270deg); }
+    .wheel-card:nth-child(8) { transform: rotate(315deg); }
+
+    .wheel-center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(216, 180, 90, 0.3) 0%, transparent 70%);
+      border: 1px solid var(--gold);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .chat-preview {
+      width: 100%;
+      max-width: 280px;
+      height: 180px;
+      background: rgba(8, 11, 24, 0.8);
+      border-radius: 16px;
+      border: 1px solid var(--border-subtle);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .chat-bubble {
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 12px;
+      max-width: 80%;
+      animation: fadeInUp 0.5s ease-out both;
+    }
+
+    .chat-bubble-left {
+      background: rgba(23, 29, 58, 0.9);
+      border: 1px solid var(--border-gold);
+      color: var(--text-secondary);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      animation-delay: 0.2s;
+    }
+
+    .chat-bubble-right {
+      background: rgba(216, 180, 90, 0.15);
+      border: 1px solid rgba(216, 180, 90, 0.3);
+      color: var(--gold-soft);
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+      animation-delay: 0.6s;
+    }
+
+    .calendar-mini {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      width: 100%;
+      max-width: 220px;
+    }
+
+    .calendar-mini .day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      border-radius: 8px;
+      color: var(--text-muted);
+    }
+
+    .calendar-mini .day.lit {
+      color: var(--gold);
+      position: relative;
+    }
+
+    .calendar-mini .day.lit::after {
+      content: '★';
+      position: absolute;
+      font-size: 16px;
+      opacity: 0.9;
+      animation: twinkle 2s ease-in-out infinite;
+    }
+
+    .calendar-mini .day.today {
+      border: 1px solid var(--gold);
+      color: var(--gold-soft);
+    }
+
+    .calendar-mini .day.future {
+      opacity: 0.35;
+    }
+
+    .cards-stack-visual {
+      position: relative;
+      width: 160px;
+      height: 120px;
+    }
+
+    .cards-stack-visual .stack-card {
+      position: absolute;
+      width: 60px;
+      height: 96px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #1a1f3a 0%, #0f1225 100%);
+      border: 1px solid var(--gold);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      transition: all 0.4s ease;
+    }
+
+    .cards-stack-visual .stack-card:nth-child(1) { left: 0; transform: rotate(-12deg); z-index: 1; }
+    .cards-stack-visual .stack-card:nth-child(2) { left: 35px; transform: rotate(-4deg); z-index: 2; }
+    .cards-stack-visual .stack-card:nth-child(3) { left: 70px; transform: rotate(4deg); z-index: 3; }
+    .cards-stack-visual .stack-card:nth-child(4) { left: 105px; transform: rotate(12deg); z-index: 4; }
+
+    .bento-card:hover .cards-stack-visual .stack-card:nth-child(1) { transform: translateX(-10px) rotate(-18deg); }
+    .bento-card:hover .cards-stack-visual .stack-card:nth-child(2) { transform: translateX(-3px) rotate(-6deg); }
+    .bento-card:hover .cards-stack-visual .stack-card:nth-child(3) { transform: translateX(3px) rotate(6deg); }
+    .bento-card:hover .cards-stack-visual .stack-card:nth-child(4) { transform: translateX(10px) rotate(18deg); }
+
+    /* Chat Section */
+    .chat-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .phone-mockup {
+      width: 320px;
+      height: 640px;
+      background: #0a0c18;
+      border-radius: 44px;
+      border: 8px solid #1a1d2e;
+      box-shadow:
+        0 40px 100px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(216, 180, 90, 0.1),
+        0 0 60px rgba(216, 180, 90, 0.08);
+      overflow: hidden;
+      position: relative;
+      margin: 0 auto;
+      animation: float 7s ease-in-out infinite;
+    }
+
+    .phone-notch {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 28px;
+      background: #1a1d2e;
+      border-radius: 0 0 16px 16px;
+      z-index: 10;
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #0F0F23 0%, #080B18 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .phone-state {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity 0.6s ease;
+      padding: 48px 24px 24px;
+    }
+
+    .phone-state.active {
+      opacity: 1;
+    }
+
+    .phone-avatar-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .phone-avatar {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 30px rgba(216, 180, 90, 0.25);
+      position: relative;
+    }
+
+    .phone-avatar::after {
+      content: '';
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 1px solid rgba(216, 180, 90, 0.3);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .phone-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .phone-title {
+      font-size: 24px;
+      text-align: center;
+      color: var(--gold-soft);
+      margin-bottom: 8px;
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .phone-subtitle {
+      font-size: 13px;
+      text-align: center;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      line-height: 1.6;
+    }
+
+    .phone-description {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.9;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .phone-btn {
+      margin-top: auto;
+      padding: 14px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
+      color: var(--bg-deep);
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 16px;
+    }
+
+    .chat-header-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 1px solid var(--gold);
+    }
+
+    .chat-header-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .chat-header-info {
+      flex: 1;
+    }
+
+    .chat-header-name {
+      font-size: 15px;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .chat-header-status {
+      font-size: 11px;
+      color: var(--aurora);
+    }
+
+    .chat-messages {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      padding-bottom: 16px;
+    }
+
+    .chat-msg {
+      max-width: 80%;
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.5s ease;
+    }
+
+    .chat-msg.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .chat-msg-left {
+      align-self: flex-start;
+      background: rgba(23, 29, 58, 0.95);
+      border: 1px solid var(--border-gold);
+      border-bottom-left-radius: 4px;
+      color: var(--text-secondary);
+    }
+
+    .chat-msg-right {
+      align-self: flex-end;
+      background: rgba(216, 180, 90, 0.12);
+      border: 1px solid rgba(216, 180, 90, 0.25);
+      border-bottom-right-radius: 4px;
+      color: var(--gold-soft);
+    }
+
+    .typing-dots {
+      display: none;
+      align-self: flex-start;
+      padding: 12px 16px;
+      background: rgba(23, 29, 58, 0.95);
+      border: 1px solid var(--border-gold);
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+    }
+
+    .typing-dots.active {
+      display: flex;
+      gap: 4px;
+    }
+
+    .typing-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--gold);
+      animation: typing 1.4s ease-in-out infinite;
+    }
+
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+    .chat-input {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      background: rgba(23, 29, 58, 0.6);
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .chat-input-placeholder {
+      flex: 1;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      padding-left: 12px;
+    }
+
+    .chat-send {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--bg-deep);
+    }
+
+    /* Star Calendar Section */
+    .calendar-section {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .calendar-card {
+      background: rgba(23, 29, 58, 0.72);
+      border: 1px solid var(--border-gold);
+      border-radius: 28px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .calendar-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(180deg, rgba(216, 180, 90, 0.04) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .calendar-month {
+      font-size: 20px;
+      color: var(--text-primary);
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .calendar-nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .calendar-nav button {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border-gold);
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      background: transparent;
+    }
+
+    .calendar-nav button:hover {
+      background: rgba(216, 180, 90, 0.1);
+    }
+
+    .calendar-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .calendar-weekday {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 8px 0;
+    }
+
+    .calendar-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      position: relative;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid transparent;
+    }
+
+    .calendar-day:hover {
+      background: rgba(216, 180, 90, 0.08);
+    }
+
+    .calendar-day.lit {
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    .calendar-day.lit .star-icon {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .calendar-day.today {
+      border: 1px solid var(--gold);
+      color: var(--gold-soft);
+    }
+
+    .calendar-day.future {
+      color: var(--text-muted);
+      opacity: 0.4;
+    }
+
+    .star-icon {
+      position: absolute;
+      font-size: 20px;
+      opacity: 0;
+      transform: scale(0);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      color: var(--gold);
+    }
+
+    .calendar-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 14px;
+      background: rgba(8, 11, 24, 0.95);
+      border: 1px solid var(--border-gold);
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 5;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+
+    .calendar-day:hover .calendar-tooltip {
+      opacity: 1;
+    }
+
+    .level-card {
+      background: rgba(23, 29, 58, 0.72);
+      border: 1px solid var(--border-gold);
+      border-radius: 28px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .level-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 40%;
+      background: linear-gradient(180deg, rgba(216, 180, 90, 0.04) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .level-current {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .level-name {
+      font-size: 32px;
+      color: var(--gold-soft);
+      margin-bottom: 24px;
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .level-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .level-stat {
+      padding: 16px;
+      background: rgba(8, 11, 24, 0.5);
+      border-radius: 16px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .level-stat-value {
+      font-size: 24px;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .level-stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .level-progress-wrap {
+      margin-bottom: 24px;
+    }
+
+    .level-progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .level-progress-bar {
+      height: 8px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .level-progress-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--gold) 0%, var(--gold-soft) 100%);
+      border-radius: 999px;
+      transition: width 1.5s ease-out;
+      box-shadow: 0 0 20px rgba(216, 180, 90, 0.3);
+    }
+
+    .level-ladder {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .level-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+      transition: all 0.3s ease;
+    }
+
+    .level-step.active {
+      color: var(--gold-soft);
+      font-weight: 500;
+    }
+
+    .level-step.active .level-dot {
+      background: var(--gold);
+      box-shadow: 0 0 12px rgba(216, 180, 90, 0.5);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .level-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+    }
+
+    .level-note {
+      margin-top: 24px;
+      padding: 16px;
+      background: rgba(216, 180, 90, 0.06);
+      border-radius: 16px;
+      border: 1px solid var(--border-gold);
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    /* Card Gallery */
+    .card-gallery {
+      margin-top: 60px;
+      position: relative;
+    }
+
+    .card-scroll {
+      display: flex;
+      gap: 24px;
+      overflow-x: auto;
+      padding: 40px 24px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--gold) transparent;
+    }
+
+    .card-scroll::-webkit-scrollbar {
+      height: 4px;
+    }
+
+    .card-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .card-scroll::-webkit-scrollbar-thumb {
+      background: var(--gold);
+      border-radius: 999px;
+    }
+
+    .card-item {
+      flex: 0 0 auto;
+      width: 200px;
+      perspective: 1000px;
+      scroll-snap-align: center;
+      animation: fadeInUp 0.5s ease-out both;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 0.625;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.5s ease;
+      transform-style: preserve-3d;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-item:hover .card-inner {
+      transform: translateY(-12px) rotateY(8deg);
+      box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5), 0 0 40px rgba(216, 180, 90, 0.15);
+    }
+
+    .card-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 16px;
+    }
+
+    .card-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 0%, rgba(8, 11, 24, 0.95) 60%);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 20px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      border-radius: 16px;
+    }
+
+    .card-item:hover .card-overlay {
+      opacity: 1;
+    }
+
+    .card-overlay-name {
+      font-size: 16px;
+      color: var(--gold-soft);
+      margin-bottom: 8px;
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .card-overlay-tags {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .card-overlay-tag {
+      font-size: 10px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border-gold);
+      color: var(--gold);
+      background: rgba(216, 180, 90, 0.08);
+    }
+
+    .card-overlay-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .card-suits {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+
+    .card-suit {
+      padding: 10px 20px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      font-size: 14px;
+      transition: all 0.3s ease;
+      background: rgba(23, 29, 58, 0.5);
+    }
+
+    .card-suit:hover, .card-suit.active {
+      border-color: var(--gold);
+      color: var(--gold-soft);
+      background: rgba(216, 180, 90, 0.08);
+    }
+
+    .card-placeholder .card-inner {
+      background: linear-gradient(135deg, #1a1f3a 0%, #0f1225 100%);
+      border: 1px solid var(--border-gold);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .card-placeholder .card-back-img {
+      width: 80%;
+      height: auto;
+      border-radius: 8px;
+      opacity: 0.85;
+    }
+
+    .card-placeholder .card-placeholder-label {
+      font-size: 14px;
+      color: var(--gold-soft);
+      font-family: 'Noto Serif SC', serif;
+      text-align: center;
+    }
+
+    .card-placeholder .card-placeholder-note {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    /* Boundaries */
+    .boundaries-card {
+      background: rgba(23, 29, 58, 0.72);
+      border: 1px solid var(--border-gold);
+      border-radius: 28px;
+      padding: 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .boundaries-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(180deg, rgba(94, 215, 210, 0.03) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .boundary-tags {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+
+    .boundary-tag {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 24px;
+      border-radius: 999px;
+      border: 1px solid var(--border-gold);
+      background: rgba(8, 11, 24, 0.5);
+      color: var(--text-secondary);
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .boundary-tag:hover {
+      border-color: var(--gold);
+      color: var(--gold-soft);
+      background: rgba(216, 180, 90, 0.08);
+    }
+
+    .boundary-tag svg {
+      width: 18px;
+      height: 18px;
+      color: var(--gold);
+    }
+
+    .boundary-note {
+      margin-top: 40px;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Download */
+    .download-cta {
+      text-align: center;
+      position: relative;
+    }
+
+    .download-phones {
+      position: relative;
+      height: 560px;
+      margin-top: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .download-phone {
+      position: absolute;
+      width: 260px;
+      height: 520px;
+      border-radius: 36px;
+      border: 6px solid #1a1d2e;
+      overflow: hidden;
+      background: #0a0c18;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+      transition: all 0.5s ease;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .download-phone:nth-child(1) {
+      left: 50%;
+      transform: translateX(-170%) scale(0.85) rotateY(8deg);
+      z-index: 1;
+      opacity: 0.7;
+      filter: blur(1px);
+      animation-delay: 0s;
+    }
+
+    .download-phone:nth-child(2) {
+      left: 50%;
+      transform: translateX(-50%) scale(1);
+      z-index: 3;
+      animation-delay: 1s;
+    }
+
+    .download-phone:nth-child(3) {
+      left: 50%;
+      transform: translateX(70%) scale(0.85) rotateY(-8deg);
+      z-index: 1;
+      opacity: 0.7;
+      filter: blur(1px);
+      animation-delay: 2s;
+    }
+
+    .download-phones:hover .download-phone:nth-child(2) {
+      transform: translateX(-50%) scale(1.02) translateZ(20px);
+    }
+
+    .download-phone-screen {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #0F0F23 0%, #080B18 100%);
+      padding: 32px 16px 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .download-phone-title {
+      font-size: 14px;
+      text-align: center;
+      color: var(--gold-soft);
+      margin-bottom: 16px;
+      font-family: 'Noto Serif SC', serif;
+    }
+
+    .download-phone-img {
+      flex: 1;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      background: rgba(23, 29, 58, 0.5);
+    }
+
+    .download-phone-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center bottom;
+      background: linear-gradient(180deg, rgba(8, 11, 24, 0.3) 0%, rgba(8, 11, 24, 0.8) 100%);
+    }
+
+    .download-moon {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, rgba(241, 223, 165, 0.15) 0%, transparent 60%);
+      box-shadow: 0 0 80px rgba(216, 180, 90, 0.1);
+      pointer-events: none;
+    }
+
+    .download-reflection {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 120px;
+      background: linear-gradient(180deg, transparent 0%, rgba(216, 180, 90, 0.03) 100%);
+      pointer-events: none;
+    }
+
+    /* Footer */
+    .footer {
+      border-top: 1px solid var(--border-subtle);
+      background: rgba(8, 11, 24, 0.6);
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 24px 32px;
+    }
+
+    .footer-main {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 48px;
+      margin-bottom: 48px;
+    }
+
+    .footer-brand {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-logo-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border-gold);
+    }
+
+    .footer-logo-icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .footer-brand-name {
+      font-family: 'Noto Serif SC', serif;
+      font-size: 18px;
+      color: var(--gold-soft);
+    }
+
+    .footer-tagline {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .footer-column h4 {
+      font-size: 14px;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      font-family: 'Noto Sans SC', sans-serif;
+      font-weight: 600;
+    }
+
+    .footer-column a {
+      display: block;
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      transition: color 0.3s ease;
+    }
+
+    .footer-column a:hover {
+      color: var(--gold);
+    }
+
+    .footer-bottom {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-copyright {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .footer-disclaimer {
+      font-size: 12px;
+      color: var(--text-muted);
+      max-width: 600px;
+      line-height: 1.6;
+    }
+
+    /* Animations */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.4; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.1); }
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-6px); opacity: 1; }
+    }
+
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(216, 180, 90, 0.2); }
+      50% { box-shadow: 0 0 40px rgba(216, 180, 90, 0.4); }
+    }
+
+    /* Scroll reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+
+    /* Parallax glow */
+    .glow-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+      transition: transform 0.2s ease-out;
+    }
+
+    .glow-orb-1 {
+      width: 400px;
+      height: 400px;
+      background: rgba(94, 215, 210, 0.08);
+      top: 10%;
+      left: 10%;
+    }
+
+    .glow-orb-2 {
+      width: 300px;
+      height: 300px;
+      background: rgba(216, 180, 90, 0.06);
+      top: 50%;
+      right: 5%;
+    }
+
+    .glow-orb-3 {
+      width: 350px;
+      height: 350px;
+      background: rgba(139, 126, 200, 0.06);
+      bottom: 20%;
+      left: 20%;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .hero-inner {
+        grid-template-columns: 1fr;
+        gap: 48px;
+      }
+
+      .hero-visual {
+        order: -1;
+        min-height: 420px;
+      }
+
+      .hero-character {
+        width: 320px;
+        height: 420px;
+      }
+
+      .hero-tip-card {
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 0;
+      }
+
+      .hero-orbit {
+        width: 400px;
+        height: 400px;
+      }
+
+      .meet-grid,
+      .chat-section,
+      .calendar-section {
+        grid-template-columns: 1fr;
+      }
+
+      .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .bento-card-large,
+      .bento-card-wide {
+        grid-column: span 2;
+      }
+
+      .footer-main {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .mobile-menu-btn {
+        display: flex;
+      }
+
+      .mobile-menu {
+        display: flex;
+      }
+
+      .hero-title {
+        font-size: 40px;
+      }
+
+      .hero-subtitle {
+        font-size: 18px;
+      }
+
+      .section-title {
+        font-size: 30px;
+      }
+
+      .section-inner {
+        padding: 72px 20px;
+      }
+
+      .hero-buttons {
+        flex-direction: column;
+      }
+
+      .btn-primary, .btn-secondary {
+        width: 100%;
+        text-align: center;
+      }
+
+      .bento-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .bento-card-large,
+      .bento-card-wide {
+        grid-column: span 1;
+        grid-row: span 1;
+      }
+
+      .phone-mockup {
+        width: 280px;
+        height: 560px;
+      }
+
+      .calendar-section,
+      .chat-section {
+        gap: 40px;
+      }
+
+      .card-item {
+        width: 160px;
+      }
+
+      .download-phones {
+        height: 420px;
+      }
+
+      .download-phone {
+        width: 180px;
+        height: 360px;
+      }
+
+      .download-phone:nth-child(1) {
+        transform: translateX(-120%) scale(0.85) rotateY(8deg);
+      }
+
+      .download-phone:nth-child(2) {
+        transform: translateX(-50%) scale(1);
+      }
+
+      .download-phone:nth-child(3) {
+        transform: translateX(20%) scale(0.85) rotateY(-8deg);
+      }
+
+      .footer-main {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .boundary-tags {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .boundary-tag {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .hero-key {
+        width: 50px;
+        height: 50px;
+        right: 20px;
+      }
+    }
+
+    @media (max-width: 390px) {
+      .hero-title {
+        font-size: 34px;
+      }
+
+      .hero-character {
+        width: 260px;
+        height: 340px;
+      }
+
+      .hero-tip-card {
+        width: 200px;
+        padding: 16px;
+      }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="starfield"></canvas>
+  <div class="aurora-bg"></div>
+  <div class="glow-orb glow-orb-1"></div>
+  <div class="glow-orb glow-orb-2"></div>
+  <div class="glow-orb glow-orb-3"></div>
+
+  <div class="page-wrapper">
+    <!-- Navigation -->
+    <nav class="nav-container" id="navbar">
+      <div class="nav-inner">
+        <a href="#" class="nav-logo">
+          <div class="nav-logo-icon">
+            <img src="images/app_icon1111.png" alt="星钥塔罗">
+          </div>
+          <div class="nav-brand-text">
+            <span class="nav-brand-name">星钥塔罗</span>
+            <span class="nav-brand-en">XingKey Tarot</span>
+          </div>
+        </a>
+        <div class="nav-links">
+          <a href="#xinglan" class="nav-link">星澜</a>
+          <a href="#features" class="nav-link">功能</a>
+          <a href="#calendar" class="nav-link">星历</a>
+          <a href="#cards" class="nav-link">卡牌</a>
+          <a href="#boundaries" class="nav-link">边界</a>
+          <a href="#download" class="nav-cta">下载体验</a>
+        </div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="打开菜单">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="#xinglan" class="mobile-link">星澜</a>
+      <a href="#features" class="mobile-link">功能</a>
+      <a href="#calendar" class="mobile-link">星历</a>
+      <a href="#cards" class="mobile-link">卡牌</a>
+      <a href="#boundaries" class="mobile-link">边界</a>
+      <a href="#download" class="mobile-cta">下载体验</a>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+      <div class="hero-inner">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            </svg>
+            塔罗式情绪陪伴与自我探索
+          </div>
+          <h1 class="hero-title">星澜会听你<br><span>慢慢说</span></h1>
+          <p class="hero-subtitle">不是预测未来，<br>而是陪你看见此刻的自己。</p>
+          <p class="hero-body">《星钥塔罗》是一款塔罗式情绪陪伴与自我探索 App。你可以用一张牌、一段聊天、一个安静的夜晚，把心里的感受轻轻放下来一点。</p>
+          <div class="hero-buttons">
+            <a href="#download" class="btn-primary">进入星澜的月光里</a>
+            <a href="#xinglan" class="btn-secondary">了解星钥塔罗</a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-orbit"></div>
+          <div class="hero-character">
+            <div class="hero-character-glow"></div>
+            <img src="images/xinglan_home.png" alt="星澜 - 温柔的月光陪伴者">
+          </div>
+          <div class="hero-key">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="#D8B45A"/>
+              <circle cx="12" cy="12" r="3" fill="#080B18"/>
+            </svg>
+          </div>
+          <div class="hero-tip-card">
+            <div class="hero-tip-label">今日星钥</div>
+            <div class="hero-tip-text">你不是想太多，只是很认真地在感受。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Meet Xinglan -->
+    <section class="section" id="xinglan">
+      <div class="section-inner">
+        <div class="section-label reveal">Meet Xinglan</div>
+        <h2 class="section-title reveal">遇见星澜</h2>
+        <p class="section-subtitle reveal">她不是预言者，而是午夜里安静的倾听者。</p>
+        <div class="meet-grid">
+          <div class="meet-character-card reveal">
+            <div class="meet-character-img">
+              <img src="images/ChatGPT%20Image.png" alt="星澜">
+            </div>
+            <h3 class="meet-character-name">星澜</h3>
+            <p class="meet-character-title">温柔的月光陪伴者</p>
+          </div>
+          <div class="meet-ability-cards">
+            <div class="ability-card reveal reveal-delay-1">
+              <div class="ability-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2C7.5 2 4 5.5 4 10c0 3.5 2 6.5 5 8.5L12 22l3-3.5c3-2 5-5 5-8.5 0-4.5-3.5-8-8-8z"/>
+                  <path d="M12 7v6M9 10h6"/>
+                </svg>
+              </div>
+              <h3 class="ability-title">她会倾听</h3>
+              <p class="ability-desc">慢慢说也没关系，星澜会先听你说完。</p>
+            </div>
+            <div class="ability-card reveal reveal-delay-2">
+              <div class="ability-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 16v-4M12 8h.01"/>
+                </svg>
+              </div>
+              <h3 class="ability-title">她不评判</h3>
+              <p class="ability-desc">你的情绪不是麻烦，它只是正在提醒你什么。</p>
+            </div>
+            <div class="ability-card reveal reveal-delay-3">
+              <div class="ability-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>
+                </svg>
+              </div>
+              <h3 class="ability-title">她不预言</h3>
+              <p class="ability-desc">星澜不会告诉你未来一定如何，只陪你看清此刻。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bento Grid Features -->
+    <section class="section" id="features">
+      <div class="section-inner">
+        <div class="section-label reveal">Features</div>
+        <h2 class="section-title reveal">一张星钥，照见一段心事</h2>
+        <p class="section-subtitle reveal">从抽牌、聊天到星历记录，星钥塔罗陪你建立自己的情绪轨迹。</p>
+        <div class="bento-grid">
+          <div class="bento-card bento-card-large reveal">
+            <div>
+              <h3 class="bento-card-title">每日一占</h3>
+              <p class="bento-card-desc">一句话心事，一张星钥。适合在清晨、睡前，或情绪纷乱的时候，轻轻整理自己。</p>
+            </div>
+            <div class="bento-visual">
+              <div class="floating-card">
+                <div class="floating-card-star">
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="currentColor"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bento-card reveal reveal-delay-1">
+            <div>
+              <h3 class="bento-card-title">圣三角牌阵</h3>
+              <p class="bento-card-desc">过去、现在、可能的方向。不是给答案，而是帮你看见脉络。</p>
+            </div>
+            <div class="bento-visual">
+              <div class="triangle-cards">
+                <div class="triangle-card"></div>
+                <div class="triangle-card"></div>
+                <div class="triangle-card"></div>
+                <div class="triangle-lines">
+                  <svg viewBox="0 0 160 140" fill="none">
+                    <path d="M80 20L30 110M80 20L130 110M30 110L130 110" stroke="rgba(216,180,90,0.3)" stroke-width="1" stroke-dasharray="4 4"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bento-card reveal reveal-delay-2">
+            <div>
+              <h3 class="bento-card-title">关系探索</h3>
+              <p class="bento-card-desc">不替你判断谁对谁错。只陪你看清关系中的感受、期待和边界。</p>
+            </div>
+            <div class="bento-visual">
+              <div class="relation-visual">
+                <svg class="relation-star" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                </svg>
+                <div class="relation-line"></div>
+                <svg class="relation-star" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+          <div class="bento-card reveal">
+            <div>
+              <h3 class="bento-card-title">旋转牌轮</h3>
+              <p class="bento-card-desc">左右滑动牌轮，在流动的星光里选择此刻吸引你的牌。</p>
+            </div>
+            <div class="bento-visual">
+              <div class="wheel-visual">
+                <div class="wheel-card"></div>
+                <div class="wheel-card"></div>
+                <div class="wheel-card"></div>
+                <div class="wheel-card"></div>
+                <div class="wheel-card"></div>
+                <div class="wheel-card"></div>
+                <div class="wheel-card"></div>
+                <div class="wheel-card"></div>
+                <div class="wheel-center"></div>
+              </div>
+            </div>
+          </div>
+          <div class="bento-card bento-card-wide reveal reveal-delay-1">
+            <div>
+              <h3 class="bento-card-title">星澜聊天</h3>
+              <p class="bento-card-desc">慢慢说，星澜会先听你说完。</p>
+            </div>
+            <div class="bento-visual">
+              <div class="chat-preview">
+                <div class="chat-bubble chat-bubble-left">我听见了，慢慢说也没关系。</div>
+                <div class="chat-bubble chat-bubble-right">我今天有点累。</div>
+                <div class="chat-bubble chat-bubble-left">累也很正常，你已经撑了很久了。</div>
+              </div>
+            </div>
+          </div>
+          <div class="bento-card reveal">
+            <div>
+              <h3 class="bento-card-title">星澜星历</h3>
+              <p class="bento-card-desc">每天留下一颗情绪星。不是打卡，只是把认真感受过的日子轻轻留下。</p>
+            </div>
+            <div class="bento-visual">
+              <div class="calendar-mini">
+                <div class="day lit">1</div>
+                <div class="day">2</div>
+                <div class="day lit">3</div>
+                <div class="day lit">4</div>
+                <div class="day">5</div>
+                <div class="day lit">6</div>
+                <div class="day">7</div>
+                <div class="day lit">8</div>
+                <div class="day">9</div>
+                <div class="day lit">10</div>
+                <div class="day">11</div>
+                <div class="day lit">12</div>
+              </div>
+            </div>
+          </div>
+          <div class="bento-card reveal reveal-delay-1">
+            <div>
+              <h3 class="bento-card-title">78 张塔罗牌</h3>
+              <p class="bento-card-desc">查看每张牌的正位、逆位与情绪陪伴式解读。</p>
+            </div>
+            <div class="bento-visual">
+              <div class="cards-stack-visual">
+                <div class="stack-card"></div>
+                <div class="stack-card"></div>
+                <div class="stack-card"></div>
+                <div class="stack-card"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chat Section -->
+    <section class="section" id="chat">
+      <div class="section-inner">
+        <div class="chat-section">
+          <div class="chat-text">
+            <div class="section-label reveal">Xinglan Chat</div>
+            <h2 class="section-title reveal">有些话，可以慢慢说</h2>
+            <p class="section-subtitle reveal" style="max-width: 480px;">在星澜聊天里，你不需要马上变好。你可以说烦恼、关系、学习、工作、自我怀疑，也可以只是说一句：“我今天有点累。”</p>
+            <p class="reveal" style="color: var(--text-secondary); margin-top: 24px; line-height: 1.9; max-width: 480px;">星澜会用温和、具体、有陪伴感的方式回应你，帮助你把混乱的感受慢慢理清。</p>
+          </div>
+          <div class="phone-mockup reveal reveal-delay-1">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <div class="phone-state active" id="phoneEntry">
+                <div class="phone-avatar-wrap">
+                  <div class="phone-avatar">
+                    <img src="images/foreground.png" alt="星澜">
+                  </div>
+                </div>
+                <h3 class="phone-title">星澜聊天</h3>
+                <p class="phone-subtitle">慢慢说，星澜会先听你说完。</p>
+                <p class="phone-description">你可以慢慢说。星澜不会替你判断，也不会催你变好。这里，只陪你把心里的话放下来一点。</p>
+                <div class="phone-btn">进入星澜聊天</div>
+              </div>
+              <div class="phone-state" id="phoneChat">
+                <div class="chat-header">
+                  <div class="chat-header-avatar">
+                    <img src="images/foreground.png" alt="星澜">
+                  </div>
+                  <div class="chat-header-info">
+                    <div class="chat-header-name">星澜</div>
+                    <div class="chat-header-status">星澜在听</div>
+                  </div>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                  <div class="chat-msg chat-msg-left" data-delay="0">我听见了，慢慢说也没关系。</div>
+                  <div class="chat-msg chat-msg-right" data-delay="1200">我最近总觉得自己不够好。</div>
+                  <div class="chat-msg chat-msg-left" data-delay="2400">也许不是你不够好，而是你已经撑了很久了。</div>
+                </div>
+                <div class="typing-dots" id="typingDots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+                <div class="chat-input">
+                  <div class="chat-input-placeholder">想对星澜说的话...</div>
+                  <div class="chat-send">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Star Calendar & Level -->
+    <section class="section" id="calendar">
+      <div class="section-inner">
+        <div class="calendar-section">
+          <div class="calendar-card reveal">
+            <div class="calendar-header">
+              <h3 class="calendar-month">2026 年 6 月</h3>
+              <div class="calendar-nav">
+                <button aria-label="上月">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M15 18l-6-6 6-6"/>
+                  </svg>
+                </button>
+                <button aria-label="下月">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 18l6-6-6-6"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="calendar-weekdays">
+              <div class="calendar-weekday">日</div>
+              <div class="calendar-weekday">一</div>
+              <div class="calendar-weekday">二</div>
+              <div class="calendar-weekday">三</div>
+              <div class="calendar-weekday">四</div>
+              <div class="calendar-weekday">五</div>
+              <div class="calendar-weekday">六</div>
+            </div>
+            <div class="calendar-days" id="calendarDays">
+              <!-- Generated by JS -->
+            </div>
+          </div>
+          <div class="level-card reveal reveal-delay-1">
+            <div class="level-current">星钥等级</div>
+            <h3 class="level-name">七日星轨</h3>
+            <div class="level-stats">
+              <div class="level-stat">
+                <div class="level-stat-value">7</div>
+                <div class="level-stat-label">累计点亮天数</div>
+              </div>
+              <div class="level-stat">
+                <div class="level-stat-value">3</div>
+                <div class="level-stat-label">连续点亮天数</div>
+              </div>
+            </div>
+            <div class="level-progress-wrap">
+              <div class="level-progress-label">
+                <span>下一称号：月下自省者</span>
+                <span>还差 14 天</span>
+              </div>
+              <div class="level-progress-bar">
+                <div class="level-progress-fill" id="levelProgressFill"></div>
+              </div>
+            </div>
+            <div class="level-ladder" id="levelLadder">
+              <div class="level-step"><div class="level-dot"></div><span>初见</span></div>
+              <div class="level-step"><div class="level-dot"></div><span>星火初亮</span></div>
+              <div class="level-step active"><div class="level-dot"></div><span>七日星轨</span></div>
+              <div class="level-step"><div class="level-dot"></div><span>月下自省者</span></div>
+              <div class="level-step"><div class="level-dot"></div><span>星钥守望者</span></div>
+              <div class="level-step"><div class="level-dot"></div><span>星河同行者</span></div>
+              <div class="level-step"><div class="level-dot"></div><span>半年听心者</span></div>
+              <div class="level-step"><div class="level-dot"></div><span>长夜星澜</span></div>
+            </div>
+            <div class="level-note">星钥等级由累计点亮天数决定。漏一天也没关系，称号不会倒退。星澜不制造焦虑，只陪你看见自己走过的星光。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Card Gallery -->
+    <section class="section" id="cards">
+      <div class="section-inner" style="padding-bottom: 40px;">
+        <div class="section-label reveal">Tarot Library</div>
+        <h2 class="section-title reveal">78 张牌，不是答案，而是镜子</h2>
+        <p class="section-subtitle reveal">每张牌都不是命运判决。它更像一面镜子，帮你看见当下的情绪、期待、犹豫和力量。</p>
+      </div>
+      <div class="card-gallery">
+        <div class="card-scroll" id="cardScroll">
+          <!-- 卡牌由 JS 动态渲染 -->
+        </div>
+        <div class="card-suits">
+          <button class="card-suit active">大阿尔卡那</button>
+          <button class="card-suit">权杖</button>
+          <button class="card-suit">圣杯</button>
+          <button class="card-suit">宝剑</button>
+          <button class="card-suit">星币</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Boundaries -->
+    <section class="section" id="boundaries">
+      <div class="section-inner">
+        <div class="boundaries-card reveal">
+          <div class="section-label">Boundaries</div>
+          <h2 class="section-title">温柔，也有边界</h2>
+          <p class="section-subtitle" style="margin: 0 auto; max-width: 640px;">星钥塔罗不是传统算命工具。它不会预测未来，不承诺复合，不替你做决定，也不提供医疗、法律、金融等专业建议。</p>
+          <p style="color: var(--text-secondary); margin-top: 20px; max-width: 640px; margin-left: auto; margin-right: auto; line-height: 1.9;">它更像一盏夜里的小灯：当你需要整理情绪时，陪你慢慢看见自己。</p>
+          <div class="boundary-tags">
+            <div class="boundary-tag">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 6v6l4 2"/>
+              </svg>
+              不预测未来
+            </div>
+            <div class="boundary-tag">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              不替你决定
+            </div>
+            <div class="boundary-tag">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+              不制造焦虑
+            </div>
+            <div class="boundary-tag">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="16" y1="13" x2="8" y2="13"/>
+                <line x1="16" y1="17" x2="8" y2="17"/>
+              </svg>
+              不提供专业诊断
+            </div>
+          </div>
+          <div class="boundary-note">星澜的回应仅供情绪陪伴与自我探索参考。如果你正在经历严重危机，请及时寻求现实中的可信支持或专业帮助。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Download CTA -->
+    <section class="section" id="download">
+      <div class="section-inner">
+        <div class="download-cta">
+          <div class="section-label reveal">Download</div>
+          <h2 class="section-title reveal">今晚，也给自己留一张星钥吧</h2>
+          <p class="section-subtitle reveal" style="margin: 0 auto;">从一句心事开始，让星澜陪你慢慢看见自己。</p>
+          <div class="hero-buttons reveal" style="justify-content: center; margin-top: 32px;">
+            <a href="#" class="btn-primary">下载星钥塔罗</a>
+            <a href="#features" class="btn-secondary">查看功能介绍</a>
+          </div>
+          <div class="download-phones">
+            <div class="download-moon"></div>
+            <div class="download-phone">
+              <div class="download-phone-screen">
+                <div class="download-phone-title">星澜聊天</div>
+                <div class="download-phone-img">
+                  <img src="images/ChatGPT%20Image.png" alt="星澜聊天">
+                </div>
+              </div>
+            </div>
+            <div class="download-phone">
+              <div class="download-phone-screen">
+                <div class="download-phone-title">我的星历</div>
+                <div class="download-phone-img">
+                  <img src="images/ChatGPT%20Image.png" alt="星澜星历">
+                </div>
+              </div>
+            </div>
+            <div class="download-phone">
+              <div class="download-phone-screen">
+                <div class="download-phone-title">卡牌总览</div>
+                <div class="download-phone-img">
+                  <img src="images/tarot_major_18_moon.png" alt="卡牌总览">
+                </div>
+              </div>
+            </div>
+            <div class="download-reflection"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer-inner">
+        <div class="footer-main">
+          <div class="footer-brand">
+            <div class="footer-logo">
+              <div class="footer-logo-icon">
+                <img src="images/app_icon1111.png" alt="星钥塔罗">
+              </div>
+              <span class="footer-brand-name">星钥塔罗</span>
+            </div>
+            <p class="footer-tagline">塔罗式情绪陪伴与自我探索<br>不是预测未来，而是陪你看见此刻的自己。</p>
+          </div>
+          <div class="footer-column">
+            <h4>产品</h4>
+            <a href="#features">功能介绍</a>
+            <a href="#xinglan">遇见星澜</a>
+            <a href="#cards">卡牌总览</a>
+            <a href="#calendar">星澜星历</a>
+          </div>
+          <div class="footer-column">
+            <h4>支持</h4>
+            <a href="#">使用说明</a>
+            <a href="#">常见问题</a>
+            <a href="#">联系我们</a>
+          </div>
+          <div class="footer-column">
+            <h4>法律</h4>
+            <a href="#">隐私政策</a>
+            <a href="#">用户协议</a>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <div class="footer-copyright">© 2026 星钥塔罗. All rights reserved.</div>
+          <div class="footer-disclaimer">星澜的回应仅供陪伴与自我探索参考，不构成任何专业建议。</div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // Mobile menu
+      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+      const mobileMenu = document.getElementById('mobileMenu');
+      const mobileLinks = document.querySelectorAll('.mobile-menu a');
+
+      function toggleMobileMenu() {
+        mobileMenuBtn.classList.toggle('active');
+        mobileMenu.classList.toggle('active');
+        document.body.style.overflow = mobileMenu.classList.contains('active') ? 'hidden' : '';
+      }
+
+      mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+      mobileLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          toggleMobileMenu();
+        });
+      });
+
+      // Navbar scroll effect
+      const navbar = document.getElementById('navbar');
+      function updateNavbar() {
+        if (window.scrollY > 50) {
+          navbar.classList.add('scrolled');
+        } else {
+          navbar.classList.remove('scrolled');
+        }
+      }
+      window.addEventListener('scroll', updateNavbar, { passive: true });
+      updateNavbar();
+
+      // Starfield canvas
+      const canvas = document.getElementById('starfield');
+      const ctx = canvas.getContext('2d');
+      let stars = [];
+      let width, height;
+
+      function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+        initStars();
+      }
+
+      function initStars() {
+        stars = [];
+        const count = Math.min(Math.floor(width * height / 6000), 180);
+        for (let i = 0; i < count; i++) {
+          stars.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            radius: Math.random() * 1.5 + 0.3,
+            opacity: Math.random(),
+            speed: Math.random() * 0.02 + 0.005,
+            twinkleSpeed: Math.random() * 0.02 + 0.01,
+            maxOpacity: Math.random() * 0.6 + 0.2
+          });
+        }
+      }
+
+      function animateStars() {
+        ctx.clearRect(0, 0, width, height);
+        for (let i = 0; i < stars.length; i++) {
+          const star = stars[i];
+          star.opacity += star.twinkleSpeed;
+          const alpha = Math.abs(Math.sin(star.opacity)) * star.maxOpacity;
+          ctx.beginPath();
+          ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(241, 223, 165, ' + alpha + ')';
+          ctx.fill();
+        }
+        requestAnimationFrame(animateStars);
+      }
+
+      resizeCanvas();
+      animateStars();
+      window.addEventListener('resize', resizeCanvas);
+
+      // Parallax glow orbs
+      const orbs = document.querySelectorAll('.glow-orb');
+      let mouseX = 0, mouseY = 0;
+      let targetX = 0, targetY = 0;
+
+      document.addEventListener('mousemove', function(e) {
+        targetX = (e.clientX / width - 0.5) * 2;
+        targetY = (e.clientY / height - 0.5) * 2;
+      }, { passive: true });
+
+      function animateOrbs() {
+        mouseX += (targetX - mouseX) * 0.05;
+        mouseY += (targetY - mouseY) * 0.05;
+        orbs.forEach(function(orb, index) {
+          const factor = (index + 1) * 15;
+          orb.style.transform = 'translate(' + (mouseX * factor) + 'px, ' + (mouseY * factor) + 'px)';
+        });
+        requestAnimationFrame(animateOrbs);
+      }
+      animateOrbs();
+
+      // Scroll reveal
+      const revealElements = document.querySelectorAll('.reveal');
+      const revealObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+      revealElements.forEach(function(el) {
+        revealObserver.observe(el);
+      });
+
+      // Calendar generation
+      const calendarDays = document.getElementById('calendarDays');
+      const litDays = [1, 3, 4, 6, 8, 10, 12, 15, 17, 19, 21, 24, 26, 29];
+      const today = 30;
+      const tooltipData = {
+        1: '6月1日 · 今日星名：能量低落 · 今日牌名：隐士',
+        3: '6月3日 · 今日星名：关系内耗 · 今日牌名：月亮',
+        6: '6月6日 · 今日星名：选择纠结 · 今日牌名：战车',
+        10: '6月10日 · 今日星名：寻求安慰 · 今日牌名：星星',
+        12: '6月12日 · 今日星名：职场疲惫 · 今日牌名：力量',
+        15: '6月15日 · 今日星名：关系评估 · 今日牌名：恋人',
+        17: '6月17日 · 今日星名：能量低落 · 今日牌名：女祭司',
+        19: '6月19日 · 今日星名：选择纠结 · 今日牌名：愚者',
+        21: '6月21日 · 今日星名：寻求安慰 · 今日牌名：太阳',
+        24: '6月24日 · 今日星名：职场疲惫 · 今日牌名：节制',
+        26: '6月26日 · 今日星名：关系内耗 · 今日牌名：月亮',
+        29: '6月29日 · 今日星名：关系内耗 · 今日牌名：月亮'
+      };
+
+      for (let d = 1; d <= 30; d++) {
+        const dayEl = document.createElement('div');
+        dayEl.className = 'calendar-day';
+        dayEl.textContent = d;
+
+        const starIcon = document.createElement('span');
+        starIcon.className = 'star-icon';
+        starIcon.textContent = '★';
+        dayEl.appendChild(starIcon);
+
+        if (litDays.indexOf(d) !== -1) {
+          dayEl.classList.add('lit');
+        }
+        if (d === today) {
+          dayEl.classList.add('today');
+        }
+        if (d > today) {
+          dayEl.classList.add('future');
+        }
+
+        if (tooltipData[d]) {
+          const tooltip = document.createElement('div');
+          tooltip.className = 'calendar-tooltip';
+          tooltip.textContent = tooltipData[d];
+          dayEl.appendChild(tooltip);
+        }
+
+        calendarDays.appendChild(dayEl);
+      }
+
+      // Calendar star animation on scroll
+      const calendarCard = document.querySelector('.calendar-card');
+      const calendarObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            const litStars = entry.target.querySelectorAll('.calendar-day.lit');
+            litStars.forEach(function(star, index) {
+              setTimeout(function() {
+                star.classList.add('lit');
+              }, index * 80);
+            });
+            calendarObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.3 });
+
+      calendarObserver.observe(calendarCard);
+
+      // Level progress animation
+      const levelProgressFill = document.getElementById('levelProgressFill');
+      const levelLadder = document.getElementById('levelLadder');
+      const levelObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            setTimeout(function() {
+              levelProgressFill.style.width = '33%';
+            }, 300);
+            levelObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.3 });
+
+      levelObserver.observe(levelLadder);
+
+      // Chat mockup auto-switch
+      const phoneEntry = document.getElementById('phoneEntry');
+      const phoneChat = document.getElementById('phoneChat');
+      const chatMessages = document.getElementById('chatMessages').querySelectorAll('.chat-msg');
+      const typingDots = document.getElementById('typingDots');
+
+      let chatState = 0;
+      let messageIndex = 0;
+
+      function showMessages() {
+        if (messageIndex < chatMessages.length) {
+          const msg = chatMessages[messageIndex];
+          const delay = parseInt(msg.getAttribute('data-delay')) || 0;
+          setTimeout(function() {
+            msg.classList.add('visible');
+            messageIndex++;
+            if (messageIndex < chatMessages.length) {
+              showMessages();
+            } else {
+              setTimeout(function() {
+                typingDots.classList.remove('active');
+              }, 1000);
+            }
+          }, messageIndex === 0 ? 500 : 1000);
+        }
+      }
+
+      function startChatDemo() {
+        chatMessages.forEach(function(msg) {
+          msg.classList.remove('visible');
+        });
+        messageIndex = 0;
+        typingDots.classList.add('active');
+        showMessages();
+      }
+
+      function switchPhoneState() {
+        if (chatState === 0) {
+          phoneEntry.classList.remove('active');
+          phoneChat.classList.add('active');
+          setTimeout(startChatDemo, 300);
+          chatState = 1;
+        } else {
+          phoneChat.classList.remove('active');
+          phoneEntry.classList.add('active');
+          chatState = 0;
+        }
+      }
+
+      setInterval(switchPhoneState, 8000);
+      setTimeout(switchPhoneState, 3000);
+
+      // Smooth scroll for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+        anchor.addEventListener('click', function(e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            const navHeight = 72;
+            const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navHeight;
+            window.scrollTo({
+              top: targetPosition,
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+
+      // Card gallery - dynamic suit switching
+      const cardScroll = document.getElementById('cardScroll');
+      const suits = document.querySelectorAll('.card-suit');
+      const suitMap = {
+        '大阿尔卡那': 'major',
+        '权杖': 'wands',
+        '圣杯': 'cups',
+        '宝剑': 'swords',
+        '星币': 'pentacles'
+      };
+
+      const cardData = {
+        major: [
+          { id: '00', file: 'fool', name: '愚人', desc: '允许自己踏出第一步，新的开始不一定需要完美的计划。' },
+          { id: '01', file: 'magician', name: '魔术师', desc: '你其实已经拥有开始的力量，只是还没完全看见。' },
+          { id: '02', file: 'high_priestess', name: '女祭司', desc: '静下来，答案会在安静里浮现。' },
+          { id: '03', file: 'empress', name: '皇后', desc: '给自己温柔和滋养的空间，你值得被照顾。' },
+          { id: '04', file: 'emperor', name: '皇帝', desc: '在混乱中建立一点点秩序，情绪会因此有落脚点。' },
+          { id: '05', file: 'hierophant', name: '教皇', desc: '传统和规则里，也有值得借鉴的稳定。' },
+          { id: '06', file: 'lovers', name: '恋人', desc: '关系里，先看清自己真正想要什么。' },
+          { id: '07', file: 'chariot', name: '战车', desc: '用意志推着情绪往前走，也需要记得休息。' },
+          { id: '08', file: 'strength', name: '力量', desc: '真正的力量不是控制，而是温柔地坚持。' },
+          { id: '09', file: 'hermit', name: '隐士', desc: '独处不是逃避，是给内心留一点空间。' },
+          { id: '10', file: 'wheel_of_fortune', name: '命运之轮', desc: '变化是常态，不必急着抓住所有答案。' },
+          { id: '11', file: 'justice', name: '正义', desc: '看见事实，也看见自己的判断。' },
+          { id: '12', file: 'hanged_man', name: '倒吊人', desc: '暂停有时比行动更有价值，让事情沉淀一下。' },
+          { id: '13', file: 'death', name: '死神', desc: '结束是另一种开始，允许旧事物离开。' },
+          { id: '14', file: 'temperance', name: '节制', desc: '平衡不是完美，而是不断微调。' },
+          { id: '15', file: 'devil', name: '恶魔', desc: '看清捆绑自己的模式，就是松开的开始。' },
+          { id: '16', file: 'tower', name: '高塔', desc: '突如其来的变化，往往也带来清理。' },
+          { id: '17', file: 'star', name: '星星', desc: '希望是在黑暗里仍然愿意相信光。' },
+          { id: '18', file: 'moon', name: '月亮', desc: '不安里藏着还没被理解的情绪。' },
+          { id: '19', file: 'sun', name: '太阳', desc: '温暖不是没有阴影，而是愿意记得光。' },
+          { id: '20', file: 'judgement', name: '审判', desc: '听见内心的召唤，做出属于自己的选择。' },
+          { id: '21', file: 'world', name: '世界', desc: '一个阶段的完整，带着收获走向新的开始。' }
+        ],
+        wands: [
+          { name: '权杖王牌', theme: '热情与启程' },
+          { name: '权杖二', theme: '计划与远见' },
+          { name: '权杖三', theme: '探索与扩张' },
+          { name: '权杖四', theme: '稳定与庆祝' },
+          { name: '权杖五', theme: '竞争与冲突' }
+        ],
+        cups: [
+          { name: '圣杯王牌', theme: '情感的开始' },
+          { name: '圣杯二', theme: '关系的连接' },
+          { name: '圣杯三', theme: '分享与欢聚' },
+          { name: '圣杯四', theme: '倦怠与重新选择' },
+          { name: '圣杯五', theme: '失落与疗愈' }
+        ],
+        swords: [
+          { name: '宝剑王牌', theme: '清晰的念头' },
+          { name: '宝剑二', theme: '两难与僵持' },
+          { name: '宝剑三', theme: '心痛与释放' },
+          { name: '宝剑四', theme: '休息与复原' },
+          { name: '宝剑五', theme: '争执与反思' }
+        ],
+        pentacles: [
+          { name: '星币王牌', theme: '物质的新机会' },
+          { name: '星币二', theme: '平衡与兼顾' },
+          { name: '星币三', theme: '合作与技艺' },
+          { name: '星币四', theme: '保守与安全感' },
+          { name: '星币五', theme: '匮乏与互助' }
+        ]
+      };
+
+      function renderCards(suit) {
+        cardScroll.innerHTML = '';
+        const fragment = document.createDocumentFragment();
+
+        if (suit === 'major') {
+          cardData.major.forEach(function(card, index) {
+            const item = document.createElement('div');
+            item.className = 'card-item';
+            item.style.animationDelay = (index * 0.04) + 's';
+            item.innerHTML = '<div class="card-inner">' +
+              '<img src="images/tarot_major_' + card.id + '_' + card.file + '.png" alt="' + card.name + '">' +
+              '<div class="card-overlay">' +
+                '<div class="card-overlay-name">' + card.name + '</div>' +
+                '<div class="card-overlay-tags">' +
+                  '<span class="card-overlay-tag">正位</span>' +
+                  '<span class="card-overlay-tag">逆位</span>' +
+                '</div>' +
+                '<div class="card-overlay-desc">' + card.desc + '</div>' +
+              '</div>' +
+            '</div>';
+            fragment.appendChild(item);
+          });
+        } else {
+          cardData[suit].forEach(function(card, index) {
+            const item = document.createElement('div');
+            item.className = 'card-item card-placeholder';
+            item.style.animationDelay = (index * 0.06) + 's';
+            item.innerHTML = '<div class="card-inner">' +
+              '<img class="card-back-img" src="images/card_back.png" alt="' + card.name + '">' +
+              '<div class="card-placeholder-label">' + card.name + '</div>' +
+              '<div class="card-placeholder-note">' + card.theme + '</div>' +
+            '</div>';
+            fragment.appendChild(item);
+          });
+        }
+
+        cardScroll.appendChild(fragment);
+        cardScroll.scrollTo({ left: 0, behavior: 'smooth' });
+      }
+
+      suits.forEach(function(suit) {
+        suit.addEventListener('click', function() {
+          suits.forEach(function(s) { s.classList.remove('active'); });
+          this.classList.add('active');
+          const suitKey = suitMap[this.textContent];
+          if (suitKey) {
+            renderCards(suitKey);
+          }
+        });
+      });
+
+      renderCards('major');
+
+    })();
+  </script>
+</body>
+</html>
