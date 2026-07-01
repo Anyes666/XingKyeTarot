@@ -124,8 +124,8 @@ struct UsageGuidePage {
           direction: GradientDirection.Bottom,
           colors: [
             [Theme.BG_DEEP_SPACE, 0.0],
-            [Theme.BG_DEEP_INDIGO, 0.55],
-            [Theme.BG_DEEP_INDIGO, 1.0]
+            [Theme.V2A_BG_BASE, 0.55],
+            [Theme.V2A_BG_BASE, 1.0]
           ]
         })
 
@@ -143,7 +143,7 @@ struct UsageGuidePage {
         // 标题
         Text('使用说明')
           .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.GOLD_LIGHT)
+          .fontColor(Theme.V2A_GOLD_ACCENT)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
           .width('100%')

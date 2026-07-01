@@ -13,6 +13,7 @@ import { getPositiveScenarioContent, PositiveEmotionTag } from '../data/Positive
 import { Routes } from '../common/Routes';
 import { EmotionTag, ScenarioContent, StructuredInterpretation } from '../model/TarotCard';
 import { HistoryStore } from '../common/HistoryStore';
+import { getSingleCardCompanionText, ResultCompanionText } from '../data/XinglanResultCompanionText';
 import { AppStateStore } from '../common/AppStateStore';
 import {
   SpreadType,
@@ -326,6 +327,9 @@ struct ResultGoldenPage {
           // ═══════════ "为什么是这张牌" ═══════════
           this.buildWhyThisCard()
 
+          // ═══════════ 星澜陪你看见 ═══════════
+          this.buildCompanionSection()
+
           Divider()
             .strokeWidth(0.5)
             .color(Theme.V2C_SPINE_LINE)
@@ -484,6 +488,54 @@ struct ResultGoldenPage {
     .backgroundColor(Theme.V2C_BG_CARD)
     .borderRadius(Theme.V2C_RADIUS_CARD)
     .border({ width: 1, color: 'rgba(197, 160, 80, 0.15)' })
+  }
+
+  @Builder
+  buildCompanionSection(): void {
+    Column() {
+      Text(getSingleCardCompanionText(this.cardName || '这张牌', this.isReversed).title)
+        .fontSize(Theme.V2C_FONT_SUBTITLE)
+        .fontColor(Theme.V2C_GOLD_GILT)
+        .fontWeight(FontWeight.Bold)
+        .width('100%')
+        .margin({ bottom: Theme.V2_SPACE_MD })
+
+      Column({ space: Theme.V2_SPACE_MD }) {
+        Text(getSingleCardCompanionText(this.cardName || '这张牌', this.isReversed).receive)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_PRIMARY)
+          .lineHeight(24)
+          .width('100%')
+
+        Text(getSingleCardCompanionText(this.cardName || '这张牌', this.isReversed).reflect)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_PRIMARY)
+          .lineHeight(24)
+          .width('100%')
+
+        Text(getSingleCardCompanionText(this.cardName || '这张牌', this.isReversed).question)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_GOLD_GILT_SOFT)
+          .fontWeight(FontWeight.Medium)
+          .lineHeight(24)
+          .width('100%')
+          .margin({ top: Theme.V2_SPACE_XS })
+
+        Text(getSingleCardCompanionText(this.cardName || '这张牌', this.isReversed).action)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
+          .lineHeight(24)
+          .width('100%')
+          .fontStyle(FontStyle.Italic)
+      }
+      .width('100%')
+    }
+    .width('100%')
+    .padding(Theme.V2_SPACE_LG)
+    .backgroundColor(Theme.V2C_BG_CARD)
+    .borderRadius(Theme.V2C_RADIUS_CARD)
+    .border({ width: 1, color: 'rgba(197, 160, 80, 0.15)' })
+    .margin({ top: Theme.V2_SPACE_MD })
   }
 
   @Builder

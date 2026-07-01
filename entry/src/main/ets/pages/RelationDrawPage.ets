@@ -61,8 +61,12 @@ struct RelationDrawPage {
   @State private cardSlots: RelationCardSlotInfo[] = [];
   @State private revealedSlots: boolean[] = [false, false, false];
   @State private isAnimDone: boolean = false;
+  // ── Timer 生命周期管理 ──
+  private isPageAlive: boolean = true;
+  private timerIds: number[] = [];
 
   aboutToAppear(): void {
+    this.isPageAlive = true;
     const rawParams: Object | undefined = router.getParams();
     if (rawParams) {
       const params = rawParams as RelationDrawInParams;
@@ -106,10 +110,12 @@ struct RelationDrawPage {
 
   private startRevealAnimation(): void {
     const revealNext = (index: number): void => {
+      if (!this.isPageAlive) { return; }
       if (index >= 3) {
-        setTimeout(() => {
+        this.timerIds.push(setTimeout(() => {
+          if (!this.isPageAlive) { return; }
           this.navigateToResult();
-        }, 1000);
+        }, 1000));
         return;
       }
 
@@ -117,15 +123,25 @@ struct RelationDrawPage {
         duration: 400,
         curve: Curve.EaseInOut,
       }, () => {
+        if (!this.isPageAlive) { return; }
         this.revealedSlots[index] = true;
       });
 
-      setTimeout(() => {
+      this.timerIds.push(setTimeout(() => {
+        if (!this.isPageAlive) { return; }
         revealNext(index + 1);
-      }, 800);
+      }, 800));
     };
 
     revealNext(0);
+  }
+
+  aboutToDisappear(): void {
+    this.isPageAlive = false;
+    for (let i = 0; i < this.timerIds.length; i++) {
+      clearTimeout(this.timerIds[i]);
+    }
+    this.timerIds = [];
   }
 
   private navigateToResult(): void {

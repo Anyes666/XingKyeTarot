@@ -14,7 +14,7 @@ struct VersionInfoPage {
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .backgroundColor(Theme.V2A_BG_BASE)
 
       Scroll() {
         Column() {
@@ -30,7 +30,7 @@ struct VersionInfoPage {
           // 标题
           Text('版本信息')
           .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.GOLD_LIGHT)
+          .fontColor(Theme.V2A_GOLD_ACCENT)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
           .width('100%')
@@ -41,7 +41,7 @@ struct VersionInfoPage {
           // 应用名
           Text('星钥塔罗')
             .fontSize(Theme.FONT_TITLE)
-            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+            .fontColor(Theme.V2A_TEXT_PRIMARY)
             .fontWeight(FontWeight.Bold)
             .textAlign(TextAlign.Center)
             .width('100%')
@@ -49,7 +49,7 @@ struct VersionInfoPage {
           // 版本号
           Text('v1.0.0')
             .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.GOLD_LIGHT)
+            .fontColor(Theme.V2A_GOLD_ACCENT)
             .textAlign(TextAlign.Center)
             .width('100%')
             .margin({ top: Theme.SPACE_SM })
@@ -62,7 +62,7 @@ struct VersionInfoPage {
           // 更新内容
           Text('v1.0.0 更新内容')
             .fontSize(Theme.FONT_SUBTITLE)
-            .fontColor(Theme.GOLD_LIGHT)
+            .fontColor(Theme.V2A_GOLD_ACCENT)
             .fontWeight(FontWeight.Medium)
             .width('100%')
             .margin({ bottom: Theme.SPACE_SM })
@@ -85,7 +85,7 @@ struct VersionInfoPage {
             '· 新中式星空视觉风格：深蓝紫底色 + 温润金色点缀 + 精致塔罗牌翻牌动画'
           )
             .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+            .fontColor(Theme.V2A_TEXT_PRIMARY)
             .lineHeight(26)
             .width('100%')
         }

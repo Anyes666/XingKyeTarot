@@ -63,8 +63,12 @@ struct TriangleDrawPage {
   @State private revealedSlots: boolean[] = [false, false, false];
   @State private isAnimDone: boolean = false;
   @State private currentRevealIndex: number = 0;
+  // ── Timer 生命周期管理 ──
+  private isPageAlive: boolean = true;
+  private timerIds: number[] = [];
 
   aboutToAppear(): void {
+    this.isPageAlive = true;
     const rawParams: Object | undefined = router.getParams();
     if (rawParams) {
       const params = rawParams as TriangleDrawInParams;
@@ -109,15 +113,16 @@ struct TriangleDrawPage {
   }
 
   /**
-   * 依次翻开动画（每 800ms 翻一张）
+   * 依次翻开动画（每 800ms 翻一张）— 所有 setTimeout 受生命周期保护
    */
   private startRevealAnimation(): void {
     const revealNext = (index: number): void => {
+      if (!this.isPageAlive) { return; }
       if (index >= 3) {
-        // 全部翻开，1s 后跳转
-        setTimeout(() => {
+        this.timerIds.push(setTimeout(() => {
+          if (!this.isPageAlive) { return; }
           this.navigateToResult();
-        }, 1000);
+        }, 1000));
         return;
       }
 
@@ -125,16 +130,26 @@ struct TriangleDrawPage {
         duration: 400,
         curve: Curve.EaseInOut,
       }, () => {
+        if (!this.isPageAlive) { return; }
         this.revealedSlots[index] = true;
       });
 
       this.currentRevealIndex = index + 1;
-      setTimeout(() => {
+      this.timerIds.push(setTimeout(() => {
+        if (!this.isPageAlive) { return; }
         revealNext(index + 1);
-      }, 800);
+      }, 800));
     };
 
     revealNext(0);
+  }
+
+  aboutToDisappear(): void {
+    this.isPageAlive = false;
+    for (let i = 0; i < this.timerIds.length; i++) {
+      clearTimeout(this.timerIds[i]);
+    }
+    this.timerIds = [];
   }
 
   /**

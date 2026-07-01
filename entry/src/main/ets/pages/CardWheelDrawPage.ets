@@ -174,9 +174,9 @@ struct CardWheelDrawPage {
   @State private visibleOffsets: number[] = [];
 
   // ── UI 文案 ──
-  @State private confirmText: string = '确认这张牌';
+  @State private confirmText: string = '确认这张星钥';
   @State private progressText: string = '选择 1 / 1';
-  @State private instructionText: string = '让牌轮停下，再确认这一张。';
+  @State private instructionText: string = '这张牌停在你面前了。准备好时，轻轻点亮它。';
 
   aboutToAppear(): void {
     const rawParams: Object | undefined = router.getParams();
@@ -263,11 +263,11 @@ struct CardWheelDrawPage {
     const step: number = this.selectedCards.length + 1;
     if (this.drawCount === 1) {
       this.progressText = '选择 1 / 1';
-      this.confirmText = '确认这张牌';
-      this.instructionText = '让牌轮停下，再确认这一张。';
+      this.confirmText = '确认这张星钥';
+      this.instructionText = '这张牌停在你面前了。准备好时，轻轻点亮它。';
     } else {
       this.progressText = `选择 ${step} / ${this.drawCount}`;
-      this.confirmText = `确认第 ${step} 张`;
+      this.confirmText = `确认第 ${step} 张星钥`;
       this.instructionText = `第 ${step} 张：让牌轮停下，再确认。`;
     }
   }

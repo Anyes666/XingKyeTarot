@@ -1,4 +1,4 @@
-import { router } from '@kit.ArkUI';
+﻿import { router } from '@kit.ArkUI';
 import { Theme } from '../common/Theme';
 import { CompanionBottomNav } from '../components/CompanionBottomNav';
 import { Routes } from '../common/Routes';
@@ -6,6 +6,7 @@ import { Constants } from '../common/Constants';
 import { PreferenceStore } from '../data/PreferenceStore';
 import { TAROT_CARDS } from '../data/TarotCardData';
 import { TarotCard, ArcanaType, TarotSuit } from '../model/TarotCard';
+import { TarotCardImage } from '../components/TarotCardImage';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { GlobalBgmManager } from '../common/GlobalBgmManager';
 import { UserProfileStore } from '../common/UserProfileStore';
@@ -129,7 +130,7 @@ struct MainFramePage {
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .backgroundColor(Theme.V2C_BG_BASE)
 
       Column() {
         // 页面内容区 — 只渲染当前 Tab（条件渲染）
@@ -149,7 +150,7 @@ struct MainFramePage {
           })
         }
         .width('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .backgroundColor(Theme.V2C_BG_BASE)
       }
       .width('100%')
       .height('100%')
@@ -308,19 +309,19 @@ struct DivinationCenterTabContent {
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .backgroundColor(Theme.V2C_BG_BASE)
 
       Column() {
         // 顶部安全区
         Column()
           .width('100%')
           .height(Theme.SAFE_TOP + 16)
-          .backgroundColor(Theme.BG_DEEP_INDIGO)
+          .backgroundColor(Theme.V2C_BG_BASE)
 
         // 标题
         Text('占卜')
           .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.GOLD_LIGHT)
+          .fontColor(Theme.V2C_GOLD_GILT)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
           .width('100%')
@@ -328,7 +329,7 @@ struct DivinationCenterTabContent {
 
         Text('用一张牌、一组牌阵，轻轻照见此刻的心事。')
           .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.MOON_MUTED)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .width('100%')
           .margin({ top: Theme.SPACE_SM, bottom: Theme.SPACE_LG })
@@ -346,12 +347,12 @@ struct DivinationCenterTabContent {
                 Column() {
                   Text(entry.title)
                     .fontSize(Theme.FONT_SUBTITLE)
-                    .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                    .fontColor(Theme.V2C_TEXT_PRIMARY)
                     .fontWeight(FontWeight.Medium)
 
                   Text(entry.subtitle)
                     .fontSize(Theme.FONT_CAPTION)
-                    .fontColor(Theme.MOON_MUTED)
+                    .fontColor(Theme.V2C_TEXT_SECONDARY)
                     .margin({ top: 4 })
                     .lineHeight(18)
                 }
@@ -361,7 +362,7 @@ struct DivinationCenterTabContent {
 
                 Text('›')
                   .fontSize(24)
-                  .fontColor(Theme.GOLD_DIM)
+                  .fontColor(Theme.V2C_SPINE_LINE)
               }
               .width('92%')
               .padding(Theme.SPACE_MD)
@@ -384,7 +385,7 @@ struct DivinationCenterTabContent {
 
         Text(Constants.COMPLIANCE_FOOTER)
           .fontSize(11)
-          .fontColor(Theme.MOON_MUTED)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .lineHeight(16)
           .width('100%')
@@ -883,17 +884,17 @@ struct TarotCardsTabContent {
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .backgroundColor(Theme.V2C_BG_BASE)
 
       Column() {
         Column()
           .width('100%')
           .height(Theme.SAFE_TOP + 16)
-          .backgroundColor(Theme.BG_DEEP_INDIGO)
+          .backgroundColor(Theme.V2C_BG_BASE)
 
         Text('卡牌总览')
           .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.GOLD_LIGHT)
+          .fontColor(Theme.V2C_GOLD_GILT)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
           .width('100%')
@@ -901,7 +902,7 @@ struct TarotCardsTabContent {
 
         Text('78 张塔罗牌，不是答案，而是看见自己的不同方式。')
           .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.MOON_MUTED)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .width('100%')
           .margin({ top: Theme.SPACE_SM, bottom: Theme.SPACE_MD })
@@ -912,7 +913,7 @@ struct TarotCardsTabContent {
             ForEach(this.filters, (filter: FilterOption, index: number) => {
               Text(filter.label)
                 .fontSize(13)
-                .fontColor(this.selectedFilter === filter.value ? Theme.BG_DEEP_INDIGO : Theme.MOON_MUTED)
+                .fontColor(this.selectedFilter === filter.value ? Theme.V2C_BG_BASE : Theme.V2C_TEXT_SECONDARY)
                 .fontWeight(this.selectedFilter === filter.value ? FontWeight.Bold : FontWeight.Normal)
                 .backgroundColor(this.selectedFilter === filter.value ? '#E8B83D' : 'rgba(27, 27, 48, 0.68)')
                 .borderRadius(16)
@@ -936,72 +937,41 @@ struct TarotCardsTabContent {
           .color(Theme.DEEP_STARRY)
           .margin({ bottom: Theme.SPACE_SM })
 
-        // 卡牌列表
+        // 卡牌网格（3 列真实牌面）
         Scroll() {
-          List() {
+          Grid() {
             ForEach(this.displayedCards, (card: TarotCard, index: number) => {
-              ListItem() {
-                Row() {
-                  Text(this.formatIndex(card.index))
-                    .fontSize(12)
-                    .fontColor(Theme.GOLD_DIM)
-                    .width(36)
+              GridItem() {
+                Column() {
+                  TarotCardImage({ cardId: card.id, cardWidth: 90, cardHeight: 140 })
+                    .margin({ bottom: 6 })
+
+                  Text(card.nameZh)
+                    .fontSize(11)
+                    .fontColor(Theme.V2C_TEXT_SECONDARY)
+                    .fontWeight(FontWeight.Medium)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
                     .textAlign(TextAlign.Center)
-
-                  Column() {
-                    Text(card.nameZh)
-                      .fontSize(Theme.FONT_BODY)
-                      .fontColor(Theme.TEXT_PRIMARY_LIGHT)
-                      .fontWeight(FontWeight.Medium)
-
-                    Text(card.nameEn)
-                      .fontSize(11)
-                      .fontColor(Theme.MOON_MUTED)
-                      .margin({ top: 2 })
-
-                    Row() {
-                      ForEach(card.keywords, (keyword: string, ki: number) => {
-                        Text(keyword)
-                          .fontSize(10)
-                          .fontColor(this.getSuitColor(card))
-                          .padding({ left: 6, right: 6, top: 2, bottom: 2 })
-                          .margin({ right: 4, top: 4 })
-                      }, (_kw: string, ki: number) => 'tab_kw_' + card.id + '_' + ki.toString())
-                    }
-                  }
-                  .alignItems(HorizontalAlign.Start)
-                  .layoutWeight(1)
-                  .margin({ left: Theme.SPACE_SM })
-
-                  Text(this.getSuitLabel(card))
-                    .fontSize(10)
-                    .fontColor(this.getSuitColor(card))
-                    .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-                    .border({ width: 0.5, color: this.getSuitColor(card), style: BorderStyle.Solid })
-                    .borderRadius(8)
-                    .margin({ right: 4 })
-
-                  Text('›')
-                    .fontSize(20)
-                    .fontColor(Theme.GOLD_DIM)
+                    .width('100%')
                 }
                 .width('100%')
-                .padding(Theme.SPACE_MD)
-                .alignItems(VerticalAlign.Center)
-                .backgroundColor('rgba(27, 27, 48, 0.52)')
-                .border({ width: 1, color: 'rgba(212, 160, 42, 0.12)' })
-                .borderRadius(Theme.RADIUS_MD)
-                .margin({ bottom: 8, left: Theme.SPACE_MD, right: Theme.SPACE_MD })
+                .padding({ top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_SM })
+                .backgroundColor(Theme.V2C_BG_CARD)
+                .borderRadius(Theme.V2C_RADIUS_CARD)
+                .border({ width: 1, color: Theme.V2C_SPINE_LINE })
+                .shadow(Theme.V2C_SHADOW_CARD)
                 .onClick(() => {
                   this.navigateToDetail(card);
                 })
               }
             }, (card: TarotCard) => card.id)
           }
+          .columnsTemplate('1fr 1fr 1fr')
+          .columnsGap(Theme.V2_SPACE_SM)
+          .rowsGap(Theme.V2_SPACE_SM)
           .width('100%')
-          .padding({ top: Theme.SPACE_SM, bottom: Theme.SPACE_LG })
-          .listDirection(Axis.Vertical)
-          .divider({ strokeWidth: 0 })
+          .padding({ left: Theme.V2_SPACE_MD, right: Theme.V2_SPACE_MD, top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_LG })
         }
         .width('100%')
         .layoutWeight(1)
@@ -1525,8 +1495,8 @@ struct SettingsTabContent {
           direction: GradientDirection.Bottom,
           colors: [
             [Theme.BG_DEEP_SPACE, 0.0],
-            [Theme.BG_DEEP_INDIGO, 0.55],
-            [Theme.BG_DEEP_INDIGO, 1.0]
+            [Theme.V2C_BG_BASE, 0.55],
+            [Theme.V2C_BG_BASE, 1.0]
           ]
         })
 
@@ -1545,7 +1515,7 @@ struct SettingsTabContent {
 
           Text('我的')
             .fontSize(Theme.FONT_HEADLINE)
-            .fontColor(Theme.GOLD_LIGHT)
+            .fontColor(Theme.V2C_GOLD_GILT)
             .fontWeight(FontWeight.Bold)
             .textAlign(TextAlign.Center)
             .width('100%')
@@ -1585,7 +1555,7 @@ struct SettingsTabContent {
           Row() {
             Text(this.nickname)
               .fontSize(Theme.FONT_SUBTITLE)
-              .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+              .fontColor(Theme.V2C_TEXT_PRIMARY)
               .fontWeight(FontWeight.Medium)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -1604,7 +1574,7 @@ struct SettingsTabContent {
           // 等级标签
           Text('星钥等级：' + this.level)
             .fontSize(Theme.FONT_CAPTION)
-            .fontColor(Theme.GOLD_PALE)
+            .fontColor(Theme.V2C_GOLD_GILT_SOFT)
             .padding({ left: 16, right: 16, top: 4, bottom: 4 })
             .backgroundColor('rgba(202, 138, 4, 0.12)')
             .border({ width: 1, color: 'rgba(202, 138, 4, 0.25)' })
@@ -1639,14 +1609,14 @@ struct SettingsTabContent {
           // 卡片标题
           Text('星澜星历')
             .fontSize(Theme.FONT_SUBTITLE)
-            .fontColor(Theme.GOLD_LIGHT)
+            .fontColor(Theme.V2C_GOLD_GILT)
             .fontWeight(FontWeight.Bold)
             .width('100%')
             .margin({ bottom: 4 })
 
           Text('不是打卡，只是把认真感受过的日子轻轻留下。')
             .fontSize(Theme.FONT_CAPTION)
-            .fontColor(Theme.MOON_MUTED)
+            .fontColor(Theme.V2C_TEXT_SECONDARY)
             .width('100%')
             .margin({ bottom: 16 })
 
@@ -1895,7 +1865,7 @@ struct SettingsTabContent {
 
                 Text('›')
                   .fontSize(16)
-                  .fontColor(Theme.GOLD_DIM)
+                  .fontColor(Theme.V2C_SPINE_LINE)
                   .width(20)
                   .textAlign(TextAlign.Center)
               }
@@ -1951,13 +1921,13 @@ struct SettingsTabContent {
             Column() {
               Text('背景音乐')
                 .fontSize(Theme.FONT_BODY)
-                .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                .fontColor(Theme.V2C_TEXT_PRIMARY)
                 .fontWeight(FontWeight.Medium)
                 .width('100%')
 
               Text('开启后，星钥塔罗会播放一首低音量的全局主旋律。')
                 .fontSize(13)
-                .fontColor(Theme.MOON_MUTED)
+                .fontColor(Theme.V2C_TEXT_SECONDARY)
                 .width('100%')
                 .margin({ top: 4 })
             }
@@ -1986,7 +1956,7 @@ struct SettingsTabContent {
             Column() {
               Text('重新听听星澜的介绍')
                 .fontSize(Theme.FONT_BODY)
-                .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                .fontColor(Theme.V2C_TEXT_PRIMARY)
                 .fontWeight(FontWeight.Medium)
                 .width('100%')
             }
@@ -1994,7 +1964,7 @@ struct SettingsTabContent {
 
             Text('›')
               .fontSize(20)
-              .fontColor(Theme.GOLD_DIM)
+              .fontColor(Theme.V2C_SPINE_LINE)
           }
           .width('100%')
           .alignItems(VerticalAlign.Center)
@@ -2002,7 +1972,7 @@ struct SettingsTabContent {
 
           Text('星澜会重新陪你走一遍语录页的第一次介绍。')
             .fontSize(13)
-            .fontColor(Theme.MOON_MUTED)
+            .fontColor(Theme.V2C_TEXT_SECONDARY)
             .width('100%')
             .padding({ left: 20, right: 20, bottom: 16 })
         }
@@ -2021,7 +1991,7 @@ struct SettingsTabContent {
             Column() {
               Text('使用说明')
                 .fontSize(Theme.FONT_BODY)
-                .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                .fontColor(Theme.V2C_TEXT_PRIMARY)
                 .fontWeight(FontWeight.Medium)
                 .width('100%')
             }
@@ -2029,7 +1999,7 @@ struct SettingsTabContent {
 
             Text('›')
               .fontSize(20)
-              .fontColor(Theme.GOLD_DIM)
+              .fontColor(Theme.V2C_SPINE_LINE)
           }
           .width('100%')
           .alignItems(VerticalAlign.Center)
@@ -2037,7 +2007,7 @@ struct SettingsTabContent {
 
           Text('了解星钥塔罗每个板块的用法和设计初衷。')
             .fontSize(13)
-            .fontColor(Theme.MOON_MUTED)
+            .fontColor(Theme.V2C_TEXT_SECONDARY)
             .width('100%')
             .padding({ left: 20, right: 20, bottom: 16 })
         }
@@ -2063,7 +2033,7 @@ struct SettingsTabContent {
             Column() {
               Text('关于星钥塔罗')
                 .fontSize(Theme.FONT_BODY)
-                .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                .fontColor(Theme.V2C_TEXT_PRIMARY)
                 .fontWeight(FontWeight.Medium)
                 .width('100%')
             }
@@ -2071,7 +2041,7 @@ struct SettingsTabContent {
 
             Text('›')
               .fontSize(20)
-              .fontColor(Theme.GOLD_DIM)
+              .fontColor(Theme.V2C_SPINE_LINE)
           }
           .width('100%')
           .alignItems(VerticalAlign.Center)
@@ -2079,7 +2049,7 @@ struct SettingsTabContent {
 
           Text('版本信息、隐私政策、用户协议、素材与授权。')
             .fontSize(13)
-            .fontColor(Theme.MOON_MUTED)
+            .fontColor(Theme.V2C_TEXT_SECONDARY)
             .width('100%')
             .padding({ left: 20, right: 20, bottom: 16 })
         }
@@ -2102,7 +2072,7 @@ struct SettingsTabContent {
 
         Text(Constants.COMPLIANCE_FOOTER)
           .fontSize(11)
-          .fontColor(Theme.MOON_MUTED)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .lineHeight(16)
           .width('100%')
@@ -2131,7 +2101,7 @@ struct SettingsTabContent {
           // 标题
           Text('更换头像')
             .fontSize(Theme.FONT_SUBTITLE)
-            .fontColor(Theme.GOLD_LIGHT)
+            .fontColor(Theme.V2C_GOLD_GILT)
             .fontWeight(FontWeight.Bold)
             .width('100%')
             .textAlign(TextAlign.Center)
@@ -2147,7 +2117,7 @@ struct SettingsTabContent {
           Row() {
             Text('从相册选择')
               .fontSize(Theme.FONT_BODY)
-              .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+              .fontColor(Theme.V2C_TEXT_PRIMARY)
               .width('100%')
               .textAlign(TextAlign.Center)
               .padding({ top: 18, bottom: 18 })
@@ -2164,7 +2134,7 @@ struct SettingsTabContent {
           Row() {
             Text('恢复默认头像')
               .fontSize(Theme.FONT_BODY)
-              .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+              .fontColor(Theme.V2C_TEXT_PRIMARY)
               .width('100%')
               .textAlign(TextAlign.Center)
               .padding({ top: 18, bottom: 18 })
@@ -2181,7 +2151,7 @@ struct SettingsTabContent {
           Row() {
             Text('取消')
               .fontSize(Theme.FONT_BODY)
-              .fontColor(Theme.MOON_MUTED)
+              .fontColor(Theme.V2C_TEXT_SECONDARY)
               .width('100%')
               .textAlign(TextAlign.Center)
               .padding({ top: 18, bottom: 18 })
@@ -2195,7 +2165,7 @@ struct SettingsTabContent {
             .height(Theme.SAFE_BOTTOM)
         }
         .width('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .backgroundColor(Theme.V2C_BG_BASE)
         .borderRadius({ topLeft: Theme.RADIUS_LG, topRight: Theme.RADIUS_LG })
         .position({ x: 0, y: '100%' })
         .translate({ x: 0, y: '-100%' })

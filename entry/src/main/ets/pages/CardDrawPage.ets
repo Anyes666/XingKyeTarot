@@ -63,8 +63,12 @@ struct CardDrawPage {
   @State private cardOpacity: number = 0;
   // ── B 方案月光呼吸动画状态 ──
   @State private moonlightOpacity: number = 0.6;
+  // ── Timer 生命周期管理 ──
+  private isPageAlive: boolean = true;
+  private timerIds: number[] = [];
 
   async aboutToAppear(): Promise<void> {
+    this.isPageAlive = true;
     // 接收路由参数
     const rawParams: Object | undefined = router.getParams();
     if (rawParams) {
@@ -93,6 +97,14 @@ struct CardDrawPage {
     }, () => {
       this.moonlightOpacity = 1.0;
     });
+  }
+
+  aboutToDisappear(): void {
+    this.isPageAlive = false;
+    for (let i = 0; i < this.timerIds.length; i++) {
+      clearTimeout(this.timerIds[i]);
+    }
+    this.timerIds = [];
   }
 
   onPageShow(): void {
@@ -129,35 +141,40 @@ struct CardDrawPage {
   }
 
   /**
-   * 动画序列控制器
+   * 动画序列控制器 — 所有 setTimeout 均受生命周期保护
    */
   private startAnimation(): void {
-    // 阶段 1：牌背淡入（0.3s，即 ANIM_FADE_IN=400ms）
+    // 阶段 1：牌背淡入（0.3s）
     this.animPhase = 'fadeIn';
-    setTimeout(() => {
+    this.timerIds.push(setTimeout(() => {
+      if (!this.isPageAlive) { return; }
       this.cardOpacity = 1;
-    }, 50);
+    }, 50));
 
     // 阶段 2：开始翻牌（0.3s 后开始，持续 0.6s）
-    setTimeout(() => {
+    this.timerIds.push(setTimeout(() => {
+      if (!this.isPageAlive) { return; }
       this.animPhase = 'flipping';
       this.flipAngle = 180;
-    }, 300);
+    }, 300));
 
-    // 阶段 3：翻牌完成，展示正面（0.3+0.6=0.9s 后，停留 0.5s）
-    setTimeout(() => {
+    // 阶段 3：翻牌完成，展示正面（0.9s 后）
+    this.timerIds.push(setTimeout(() => {
+      if (!this.isPageAlive) { return; }
       this.animPhase = 'revealed';
-    }, 900);
+    }, 900));
 
-    // 阶段 4：金色粒子效果（1.4s 后，持续 0.4s）
-    setTimeout(() => {
+    // 阶段 4：金色粒子效果（1.4s 后）
+    this.timerIds.push(setTimeout(() => {
+      if (!this.isPageAlive) { return; }
       this.animPhase = 'particles';
-    }, 1400);
+    }, 1400));
 
-    // 阶段 5：跳转结果页（1.8s 后，略小于总动画时长 1.5s，留余量）
-    setTimeout(() => {
+    // 阶段 5：跳转结果页（1.8s 后）
+    this.timerIds.push(setTimeout(() => {
+      if (!this.isPageAlive) { return; }
       this.navigateToResult();
-    }, 1800);
+    }, 1800));
   }
 
   /**

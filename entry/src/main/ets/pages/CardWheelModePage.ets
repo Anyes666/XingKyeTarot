@@ -39,7 +39,7 @@ struct CardWheelModePage {
         .alignItems(VerticalAlign.Center)
 
         // 标题
-        Text('选择抽牌方式')
+        Text('旋转牌轮')
           .fontSize(Theme.V2C_FONT_TITLE)
           .fontColor(Theme.V2C_GOLD_GILT)
           .fontWeight(FontWeight.Bold)
@@ -48,7 +48,7 @@ struct CardWheelModePage {
           .margin({ top: Theme.SPACE_MD })
 
         // 副标题
-        Text('先决定这一次，要让几张牌陪你看见心事。')
+        Text('让手指慢一点，停在此刻最有感觉的那张牌上。')
           .fontSize(Theme.V2C_FONT_BODY)
           .fontColor(Theme.V2C_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
@@ -71,12 +71,12 @@ struct CardWheelModePage {
             .backgroundColor(Theme.V2C_BG_FLOATING)
 
             Column() {
-              Text('抽一张')
+              Text('抽一张星钥')
                 .fontSize(Theme.V2C_FONT_SUBTITLE)
                 .fontColor(Theme.V2C_TEXT_PRIMARY)
                 .fontWeight(FontWeight.Medium)
 
-              Text('适合快速照见此刻的心情。')
+              Text('适合现在只想听一句轻轻的提醒。')
                 .fontSize(Theme.V2C_FONT_BODY)
                 .fontColor(Theme.V2C_TEXT_SECONDARY)
                 .margin({ top: 4 })
@@ -114,12 +114,12 @@ struct CardWheelModePage {
             .backgroundColor(Theme.V2C_BG_FLOATING)
 
             Column() {
-              Text('抽三张')
+              Text('抽三张星钥')
                 .fontSize(Theme.V2C_FONT_SUBTITLE)
                 .fontColor(Theme.V2C_TEXT_PRIMARY)
                 .fontWeight(FontWeight.Medium)
 
-              Text('适合看见过去、现在与可能的方向。')
+              Text('适合把一件心事拆成三个角度慢慢看。')
                 .fontSize(Theme.V2C_FONT_BODY)
                 .fontColor(Theme.V2C_TEXT_SECONDARY)
                 .margin({ top: 4 })
@@ -141,7 +141,7 @@ struct CardWheelModePage {
         })
 
         // 底部提示
-        Text('让牌轮慢慢转动。\n当它停下时，选中最靠近你的那一张。')
+        Text('不用急着选。\n当某张牌让你多看了一眼，就从那里开始。')
           .fontSize(Theme.V2C_FONT_CAPTION)
           .fontColor(Theme.V2C_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)

@@ -31,7 +31,7 @@ struct UserAgreementPage {
       }
       .width('100%')
       .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, top: 48, bottom: Theme.SPACE_MD })
-      .backgroundColor(Theme.BG_DEEP_INDIGO)
+      .backgroundColor(Theme.V2A_BG_BASE)
 
       // ── 分割线 ──
       Divider()

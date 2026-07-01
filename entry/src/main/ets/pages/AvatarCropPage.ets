@@ -223,7 +223,7 @@ struct AvatarCropPage {
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .backgroundColor(Theme.V2A_BG_BASE)
 
       // ═══════════════════════════════════════════
       // Layer 2: 用户图片（可拖动/可缩放，圆形裁剪）
@@ -295,7 +295,7 @@ struct AvatarCropPage {
       Row() {
         Text('\u2190')
           .fontSize(22)
-          .fontColor(Theme.GOLD_LIGHT)
+          .fontColor(Theme.V2A_GOLD_ACCENT)
           .padding(12)
           .onClick(() => { this.handleCancel(); })
 
@@ -303,7 +303,7 @@ struct AvatarCropPage {
 
         Text('\u8C03\u6574\u5934\u50CF')
           .fontSize(Theme.FONT_SUBTITLE)
-          .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+          .fontColor(Theme.V2A_TEXT_PRIMARY)
           .fontWeight(FontWeight.Medium)
 
         Blank()
@@ -321,7 +321,7 @@ struct AvatarCropPage {
       Column() {
         Text('\u62D6\u52A8\u6216\u7F29\u653E\u56FE\u7247\uFF0C\u9009\u62E9\u4F60\u60F3\u5C55\u793A\u7684\u5934\u50CF\u533A\u57DF')
           .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.MOON_MUTED)
+          .fontColor(Theme.V2A_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .width('100%')
       }
@@ -351,7 +351,7 @@ struct AvatarCropPage {
           .width('44%')
           .height(44)
           .textAlign(TextAlign.Center)
-          .backgroundColor(this.isSaving ? Theme.GOLD_DIM : Theme.GOLD_AMBER)
+          .backgroundColor(this.isSaving ? Theme.V2A_GOLD_GLOW : Theme.V2A_GOLD_ACCENT)
           .borderRadius(Theme.RADIUS_MD)
           .onClick(() => { this.saveAvatar(); })
       }
@@ -383,7 +383,7 @@ struct AvatarCropPage {
         .fontSize(Theme.FONT_BODY)
         .fontColor('#0F0F23')
         .padding({ left: 24, right: 24, top: 12, bottom: 12 })
-        .backgroundColor(Theme.GOLD_PALE)
+        .backgroundColor(Theme.V2A_GOLD_ACCENT)
         .borderRadius(Theme.RADIUS_FULL)
         .position({ x: '50%', y: '50%' })
         .translate({ x: '-50%', y: '-50%' })

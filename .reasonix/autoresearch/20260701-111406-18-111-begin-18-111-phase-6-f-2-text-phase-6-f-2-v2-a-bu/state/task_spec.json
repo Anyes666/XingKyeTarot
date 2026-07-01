@@ -1,0 +1,29 @@
+{
+  "task_id": "20260701-111406-18-111-begin-18-111-phase-6-f-2-text-phase-6-f-2-v2-a-bu",
+  "goal": "[已粘贴文本 #18 · 111 行]\n\n--- Begin [已粘贴文本 #18 · 111 行] ---\n很好，Phase 6-F-2 可以收口：\r\n\r\n```text\r\nPhase 6-F-2：协议 / 关于 / 使用说明类页面 v2 轻量迁移\r\n状态：完成\r\n方案：A「星图档案」\r\n编译：BUILD SUCCESSFUL，ERROR=0\r\n```\r\n\r\n这一步做得比较稳，尤其是：\r\n\r\n```text\r\n隐私政策 / 用户协议正文含义未改\r\n合规说明未误删\r\n只做视觉 Token 迁移\r\n```\r\n\r\n这是正确的。\r\n\r\n---\r\n\r\n## 现在还剩一个小尾巴\r\n\r\n报告里提到：\r\n\r\n```text\r\nVersionInfoPage.ets 标题 GOLD_LIGHT 保留待后续统一替换\r\n```\r\n\r\n这个不是大问题，但建议下一步做一个**小型收尾检查**，不要再开大迁移。\r\n\r\n---\r\n\r\n## 下一步建议：Phase 6-G 收尾核查\r\n\r\n现在不要继续新增功能，也不要大范围清理旧页面。建议做：\r\n\r\n```text\r\nPhase 6-G：v2 迁移收尾核查\r\n```\r\n\r\n只检查，不急着改。\r\n\r\n重点核查：\r\n\r\n```text\r\n1. 还有哪些真实可达页面仍有旧 Token\r\n2. 还有哪些主路径紫色残留\r\n3. VersionInfoPage 的 GOLD_LIGHT 是否需要替换\r\n4. MainFramePage 里 #8B7EC8 是否确实是宝剑组标准色，不误替换\r\n5. SharePreview / StarBackground / InterpretationPanel 是否还有旧紫色残留\r\n6. 是否有页面金色面积过大\r\n7. 是否有正文对比度不足\r\n8. 是否所有迁移页面仍 BUILD SUCCESSFUL\r\n```\r\n\r\n---\r\n\r\n## 可以给 Agent 的下一步提示词\r\n\r\n```text\r\n当前 Phase 6-F-2 已完成：\r\n\r\nAboutPage / UsageGuidePage / PrivacyPolicyPage / UserAgreementPage / MaterialsLicensePage / VersionInfoPage 已轻量迁移到 v2 A「星图档案」方案。\r\n隐私政策 / 用户协议正文含义未修改。\r\nBUILD SUCCESSFUL，ERROR=0。\r\n\r\n现在请执行 Phase 6-G：v2 迁移收尾核查。\r\n\r\n本轮只检查，不修改代码。\r\n\r\n请检查：\r\n\r\n1. 真实可达页面是否还有旧 Token 残留。\r\n2. 真实可达页面是否还有 AURORA / PURPLE_MIST / #8B7EC8 等旧紫色残留。\r\n3. VersionInfoPage.ets 中剩余 GOLD_LIGHT 的位置和是否建议替换。\r\n4. MainFramePage.ets 中 #8B7EC8 是否确认为塔罗宝剑组标准色，是否不应替换。\r\n5. InterpretationPanel.ets、SharePreview.ets、StarBackground.ets 是否还有旧紫色残留，以及是否被主路径使用。\r\n6. 是否有页面使用大面积亮金色，有无博彩感风险。\r\n7. 是否有页面正文颜色过暗，对比度不足。\r\n8. 是否有页面仍完全未迁移但用户可达。\r\n9. 输出最终剩余问题清单，按 P0 / P1 / P2 / P3 分类。\r\n\r\n禁止：\r\n\r\n不要修改代码。\r\n不要清理旧 Token。\r\n不要处理 deprecation WARN。\r\n不要删除旧页面。\r\n不要迁移新页面。\r\n不要改 BGM、聊天、抽牌、卡牌、头像、昵称、星历、图标配置。\r\n\r\n最终只输出报告。\r\n```\r\n\r\n---\r\n\r\n## 我的建议\r\n\r\nPhase 6 已经很接近完成了。\r\n接下来只做**收尾核查 + 少量修补**，不要再大改。\r\n\r\n如果 Phase 6-G 报告里没有 P0/P1 问题，下一步就应该转向：\r\n\r\n```text\r\n1. 模拟机完整回归测试\r\n2. 真机性能验证\r\n3. 应用市场截图重新拍摄\r\n4. 上架资料最终核对\r\n```\r\n\n--- End [已粘贴文本 #18 · 111 行] ---",
+  "scope": null,
+  "non_goals": null,
+  "allowed_operations": {
+    "write": true,
+    "network": false,
+    "publish": false
+  },
+  "success_criteria": [
+    {
+      "id": "objective_evidence",
+      "description": "The goal outcome is supported by direct evidence, such as inspected code, reproduced behavior, source material, or concrete findings.",
+      "required": true,
+      "evidence_ids": [
+        "f1"
+      ]
+    },
+    {
+      "id": "verification",
+      "description": "The result has relevant verification evidence, such as tests, commands, benchmarks, manual checks, or a documented reason why verification is not applicable.",
+      "required": true,
+      "evidence_ids": [
+        "f2"
+      ]
+    }
+  ]
+}

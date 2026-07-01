@@ -51,7 +51,7 @@ export struct InterpretationPanel {
           ForEach(this.keywords, (keyword: string, index: number) => {
             Text(keyword)
               .fontSize(Theme.FONT_CAPTION)
-              .fontColor(Theme.AURORA)
+              .fontColor(Theme.V2C_GOLD_GILT)
               .padding({ left: Theme.SPACE_SM, right: Theme.SPACE_SM, top: 2, bottom: 2 })
               .margin({ right: Theme.SPACE_SM })
               .borderRadius(Theme.RADIUS_SM)

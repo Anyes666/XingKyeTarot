@@ -1,0 +1,25 @@
+{
+  "task_id": "20260701-115739-28-211-begin-28-211-phase-8-a-text-phase-8-a-build-succe",
+  "goal": "[已粘贴文本 #28 · 211 行]\n\n--- Begin [已粘贴文本 #28 · 211 行] ---\n很好，Phase 8-A 可以收口：\r\n\r\n```text\r\nPhase 8-A：卡牌总览牌面化\r\n状态：完成\r\n编译：BUILD SUCCESSFUL，ERROR=0\r\n```\r\n\r\n这一步方向是对的：`TarotCardsPage.ets` 和 `MainFramePage.ets` 的 Tab 3 都同步改成了真实牌面网格，避免了“独立页和底部 Tab 不一致”的问题。\r\n\r\n现在建议先做一次模拟机检查：\r\n\r\n```text\r\n1. 卡牌总览是否为 3 列牌面网格\r\n2. 牌面是否清晰，不糊、不变形\r\n3. 牌名是否可读\r\n4. 分类筛选是否正常\r\n5. 点击任意牌面是否进入原卡牌详情页\r\n6. 返回后筛选状态是否正常\r\n7. 360×780 小屏下是否过挤\r\n```\r\n\r\n如果 90×140 看起来偏小，可以后面微调到：\r\n\r\n```text\r\n92×144\r\n或\r\n96×150\r\n```\r\n\r\n但不要马上改，先看模拟机实际效果。\r\n\r\n---\r\n\r\n## 下一步建议\r\n\r\n继续做：\r\n\r\n```text\r\nPhase 8-B：旋转牌轮文案补齐\r\n```\r\n\r\n这一步只补文案，不动牌轮逻辑。\r\n\r\n你可以直接给 Agent：\r\n\r\n```text\r\n当前 Phase 8-A 已完成：\r\n\r\nTarotCardsPage.ets 和 MainFramePage.ets 的 TarotCardsTabContent 已改为 3 列真实牌面网格。\r\nBUILD SUCCESSFUL，ERROR=0。\r\n\r\n现在请执行 Phase 8-B：旋转牌轮文案补齐。\r\n\r\n本轮只修改旋转牌轮相关文案，不修改交互逻辑。\r\n\r\n修改文件：\r\n\r\n1. entry/src/main/ets/pages/CardWheelModePage.ets\r\n2. entry/src/main/ets/pages/CardWheelDrawPage.ets\r\n\r\n目标：\r\n\r\n补齐旋转牌轮的星澜式陪伴文案，让它更像“安静地选择一张星钥”，而不是抽卡 / 转盘 / 游戏抽奖。\r\n\r\n严格禁止：\r\n\r\n1. 不修改牌轮滑动逻辑。\r\n2. 不修改吸附逻辑。\r\n3. 不修改惯性逻辑。\r\n4. 不修改抽牌算法。\r\n5. 不修改抽一张 / 抽三张规则。\r\n6. 不修改历史记录写入。\r\n7. 不修改结果页路由。\r\n8. 不修改卡牌数据。\r\n9. 不修改 BGM。\r\n10. 不修改聊天。\r\n11. 不修改头像、昵称、星历。\r\n12. 不处理 Token。\r\n13. 不处理 deprecation WARN。\r\n\r\n---\r\n\r\n# 一、CardWheelModePage 文案补齐\r\n\r\n请优化模式选择页文案。\r\n\r\n页面主标题可以保持：\r\n\r\n旋转牌轮\r\n\r\n副标题建议：\r\n\r\n让手指慢一点，停在此刻最有感觉的那张牌上。\r\n\r\n说明文案：\r\n\r\n牌不会替你决定什么。\r\n它只是陪你看见，心里某个正在发光的方向。\r\n\r\n抽一张模式文案：\r\n\r\n标题：\r\n抽一张星钥\r\n\r\n副文案：\r\n适合现在只想听一句轻轻的提醒。\r\n\r\n抽三张模式文案：\r\n\r\n标题：\r\n抽三张星钥\r\n\r\n副文案：\r\n适合把一件心事拆成三个角度慢慢看。\r\n\r\n底部提示：\r\n\r\n不用急着选。\r\n当某张牌让你多看了一眼，就从那里开始。\r\n\r\n---\r\n\r\n# 二、CardWheelDrawPage 文案补齐\r\n\r\n请优化抽牌页文案状态。\r\n\r\n初始提示：\r\n\r\n左右滑动牌轮\r\n让中间的牌停在你想停下的地方\r\n\r\n选中牌提示：\r\n\r\n这张牌停在你面前了。\r\n准备好时，轻轻点亮它。\r\n\r\n抽一张确认按钮：\r\n\r\n确认这张星钥\r\n\r\n抽三张确认按钮：\r\n\r\n收下这组星钥\r\n\r\n抽牌中进度文案：\r\n\r\n星光正在落到牌面上……\r\n请等它慢慢显现。\r\n\r\n完成文案：\r\n\r\n这几张牌已经停在这里。\r\n星澜会陪你慢慢看。\r\n\r\n如果已有 confirmText / progressText / instructionText / updateUITexts()，请只替换文案，不改逻辑。\r\n\r\n---\r\n\r\n# 三、文案风格要求\r\n\r\n文案必须：\r\n\r\n1. 温柔\r\n2. 克制\r\n3. 有星澜感\r\n4. 不预测未来\r\n5. 不制造依赖\r\n6. 不像抽卡\r\n7. 不像博彩\r\n8. 不像游戏奖励\r\n\r\n禁止出现：\r\n\r\n命运\r\n注定\r\n神准\r\n好运\r\n转运\r\n中奖\r\n抽中\r\n必然\r\n一定会\r\n复合\r\n对方爱你\r\n财运\r\n翻盘\r\n\r\n---\r\n\r\n# 四、验收标准\r\n\r\n1. CardWheelModePage 文案完整，不再单薄。\r\n2. CardWheelDrawPage 初始 / 选中 / 确认 / 抽牌中 / 完成状态都有温柔文案。\r\n3. 牌轮滑动仍正常。\r\n4. 中间牌吸附仍正常。\r\n5. 抽一张 / 抽三张仍正常。\r\n6. 结果页跳转仍正常。\r\n7. 历史记录仍正常写入。\r\n8. BUILD SUCCESSFUL，ERROR=0。\r\n\r\n完成后输出：\r\n\r\n1. 修改了哪些文件。\r\n2. 替换了哪些文案。\r\n3. 是否确认未修改牌轮逻辑 / 抽牌算法 / 历史记录 / 路由。\r\n4. 编译结果。\r\n```\r\n\r\n这一步比结果页文案丰富更小、更容易验收，适合现在继续做。\r\n\n--- End [已粘贴文本 #28 · 211 行] ---",
+  "scope": null,
+  "non_goals": null,
+  "allowed_operations": {
+    "write": true,
+    "network": false,
+    "publish": false
+  },
+  "success_criteria": [
+    {
+      "id": "objective_evidence",
+      "description": "The goal outcome is supported by direct evidence, such as inspected code, reproduced behavior, source material, or concrete findings.",
+      "required": true,
+      "evidence_ids": null
+    },
+    {
+      "id": "verification",
+      "description": "The result has relevant verification evidence, such as tests, commands, benchmarks, manual checks, or a documented reason why verification is not applicable.",
+      "required": true,
+      "evidence_ids": null
+    }
+  ]
+}

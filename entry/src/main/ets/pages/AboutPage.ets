@@ -57,7 +57,7 @@ struct AboutPage {
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .backgroundColor(Theme.V2A_BG_BASE)
 
       Column() {
         // 顶部安全区 + 返回按钮
@@ -72,7 +72,7 @@ struct AboutPage {
         // 标题
         Text('关于星钥塔罗')
           .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.GOLD_LIGHT)
+          .fontColor(Theme.V2A_GOLD_ACCENT)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
           .width('100%')

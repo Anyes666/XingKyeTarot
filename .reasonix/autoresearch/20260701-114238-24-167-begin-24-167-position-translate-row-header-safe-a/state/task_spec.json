@@ -1,0 +1,25 @@
+{
+  "task_id": "20260701-114238-24-167-begin-24-167-position-translate-row-header-safe-a",
+  "goal": "[已粘贴文本 #24 · 167 行]\n\n--- Begin [已粘贴文本 #24 · 167 行] ---\n看到了，现在右上角头像**位置太靠上，被状态栏 / 顶部安全区裁掉了**，只露出下半部分。说明这次从 `position + translate` 改成 Row 后，头像虽然进入了布局流，但**header 容器高度 / safe area / top padding 没处理好**。\r\n\r\n你可以直接给 Agent 这段修复提示词：\r\n\r\n```text\r\n请修复 XinglanChatPage.ets 右上角星澜头像位置问题。\r\n\r\n当前问题：\r\n\r\n聊天页右上角星澜头像已经替换成头像了，但现在头像太靠近顶部状态栏，被顶部裁切，只露出一部分。\r\n截图表现为：头像在右上角状态栏下方被截掉，看起来不完整。\r\n\r\n本次只修右上角头像布局，不改聊天逻辑。\r\n\r\n禁止修改：\r\n\r\n- SafetyGuard\r\n- DirectReply\r\n- Flow\r\n- MiniInteraction\r\n- typing 状态\r\n- chips\r\n- 输入框\r\n- 聊天消息列表\r\n- 星澜消息头像\r\n- 用户头像\r\n- BGM\r\n- 抽牌算法\r\n- 卡牌数据\r\n- 星历\r\n- 昵称逻辑\r\n\r\n---\r\n\r\n# 修复目标\r\n\r\n右上角头像应完整显示在安全区域内。\r\n\r\n要求：\r\n\r\n1. 头像不能被状态栏裁切。\r\n2. 头像不能贴到屏幕顶部。\r\n3. 头像不能遮挡返回按钮。\r\n4. 头像不能遮挡状态栏图标。\r\n5. 头像位置应与左上角返回按钮形成一个稳定 header 区域。\r\n6. 360×780、390×844、432×936 下都要正常。\r\n\r\n---\r\n\r\n# 推荐布局\r\n\r\n请不要使用脆弱的 translate 定位。\r\n\r\n建议使用一个顶部 Header 容器：\r\n\r\nStack / Column 页面根布局内：\r\n\r\n顶部区域高度建议：\r\n\r\n72vp ~ 88vp\r\n\r\n并给顶部安全距离：\r\n\r\ntop padding 建议 48vp ~ 56vp，或使用项目已有 SAFE_TOP / STATUS_BAR_HEIGHT 常量。\r\n\r\nHeader 内部：\r\n\r\nRow() {\r\n  左侧返回按钮\r\n  Blank()\r\n  右侧星澜头像\r\n}\r\n.width('100%')\r\n.height(48)\r\n.padding({ left: 24, right: 28 })\r\n.alignItems(VerticalAlign.Center)\r\n\r\n头像：\r\n\r\n尺寸 40vp ~ 42vp\r\nborderRadius 20vp ~ 21vp\r\nclip(true)\r\nborder 1vp 暖金低透明\r\n不要强光晕\r\n\r\n---\r\n\r\n# 如果当前页面是 Stack 叠层\r\n\r\n可以这样安排：\r\n\r\nColumn() {\r\n  Row() {\r\n    返回按钮\r\n    Blank()\r\n    星澜头像\r\n  }\r\n  .width('100%')\r\n  .height(48)\r\n  .padding({ left: 24, right: 28 })\r\n  .margin({ top: 48 })\r\n\r\n  聊天主体区域\r\n}\r\n\r\n或者：\r\n\r\nStack() {\r\n  聊天主体\r\n\r\n  Row() {\r\n    返回按钮\r\n    Blank()\r\n    星澜头像\r\n  }\r\n  .position({ x: 0, y: 48 })\r\n}\r\n\r\n如果使用 position，y 不能小于状态栏安全高度。\r\n不要再用负 translate。\r\n\r\n---\r\n\r\n# 头像视觉要求\r\n\r\n头像完整显示：\r\n\r\n- 不裁头\r\n- 不只露半个\r\n- 圆形完整\r\n- 金色边框完整\r\n- 不贴边\r\n\r\n头像资源继续复用星澜头像资源，不新增图片。\r\n\r\n---\r\n\r\n# 验收标准\r\n\r\n完成后模拟机检查：\r\n\r\n1. 右上角头像完整显示。\r\n2. 头像不被状态栏裁切。\r\n3. 头像不遮挡返回按钮。\r\n4. 头像不遮挡聊天内容。\r\n5. 头像不贴边。\r\n6. 360×780、390×844、432×936 下位置稳定。\r\n7. 聊天页可以正常发送消息。\r\n8. SafetyGuard / DirectReply / Flow 不受影响。\r\n9. BUILD SUCCESSFUL，ERROR=0。\r\n\r\n---\r\n\r\n# 最终输出\r\n\r\n完成后请输出：\r\n\r\n1. 修改了哪个文件。\r\n2. 原因是什么。\r\n3. 如何修复顶部安全区 / header 布局。\r\n4. 是否确认未修改聊天核心逻辑。\r\n5. 编译结果：BUILD SUCCESSFUL，ERROR=0。\r\n```\r\n\r\n一句话说：**头像不是资源问题，是 header 顶部安全区没留够。**\r\n让它把头像放进一个稳定的顶部 Header Row 里，不要再靠 `translate` 或贴近顶部。\r\n\n--- End [已粘贴文本 #24 · 167 行] ---",
+  "scope": null,
+  "non_goals": null,
+  "allowed_operations": {
+    "write": true,
+    "network": false,
+    "publish": false
+  },
+  "success_criteria": [
+    {
+      "id": "objective_evidence",
+      "description": "The goal outcome is supported by direct evidence, such as inspected code, reproduced behavior, source material, or concrete findings.",
+      "required": true,
+      "evidence_ids": null
+    },
+    {
+      "id": "verification",
+      "description": "The result has relevant verification evidence, such as tests, commands, benchmarks, manual checks, or a documented reason why verification is not applicable.",
+      "required": true,
+      "evidence_ids": null
+    }
+  ]
+}

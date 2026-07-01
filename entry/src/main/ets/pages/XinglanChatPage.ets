@@ -766,28 +766,29 @@ struct XinglanChatPage {
       MoonlightLayer({ strong: false })
 
       Column() {
-        // ═══ 顶部栏 ═══
+        // 顶部安全区
+        Column()
+          .width('100%')
+          .height(Theme.SAFE_TOP + 8)
+
+        // ═══ 顶部栏（返回按钮 + 星澜头像）═══
         Row() {
           AppBackButton({ fallbackUrl: Routes.MAIN_FRAME })
           Blank()
+          // 星澜头像 — v2 暖金细边 + 月光环
+          Image($r('app.media.app_icon5'))
+            .width(42)
+            .height(42)
+            .borderRadius(21)
+            .border({ width: 1.5, color: 'rgba(212, 172, 77, 0.55)' })
+            .objectFit(ImageFit.Cover)
+            .clip(true)
+            .shadow(Theme.V2_HALO_AVATAR_STANDARD)
         }
         .width('100%')
-        .height(56)
-        .padding({ top: Theme.SAFE_TOP, left: 24, right: 24 })
+        .height(50)
+        .padding({ left: 24, right: 28 })
         .alignItems(VerticalAlign.Center)
-
-        // 星澜头像 — v2 暖金细边 + 月光环
-        Image($r('app.media.app_icon5'))
-          .width(42)
-          .height(42)
-          .borderRadius(21)
-          .border({ width: 1.5, color: 'rgba(212, 172, 77, 0.55)' })
-          .objectFit(ImageFit.Cover)
-          .clip(true)
-          .shadow(Theme.V2_HALO_AVATAR_STANDARD)
-          .position({ x: '100%', y: Theme.SAFE_TOP + 18 })
-          .translate({ x: -66, y: 0 })
-          .zIndex(10)
 
         // ═══ 消息列表 ═══
         Stack() {

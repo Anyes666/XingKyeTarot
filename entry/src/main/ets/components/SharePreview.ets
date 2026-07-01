@@ -38,7 +38,7 @@ export struct SharePreview {
 
       Divider()
         .strokeWidth(0.5)
-        .color(Theme.GOLD_DIM)
+        .color(Theme.V2C_SPINE_LINE)
         .opacity(0.3)
         .width('80%')
         .margin({ bottom: 30 })
@@ -70,7 +70,7 @@ export struct SharePreview {
 
               Text(card.keywords.slice(0, 3).join(' · '))
                 .fontSize(16)
-                .fontColor(Theme.AURORA)
+                .fontColor(Theme.V2C_GOLD_GILT_SOFT)
                 .maxLines(1)
                 .margin({ top: 6 })
             }
@@ -84,7 +84,7 @@ export struct SharePreview {
 
         Divider()
           .strokeWidth(0.5)
-          .color(Theme.GOLD_DIM)
+          .color(Theme.V2C_SPINE_LINE)
           .opacity(0.3)
           .width('80%')
           .margin({ top: 30, bottom: 24 })
@@ -129,7 +129,7 @@ export struct SharePreview {
                 ForEach(card.keywords.slice(0, 3), (kw: string) => {
                   Text(kw)
                     .fontSize(16)
-                    .fontColor(Theme.AURORA)
+                    .fontColor(Theme.V2C_GOLD_GILT_SOFT)
                     .padding({ left: 10, right: 10, top: 3, bottom: 3 })
                     .margin({ right: 8 })
                     .borderRadius(6)
@@ -164,7 +164,7 @@ export struct SharePreview {
       Column() {
         Divider()
           .strokeWidth(0.5)
-          .color(Theme.GOLD_DIM)
+          .color(Theme.V2C_SPINE_LINE)
           .opacity(0.3)
           .width('80%')
           .margin({ bottom: 16 })

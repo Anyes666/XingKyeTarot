@@ -1,0 +1,25 @@
+{
+  "task_id": "20260701-112612-20-234-begin-20-234-phase-6-h-1-text-phase-6-h-1-p1-toke",
+  "goal": "[已粘贴文本 #20 · 234 行]\n\n--- Begin [已粘贴文本 #20 · 234 行] ---\n很好，Phase 6-H-1 可以收口：\r\n\r\n```text\r\nPhase 6-H-1：P1 小范围 Token 残留修复\r\n状态：完成\r\n编译：BUILD SUCCESSFUL，ERROR=0\r\n```\r\n\r\n这一步处理得很干净，尤其是没有动：\r\n\r\n```text\r\n头像裁剪核心逻辑\r\nSharePreview 截图 / PixelMap 逻辑\r\nInterpretationPanel 解读结构\r\n```\r\n\r\n下一步可以进入：\r\n\r\n```text\r\nPhase 6-H-2：MainFramePage 内联 Tab Token 残留修复\r\n```\r\n\r\n但这一步要非常小心。`MainFramePage.ets` 承载底部 Tab、我的页、星历、昵称、头像、BGM 等多个主路径，不能大重构，只能做 Token 替换。\r\n\r\n你可以直接给 Agent 这段：\r\n\r\n```text\r\n当前 Phase 6-H-1 已完成：\r\n\r\nInterpretationPanel / SharePreview / AvatarCropPage / VersionInfoPage 的 P1 Token 残留已修复。\r\nBUILD SUCCESSFUL，ERROR=0。\r\n\r\n现在请执行 Phase 6-H-2：\r\n\r\nMainFramePage 内联 Tab Token 残留修复。\r\n\r\n本轮只修改：\r\n\r\nentry/src/main/ets/pages/MainFramePage.ets\r\n\r\n不要修改其他文件。\r\n\r\n目标：\r\n\r\n修复 MainFramePage.ets 中剩余旧 Token，使底部 Tab 内联组件进一步统一到 v2 设计系统。\r\n\r\n重点区域：\r\n\r\n1. DivinationCenterTabContent\r\n   目标方案：C「星钥之书」\r\n\r\n2. TarotCardsTabContent\r\n   目标方案：C「星钥之书」\r\n\r\n3. SettingsTabContent / 我的页 / 星历区域 / 昵称弹窗 / 日期详情弹窗\r\n   目标方案：A「星图档案」为主，少量 B「月湖映心」\r\n\r\n请先定位 MainFramePage.ets 中以下旧 Token：\r\n\r\nBG_DEEP_INDIGO\r\nGOLD_LIGHT\r\nGOLD_DIM\r\nMOON_MUTED\r\nTEXT_PRIMARY_LIGHT\r\nGOLD_PALE\r\nGOLD_AMBER\r\n\r\n然后按区域替换。\r\n\r\n---\r\n\r\n# 一、DivinationCenterTabContent 替换规则\r\n\r\n目标方案：\r\n\r\nC「星钥之书」\r\n\r\n推荐替换：\r\n\r\nBG_DEEP_INDIGO → Theme.V2C_BG_BASE\r\nBG_CARD_DARK → Theme.V2C_BG_CARD\r\nTEXT_PRIMARY_LIGHT → Theme.V2C_TEXT_PRIMARY\r\nMOON_MUTED → Theme.V2C_TEXT_SECONDARY\r\nGOLD_LIGHT / GOLD_AMBER → Theme.V2C_GOLD_GILT\r\nGOLD_PALE → Theme.V2C_GOLD_GILT_SOFT\r\nGOLD_DIM → Theme.V2C_SPINE_LINE\r\n\r\n要求：\r\n\r\n1. 不修改占卜入口逻辑。\r\n2. 不修改路由。\r\n3. 不修改每日一占、圣三角、关系探索、旋转牌轮入口。\r\n4. 只替换颜色 / 边框 / 卡片背景 / 辅助文字 Token。\r\n\r\n---\r\n\r\n# 二、TarotCardsTabContent 替换规则\r\n\r\n目标方案：\r\n\r\nC「星钥之书」\r\n\r\n推荐替换：\r\n\r\nBG_DEEP_INDIGO → Theme.V2C_BG_BASE\r\nBG_CARD_DARK → Theme.V2C_BG_CARD\r\nTEXT_PRIMARY_LIGHT → Theme.V2C_TEXT_PRIMARY\r\nMOON_MUTED → Theme.V2C_TEXT_SECONDARY\r\nGOLD_LIGHT / GOLD_AMBER → Theme.V2C_GOLD_GILT\r\nGOLD_PALE → Theme.V2C_GOLD_GILT_SOFT\r\nGOLD_DIM → Theme.V2C_SPINE_LINE\r\n\r\n注意：\r\n\r\nMainFramePage.ets 中的 #8B7EC8 是 TarotSuit.SWORDS 宝剑组标准色，不是旧紫色残留，不要替换。\r\n\r\n要求：\r\n\r\n1. 不修改卡牌数据。\r\n2. 不修改分类筛选逻辑。\r\n3. 不修改卡牌详情跳转。\r\n4. 不修改 78 张牌展示逻辑。\r\n5. 只替换视觉 Token。\r\n\r\n---\r\n\r\n# 三、SettingsTabContent / 我的页替换规则\r\n\r\n目标方案：\r\n\r\nA「星图档案」为主，少量 B「月湖映心」\r\n\r\n推荐替换：\r\n\r\nBG_DEEP_INDIGO → Theme.V2A_BG_BASE\r\nBG_CARD_DARK → Theme.V2A_BG_CARD\r\nTEXT_PRIMARY_LIGHT → Theme.V2A_TEXT_PRIMARY\r\nMOON_MUTED → Theme.V2A_TEXT_SECONDARY\r\nGOLD_LIGHT / GOLD_AMBER → Theme.V2A_GOLD_ACCENT\r\nGOLD_PALE → Theme.V2A_GOLD_GLOW\r\nGOLD_DIM → Theme.V2A_ORBIT_LINE\r\n\r\n用于昵称弹窗 / 温柔陪伴类提示时，可以少量使用：\r\n\r\nTheme.V2B_TEXT_SECONDARY\r\nTheme.V2B_GOLD_CORE\r\n\r\n要求：\r\n\r\n1. 不修改头像逻辑。\r\n2. 不修改昵称编辑逻辑。\r\n3. 不修改昵称持久化。\r\n4. 不修改 BGM 开关逻辑。\r\n5. 不修改星澜星历逻辑。\r\n6. 不修改点亮记录。\r\n7. 不修改星钥等级阈值。\r\n8. 不修改日期详情弹窗逻辑。\r\n9. 只替换视觉 Token。\r\n\r\n---\r\n\r\n# 四、严格禁止\r\n\r\n本轮禁止：\r\n\r\n1. 不重构 MainFramePage。\r\n2. 不拆组件。\r\n3. 不删除旧 struct。\r\n4. 不修改底部导航逻辑。\r\n5. 不修改路由。\r\n6. 不修改 BGM。\r\n7. 不修改头像。\r\n8. 不修改昵称功能。\r\n9. 不修改星历 / 情绪星数据。\r\n10. 不修改抽牌算法。\r\n11. 不修改卡牌数据。\r\n12. 不修改聊天入口页。\r\n13. 不修改真实聊天页。\r\n14. 不处理 deprecation WARN。\r\n15. 不清理旧 Token 定义。\r\n16. 不替换 #8B7EC8 宝剑组色值。\r\n\r\n---\r\n\r\n# 五、验收标准\r\n\r\n完成后请 grep 检查 MainFramePage.ets：\r\n\r\n以下旧 Token 应尽量清零，除非有明确理由保留：\r\n\r\nBG_DEEP_INDIGO\r\nGOLD_LIGHT\r\nGOLD_DIM\r\nMOON_MUTED\r\nTEXT_PRIMARY_LIGHT\r\nGOLD_PALE\r\nGOLD_AMBER\r\n\r\n但保留：\r\n\r\n#8B7EC8\r\n\r\n因为它是塔罗宝剑组标准色。\r\n\r\n功能验收：\r\n\r\n1. 底部 5 个 Tab 正常切换。\r\n2. 塔罗 / 占卜 Tab 入口正常。\r\n3. 星澜聊天 Tab 仍显示入口页。\r\n4. 星澜语录 Tab 正常。\r\n5. 卡牌总览 Tab 正常。\r\n6. 我的页头像、昵称、星钥等级、星历、BGM 开关正常。\r\n7. 昵称编辑弹窗正常。\r\n8. 完整星历入口正常。\r\n9. 日期详情弹窗正常。\r\n10. BGM 状态不被覆盖。\r\n11. BUILD SUCCESSFUL，ERROR=0。\r\n\r\n---\r\n\r\n# 六、最终输出\r\n\r\n完成后请输出：\r\n\r\n1. 修改了 MainFramePage.ets 哪些区域。\r\n2. 替换了哪些旧 Token。\r\n3. 哪些旧 Token 如果保留，说明原因。\r\n4. 是否确认未替换 #8B7EC8 宝剑组色值。\r\n5. 是否确认未修改底部 Tab、BGM、头像、昵称、星历、抽牌、卡牌、聊天逻辑。\r\n6. 编译结果：BUILD SUCCESSFUL，ERROR=0。\r\n```\r\n\r\n这一步做完后，不建议继续马上迁移 `XinglanChatPage` 内部面板。先做一次完整模拟机回归，因为 `MainFramePage` 是主框架，改完必须确认五个 Tab 和我的页状态都稳。\r\n\n--- End [已粘贴文本 #20 · 234 行] ---",
+  "scope": null,
+  "non_goals": null,
+  "allowed_operations": {
+    "write": true,
+    "network": false,
+    "publish": false
+  },
+  "success_criteria": [
+    {
+      "id": "objective_evidence",
+      "description": "The goal outcome is supported by direct evidence, such as inspected code, reproduced behavior, source material, or concrete findings.",
+      "required": true,
+      "evidence_ids": null
+    },
+    {
+      "id": "verification",
+      "description": "The result has relevant verification evidence, such as tests, commands, benchmarks, manual checks, or a documented reason why verification is not applicable.",
+      "required": true,
+      "evidence_ids": null
+    }
+  ]
+}

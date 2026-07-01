@@ -5,6 +5,7 @@ import { ComplianceFooter } from '../components/ComplianceFooter';
 import { AppBackButton } from '../components/AppBackButton';
 import { TarotCardImage } from '../components/TarotCardImage';
 import { HistoryStore } from '../common/HistoryStore';
+import { getTriangleCompanionText } from '../data/XinglanResultCompanionText';
 import {
   SpreadType,
   DrawnCardRecord,
@@ -210,6 +211,9 @@ struct TriangleResultPage {
         // ── 行动建议 ──
         this.buildAdviceSection()
 
+        // ── 星澜陪你整理 ──
+        this.buildCompanionSection()
+
         Divider().strokeWidth(0.5).color(Theme.V2C_SPINE_LINE)
 
         // ── 操作按钮 ──
@@ -326,6 +330,53 @@ struct TriangleResultPage {
     .padding(Theme.SPACE_LG)
     .backgroundColor(Theme.V2C_BG_FLOATING)
     .borderRadius(Theme.V2C_RADIUS_CARD)
+  }
+
+  @Builder
+  buildCompanionSection(): void {
+    Column() {
+      Text(getTriangleCompanionText().title)
+        .fontSize(Theme.V2C_FONT_SUBTITLE)
+        .fontColor(Theme.V2C_GOLD_GILT)
+        .fontWeight(FontWeight.Bold)
+        .width('100%')
+        .margin({ bottom: Theme.SPACE_MD })
+
+      Column({ space: Theme.SPACE_MD }) {
+        Text(getTriangleCompanionText().receive)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_PRIMARY)
+          .lineHeight(24)
+          .width('100%')
+
+        Text(getTriangleCompanionText().reflect)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_PRIMARY)
+          .lineHeight(24)
+          .width('100%')
+
+        Text(getTriangleCompanionText().question)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_GOLD_GILT_SOFT)
+          .fontWeight(FontWeight.Medium)
+          .lineHeight(24)
+          .width('100%')
+          .margin({ top: Theme.SPACE_XS })
+
+        Text(getTriangleCompanionText().action)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
+          .lineHeight(24)
+          .width('100%')
+          .fontStyle(FontStyle.Italic)
+      }
+      .width('100%')
+    }
+    .width('100%')
+    .padding(Theme.SPACE_LG)
+    .backgroundColor(Theme.V2C_BG_FLOATING)
+    .borderRadius(Theme.V2C_RADIUS_CARD)
+    .margin({ top: Theme.SPACE_LG })
   }
 
   @Builder

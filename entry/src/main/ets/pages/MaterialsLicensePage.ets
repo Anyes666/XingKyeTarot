@@ -83,7 +83,7 @@ struct MaterialsLicensePage {
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .backgroundColor(Theme.V2A_BG_BASE)
 
       Column() {
         // 顶部安全区 + 返回按钮

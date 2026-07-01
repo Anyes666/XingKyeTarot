@@ -4,6 +4,7 @@ import { Routes } from '../common/Routes';
 import { AppBackButton } from '../components/AppBackButton';
 import { TAROT_CARDS } from '../data/TarotCardData';
 import { TarotCard, ArcanaType, TarotSuit } from '../model/TarotCard';
+import { TarotCardImage } from '../components/TarotCardImage';
 
 /**
  * 卡牌总览页面路由参数
@@ -221,77 +222,41 @@ struct TarotCardsPage {
           .opacity(0.15)
           .margin({ bottom: Theme.SPACE_SM })
 
-        // 卡牌列表（LazyForEach 懒加载优化）
+        // 卡牌网格（3 列真实牌面）
         Scroll() {
-          List() {
+          Grid() {
             LazyForEach(this.dataSource, (card: TarotCard) => {
-              ListItem() {
-                Row() {
-                  // 编号
-                  Text(this.formatIndex(card.index))
-                    .fontSize(Theme.V2C_FONT_CARD_NUM)
-                    .fontColor(Theme.V2C_GOLD_GILT)
-                    .width(36)
+              GridItem() {
+                Column() {
+                  TarotCardImage({ cardId: card.id, cardWidth: 90, cardHeight: 140 })
+                    .margin({ bottom: 6 })
+
+                  Text(card.nameZh)
+                    .fontSize(11)
+                    .fontColor(Theme.V2C_TEXT_SECONDARY)
+                    .fontWeight(FontWeight.Medium)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
                     .textAlign(TextAlign.Center)
-
-                  // 卡牌信息
-                  Column() {
-                    Text(card.nameZh)
-                      .fontSize(Theme.V2C_FONT_BODY)
-                      .fontColor(Theme.V2C_TEXT_PRIMARY)
-                      .fontWeight(FontWeight.Medium)
-
-                    Text(card.nameEn)
-                      .fontSize(Theme.V2C_FONT_CAPTION)
-                      .fontColor(Theme.V2C_TEXT_SECONDARY)
-                      .margin({ top: 2 })
-
-                    // 关键词
-                    Row() {
-                      ForEach(card.keywords, (keyword: string, ki: number) => {
-                        Text(keyword)
-                          .fontSize(Theme.V2C_FONT_DISCLAIMER)
-                          .fontColor(this.getSuitColor(card))
-                          .padding({ left: 6, right: 6, top: 2, bottom: 2 })
-                          .margin({ right: 4, top: 4 })
-                      }, (_kw: string, ki: number) => 'kw_' + card.id + '_' + ki.toString())
-                    }
-                  }
-                  .alignItems(HorizontalAlign.Start)
-                  .layoutWeight(1)
-                  .margin({ left: Theme.SPACE_SM })
-
-                  // 所属类别
-                  Text(this.getSuitLabel(card))
-                    .fontSize(Theme.V2C_FONT_DISCLAIMER)
-                    .fontColor(this.getSuitColor(card))
-                    .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-                    .border({ width: 0.5, color: this.getSuitColor(card), style: BorderStyle.Solid })
-                    .borderRadius(Theme.V2C_RADIUS_CHIP)
-                    .margin({ right: 4 })
-
-                  // 箭头
-                  Text('›')
-                    .fontSize(Theme.V2C_FONT_SUBTITLE)
-                    .fontColor(Theme.V2C_GOLD_GILT)
+                    .width('100%')
                 }
                 .width('100%')
-                .padding({ left: Theme.V2_SPACE_MD_B, right: Theme.V2_SPACE_MD_B, top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_SM })
-                .alignItems(VerticalAlign.Center)
+                .padding({ top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_SM })
                 .backgroundColor(Theme.V2C_BG_CARD)
                 .borderRadius(Theme.V2C_RADIUS_CARD)
                 .border({ width: 1, color: Theme.V2C_SPINE_LINE })
-                .margin({ bottom: 6, left: Theme.V2_SPACE_MD, right: Theme.V2_SPACE_MD })
+                .shadow(Theme.V2C_SHADOW_CARD)
                 .onClick(() => {
                   this.navigateToDetail(card);
                 })
               }
             }, (card: TarotCard) => card.id)
           }
+          .columnsTemplate('1fr 1fr 1fr')
+          .columnsGap(Theme.V2_SPACE_SM)
+          .rowsGap(Theme.V2_SPACE_SM)
           .width('100%')
-          .padding({ top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_LG })
-          .listDirection(Axis.Vertical)
-          .divider({ strokeWidth: 0 })
+          .padding({ left: Theme.V2_SPACE_MD, right: Theme.V2_SPACE_MD, top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_LG })
         }
         .width('100%')
         .layoutWeight(1)
