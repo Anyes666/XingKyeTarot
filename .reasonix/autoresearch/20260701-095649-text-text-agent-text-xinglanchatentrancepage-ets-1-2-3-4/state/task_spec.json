@@ -1,0 +1,25 @@
+{
+  "task_id": "20260701-095649-text-text-agent-text-xinglanchatentrancepage-ets-1-2-3-4",
+  "goal": "这版**立绘融合已经基本过关**了：\r\n\r\n```text\r\n右侧竖条：已消失\r\n底部横线：已消失\r\n矩形贴图感：明显减弱\r\n月牙贴纸感：减弱\r\n整体氛围：更接近“月光门廊”\r\n```\r\n\r\n现在主要剩下一个小问题：**标题换行不自然**。\r\n\r\n截图里：\r\n\r\n```text\r\n影本人，先靠近月光一\r\n点\r\n```\r\n\r\n这个“一点”被拆开了，看起来不精致。这个必须修一下，不然会显得像布局没处理好。\r\n\r\n---\r\n\r\n## 建议下一步只修标题换行\r\n\r\n直接给 Agent：\r\n\r\n```text\r\n请继续微调 XinglanChatEntrancePage.ets。\r\n\r\n当前星澜入口页立绘融合已经基本完成，不要再改立绘、遮罩、月牙、布局和动效。\r\n\r\n现在只修一个问题：\r\n\r\n昵称问候标题换行不自然。\r\n\r\n当前截图中标题显示为：\r\n\r\n影本人，先靠近月光一\r\n点\r\n\r\n“一点”被拆开了，视觉上不够高级。\r\n\r\n本次只修标题文本排版，不改其他功能。\r\n\r\n要求：\r\n\r\n1. 不修改立绘区域。\r\n2. 不修改四向渐隐。\r\n3. 不修改月牙。\r\n4. 不修改按钮。\r\n5. 不修改路由。\r\n6. 不修改 BGM / 聊天核心 / SafetyGuard / DirectReply / Flow。\r\n7. 不修改抽牌、卡牌、头像、图标、点亮记录、等级规则。\r\n\r\n---\r\n\r\n# 修复方案\r\n\r\n请优化入口页标题的换行规则。\r\n\r\n推荐方案 A：昵称和问候拆成两行\r\n\r\n当使用昵称问候时，不要把整句作为一段自然换行。\r\n\r\n例如：\r\n\r\n影本人，\r\n先靠近月光一点\r\n\r\n或者：\r\n\r\n影本人，\r\n慢慢说\r\n\r\n也就是说：\r\n\r\n第一行：{name}，\r\n第二行：问候内容\r\n\r\n这样可以避免“一点”“一些”“一点点”被拆开。\r\n\r\n---\r\n\r\n# 推荐文案结构\r\n\r\n入口页标题可以拆成：\r\n\r\nText(this.greetingNameLine)\r\nText(this.greetingTitleLine)\r\n\r\n例如：\r\n\r\ngreetingNameLine = '影本人，'\r\ngreetingTitleLine = '先靠近月光一点'\r\n\r\n默认无昵称时仍使用：\r\n\r\n慢慢说，\r\n星澜会先听你说完\r\n\r\n---\r\n\r\n# 方案 B：缩小动态标题字号\r\n\r\n如果不拆两行，也可以根据标题长度动态调整字号：\r\n\r\n标题长度 \u003c= 10：34vp\r\n标题长度 11-14：31vp\r\n标题长度 \u003e 14：28vp\r\n\r\n但更推荐方案 A，因为更稳定。\r\n\r\n---\r\n\r\n# 文案池也需要注意\r\n\r\n请检查 XinglanNicknameGreetings.ets 中较长标题，例如：\r\n\r\n{name}，先靠近月光一点\r\n{name}，今晚不用撑得很完整\r\n{name}，这里是你的月光门廊\r\n{name}，不用急着回答自己\r\n\r\n这些标题在 390 宽屏下容易断得不好。\r\n\r\n建议将长标题拆成两部分：\r\n\r\ninterface EntryGreeting {\r\n  id: number;\r\n  title: string;\r\n  subtitle: string;\r\n}\r\n\r\n可以保持数据结构不变，但渲染时处理：\r\n\r\n1. 如果 title 包含中文逗号 `，`\r\n2. 且是昵称问候\r\n3. 就按第一个逗号拆分成两行\r\n\r\n示例：\r\n\r\n原 title：\r\n影本人，先靠近月光一点\r\n\r\n渲染：\r\n影本人，\r\n先靠近月光一点\r\n\r\n这样不需要改 20 条文案数据。\r\n\r\n---\r\n\r\n# 验收标准\r\n\r\n完成后检查：\r\n\r\n1. 不再出现“一 / 点”被拆开的情况。\r\n2. 不再出现“月光门 / 廊”这种奇怪断行。\r\n3. 昵称较长时仍然不溢出。\r\n4. 默认无昵称文案仍正常：\r\n   慢慢说，\r\n   星澜会先听你说完\r\n5. 立绘融合效果保持不变。\r\n6. 入口按钮仍跳转 Routes.XINGLAN_CHAT。\r\n7. BUILD SUCCESSFUL，ERROR=0。\r\n```\r\n\r\n---\r\n\r\n## 当前状态判断\r\n\r\n这页现在不要再继续大改了。\r\n只把标题换行修好，就可以冻结为：\r\n\r\n```text\r\n星澜聊天入口页：定稿\r\n```\r\n\r\n后面再继续动，很容易过度打磨，反而破坏现在的安静感。",
+  "scope": null,
+  "non_goals": null,
+  "allowed_operations": {
+    "write": true,
+    "network": false,
+    "publish": false
+  },
+  "success_criteria": [
+    {
+      "id": "objective_evidence",
+      "description": "The goal outcome is supported by direct evidence, such as inspected code, reproduced behavior, source material, or concrete findings.",
+      "required": true,
+      "evidence_ids": null
+    },
+    {
+      "id": "verification",
+      "description": "The result has relevant verification evidence, such as tests, commands, benchmarks, manual checks, or a documented reason why verification is not applicable.",
+      "required": true,
+      "evidence_ids": null
+    }
+  ]
+}

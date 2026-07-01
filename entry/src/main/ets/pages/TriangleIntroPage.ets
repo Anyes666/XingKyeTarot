@@ -32,14 +32,14 @@ struct TriangleIntroPage {
           // ── 标题区 ──
           Column() {
             Text('圣三角')
-              .fontSize(Theme.FONT_DISPLAY)
-              .fontColor(Theme.GOLD_AMBER)
+              .fontSize(Theme.V2C_FONT_DISPLAY)
+              .fontColor(Theme.V2C_GOLD_GILT)
               .fontWeight(FontWeight.Bold)
               .textAlign(TextAlign.Center)
 
             Text('看见一件事的过去、现在与未来')
-              .fontSize(Theme.FONT_SUBTITLE)
-              .fontColor(Theme.MOON_MUTED)
+              .fontSize(Theme.V2C_FONT_SUBTITLE)
+              .fontColor(Theme.V2C_TEXT_SECONDARY)
               .textAlign(TextAlign.Center)
               .margin({ top: Theme.SPACE_SM })
           }
@@ -49,32 +49,32 @@ struct TriangleIntroPage {
           // ── 说明卡片 ──
           Column() {
             Text('圣三角是最经典的塔罗牌阵之一，由三张牌组成，分别代表：')
-              .fontSize(Theme.FONT_BODY)
-              .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+              .fontSize(Theme.V2C_FONT_BODY)
+              .fontColor(Theme.V2C_TEXT_PRIMARY)
               .margin({ bottom: Theme.SPACE_MD })
 
             Text('🔹 第一张 · 过去 —— 事件的基础，已经发生的影响因素\n🔹 第二张 · 现在 —— 当前的状态，正在发生的核心\n🔹 第三张 · 未来 —— 可能的发展方向')
-              .fontSize(Theme.FONT_BODY)
-              .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+              .fontSize(Theme.V2C_FONT_BODY)
+              .fontColor(Theme.V2C_TEXT_PRIMARY)
               .lineHeight(22)
               .margin({ bottom: Theme.SPACE_MD })
 
             Text('星澜会帮你展开这三段线索，看到事情的完整脉络。')
-              .fontSize(Theme.FONT_BODY)
-              .fontColor(Theme.GOLD_AMBER)
+              .fontSize(Theme.V2C_FONT_BODY)
+              .fontColor(Theme.V2C_GOLD_GILT)
           }
           .width('100%')
-          .padding(Theme.SPACE_LG)
-          .backgroundColor(Theme.BG_CARD_DARK)
-          .borderRadius(Theme.RADIUS_LG)
-          .border({ width: 1, color: 'rgba(202, 138, 4, 0.15)' })
+          .padding(Theme.V2_SPACE_LG)
+          .backgroundColor(Theme.V2C_BG_CARD)
+          .borderRadius(Theme.V2C_RADIUS_CARD)
+          .border({ width: 1, color: Theme.V2C_SPINE_LINE })
           .margin({ top: Theme.SPACE_XL, bottom: Theme.SPACE_XL })
 
           // ── 问题输入 ──
           Column() {
             Text('你想看清哪件事？')
-              .fontSize(Theme.FONT_SUBTITLE)
-              .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+              .fontSize(Theme.V2C_FONT_SUBTITLE)
+              .fontColor(Theme.V2C_TEXT_PRIMARY)
               .fontWeight(FontWeight.Bold)
               .width('100%')
               .margin({ bottom: Theme.SPACE_SM })
@@ -83,11 +83,11 @@ struct TriangleIntroPage {
               .width('100%')
               .height(48)
               .fontSize(Theme.FONT_BODY)
-              .fontColor(Theme.TEXT_PRIMARY_LIGHT)
-              .placeholderColor(Theme.MOON_MUTED)
-              .backgroundColor(Theme.BG_CARD_DARK)
-              .borderRadius(Theme.RADIUS_SM)
-              .border({ width: 1, color: 'rgba(202, 138, 4, 0.15)' })
+              .fontColor(Theme.V2C_TEXT_PRIMARY)
+              .placeholderColor(Theme.V2C_TEXT_SECONDARY)
+              .backgroundColor(Theme.V2C_BG_CARD)
+              .borderRadius(Theme.V2C_RADIUS_BTN)
+              .border({ width: 1, color: Theme.V2C_SPINE_LINE })
               .onChange((value: string) => {
                 this.questionText = value;
               })
@@ -98,8 +98,8 @@ struct TriangleIntroPage {
           // ── 场景选择 ──
           Column() {
             Text('选择一个场景：')
-              .fontSize(Theme.FONT_BODY)
-              .fontColor(Theme.MOON_MUTED)
+              .fontSize(Theme.V2C_FONT_BODY)
+              .fontColor(Theme.V2C_TEXT_SECONDARY)
               .width('100%')
               .margin({ bottom: Theme.SPACE_MD })
 
@@ -107,14 +107,14 @@ struct TriangleIntroPage {
               ForEach(this.scenarioOptions, (tag: string) => {
                 Text(tag)
                   .fontSize(Theme.FONT_CAPTION)
-                  .fontColor(this.scenarioTag === tag ? Theme.BG_DEEP_INDIGO : Theme.GOLD_AMBER)
+                  .fontColor(this.scenarioTag === tag ? Color.White : Theme.V2C_GOLD_GILT)
                   .fontWeight(FontWeight.Medium)
                   .height(44)
                   .padding({ left: 14, right: 14, top: 0, bottom: 0 })
                   .textAlign(TextAlign.Center)
-                  .backgroundColor(this.scenarioTag === tag ? Theme.GOLD_AMBER : 'rgba(202, 138, 4, 0.1)')
-                  .borderRadius(Theme.RADIUS_FULL)
-                  .border({ width: 1, color: 'rgba(202, 138, 4, 0.25)' })
+                  .backgroundColor(this.scenarioTag === tag ? Theme.V2C_GOLD_GILT : Theme.V2C_BG_CARD)
+                  .borderRadius(Theme.V2_RADIUS_FULL)
+                  .border({ width: 1, color: this.scenarioTag === tag ? Theme.V2C_GOLD_GILT : Theme.V2C_SPINE_LINE })
                   .onClick(() => {
                     this.scenarioTag = tag;
                   })
@@ -127,13 +127,13 @@ struct TriangleIntroPage {
 
           // ── 开始按钮 ──
           Button('开始抽牌')
-            .fontSize(Theme.FONT_SUBTITLE)
-            .fontColor(Color.White)
+            .fontSize(Theme.V2C_FONT_BODY)
+            .fontColor(Theme.V2C_BG_BASE)
             .fontWeight(FontWeight.Medium)
             .width('85%')
             .height(56)
-            .backgroundColor(Theme.GOLD_AMBER)
-            .borderRadius(Theme.RADIUS_FULL)
+            .backgroundColor(Theme.V2C_GOLD_GILT)
+            .borderRadius(Theme.V2_RADIUS_FULL)
             .margin({ top: Theme.SPACE_SM, bottom: Theme.SPACE_LG })
             .onClick(() => {
               const drawParams: TriangleDrawRouteParams = {
@@ -151,7 +151,7 @@ struct TriangleIntroPage {
             })
 
           // ── 合规页脚 ──
-          ComplianceFooter({ fontSize: Theme.FONT_CAPTION, textColor: Theme.MOON_MUTED, showDivider: false })
+          ComplianceFooter({ fontSize: Theme.V2C_FONT_CAPTION, textColor: Theme.V2C_TEXT_SECONDARY, showDivider: false })
         }
         .width('100%')
         .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: 112 })
@@ -159,7 +159,7 @@ struct TriangleIntroPage {
       .width('100%')
       .height('100%')
       .scrollBar(BarState.Off)
-      .backgroundColor(Theme.BG_DEEP_INDIGO)
+      .backgroundColor(Theme.V2C_BG_BASE)
 
       // 顶部渐变遮罩（消除状态栏硬边）
       Column()
@@ -167,7 +167,7 @@ struct TriangleIntroPage {
         .height(Theme.SAFE_TOP + 64)
         .linearGradient({
           direction: GradientDirection.Bottom,
-          colors: [['#0A0E1C', 0], ['rgba(15,15,35,0)', 1]]
+          colors: [['#0A0D1A', 0], ['rgba(15,15,35,0)', 1]]
         })
         .hitTestBehavior(HitTestMode.Transparent)
         .position({ x: 0, y: 0 })

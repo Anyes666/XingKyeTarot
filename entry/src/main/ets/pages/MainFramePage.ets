@@ -12,6 +12,7 @@ import { UserProfileStore } from '../common/UserProfileStore';
 import { EmotionStarStorage, EmotionStarRecord, StarKeyLevel, NextLevelInfo } from '../common/EmotionStarStorage';
 import { common } from '@kit.AbilityKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
+import { XinglanChatEntranceContent } from './XinglanChatEntrancePage';
 
 /**
  * Phase 6.8：主框架页面 — 底部导航容器
@@ -99,7 +100,7 @@ struct MainFramePage {
     if (index < 0 || index > 4) {
       return;
     }
-    // Tab 1（星澜聊天）：切换到入口页（XinglanChatTabContent），不再直接进入聊天页
+    // Tab 1（星澜聊天）：切换到入口内容（XinglanChatEntranceContent），不直接进入聊天页
     if (this.currentTab === index) {
       return;
     }
@@ -112,7 +113,7 @@ struct MainFramePage {
     if (this.currentTab === 0) {
       DivinationCenterTabContent()
     } else if (this.currentTab === 1) {
-      XinglanChatTabContent()
+      XinglanChatEntranceContent()
     } else if (this.currentTab === 2) {
       XinglanQuotesTabContent()
     } else if (this.currentTab === 3) {
@@ -666,7 +667,7 @@ struct XinglanQuotesTabContent {
   build() {
     Stack() {
       // ═══════════════════════════════════════════
-      // Layer 1: 星澜背景图
+      // Layer 1: 星澜背景图（月湖映心 B 方案）
       // ═══════════════════════════════════════════
       Image($r('app.media.xinglan_home_main'))
         .objectFit(ImageFit.Cover)
@@ -677,7 +678,7 @@ struct XinglanQuotesTabContent {
         .hitTestBehavior(HitTestMode.Transparent)
 
       // ═══════════════════════════════════════════
-      // Layer 2: 渐变遮罩
+      // Layer 2: 渐变遮罩（B 方案深蓝湖底过渡）
       // ═══════════════════════════════════════════
       Column()
         .width('100%')
@@ -685,21 +686,21 @@ struct XinglanQuotesTabContent {
         .linearGradient({
           direction: GradientDirection.Bottom,
           colors: [
-            ['#030716', 0.0],
-            ['#030716', 0.08],
-            ['rgba(4, 8, 23, 0.88)', 0.12],
-            ['rgba(6, 10, 28, 0.50)', 0.22],
-            ['rgba(6, 10, 28, 0.15)', 0.40],
-            ['rgba(6, 10, 28, 0)', 0.58],
+            ['#060B1A', 0.0],
+            ['#060B1A', 0.08],
+            ['rgba(6, 11, 26, 0.88)', 0.12],
+            ['rgba(6, 11, 26, 0.50)', 0.22],
+            ['rgba(6, 11, 26, 0.15)', 0.40],
+            ['rgba(6, 11, 26, 0)', 0.58],
             ['rgba(15, 15, 35, 0)', 0.65],
             ['rgba(15, 15, 35, 0.78)', 0.87],
-            ['#030716', 1.0]
+            ['#060B1A', 1.0]
           ]
         })
         .hitTestBehavior(HitTestMode.Transparent)
 
       // ═══════════════════════════════════════════
-      // Layer 3: 主内容
+      // Layer 3: 主内容（B 月湖映心 Token）
       // ═══════════════════════════════════════════
       Column() {
         // 顶部安全区
@@ -707,42 +708,43 @@ struct XinglanQuotesTabContent {
           .width('100%')
           .height(Theme.SAFE_TOP + 16)
 
-        // 标题
+        // 标题 — B 方案暖金标题
         Text('星澜语录')
-          .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.GOLD_LIGHT)
+          .fontSize(Theme.V2B_FONT_TITLE)
+          .fontColor(Theme.V2B_GOLD_CORE)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
           .width('100%')
-          .margin({ top: Theme.SPACE_MD })
+          .margin({ top: Theme.V2_SPACE_MD })
 
         Text('星澜想对你说的话，都在这里。')
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2B_FONT_BODY)
+          .fontColor(Theme.V2B_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .width('100%')
-          .margin({ top: Theme.SPACE_SM, bottom: Theme.SPACE_LG })
+          .margin({ top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_LG })
 
-        // 语录滚动区
+        // 语录滚动区 — B 方案柔和气泡
         Scroll(this.scroller) {
           Column({ space: 12 }) {
             ForEach(this.quoteList, (quote: string, index: number) => {
-              // 星澜气泡 — 左侧排列，金色细边
+              // 星澜气泡 — 左侧排列，暖金细边
               Row() {
                 Image($r('app.media.app_icon5'))
                   .width(34)
                   .height(34)
                   .borderRadius(17)
-                  .border({ width: 1.5, color: 'rgba(232, 184, 61, 0.45)' })
+                  .border({ width: 1.5, color: 'rgba(212, 172, 77, 0.55)' })
+                  .shadow(Theme.V2_HALO_AVATAR_STANDARD)
                   .objectFit(ImageFit.Cover)
                   .margin({ right: 10 })
 
                 Text(quote)
                   .fontSize(16)
-                  .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                  .fontColor(Theme.V2B_TEXT_PRIMARY)
                   .lineHeight(24)
-                  .backgroundColor('rgba(27, 27, 48, 0.68)')
-                  .border({ width: 1, color: 'rgba(202, 138, 4, 0.15)' })
+                  .backgroundColor(Theme.V2B_BG_CARD)
+                  .border({ width: 1, color: Theme.V2B_BORDER })
                   .borderRadius({ topLeft: 4, topRight: 16, bottomLeft: 16, bottomRight: 16 })
                   .padding({ left: 14, right: 14, top: 12, bottom: 12 })
                   .constraintSize({ maxWidth: '64%' })
@@ -755,7 +757,7 @@ struct XinglanQuotesTabContent {
           }
           .width('100%')
           .alignItems(HorizontalAlign.Start)
-          .padding({ top: 28, bottom: 12, left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD })
+          .padding({ top: 28, bottom: 12, left: Theme.V2_SPACE_LG, right: Theme.V2_SPACE_LG })
         }
         .width('100%')
         .layoutWeight(1)
@@ -764,22 +766,21 @@ struct XinglanQuotesTabContent {
           this.addNextXinglanQuote();
         })
 
-        // 提示
+        // 提示 — B 方案水雾灰
         Text('轻触上方区域，星澜会回应你。')
           .fontSize(12)
-          .fontColor(Theme.MOON_MUTED)
-          .opacity(0.7)
+          .fontColor(Theme.V2B_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .width('100%')
           .padding({ bottom: 12 })
 
         Text(Constants.COMPLIANCE_FOOTER)
-          .fontSize(11)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2B_FONT_CAPTION)
+          .fontColor(Theme.V2B_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .lineHeight(16)
           .width('100%')
-          .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, bottom: 12 })
+          .padding({ left: Theme.V2_SPACE_MD, right: Theme.V2_SPACE_MD, bottom: 12 })
       }
       .width('100%')
       .height('100%')
@@ -1025,6 +1026,8 @@ struct SettingsTabContent {
   @State bgmEnabled: boolean = true;
   @State avatarUri: string = '';
   @State nickname: string = '未命名旅者';
+  @State showNicknameDialog: boolean = false;
+  private nicknameEditText: string = '';
   @State level: string = '初见';
   /** 头像操作面板可见 */
   @State showAvatarSheet: boolean = false;
@@ -1357,6 +1360,105 @@ struct SettingsTabContent {
   }
 
   /**
+   * 校验并保存昵称
+   */
+  private async handleSaveNickname(): Promise<void> {
+    const trimmed: string = this.nicknameEditText.trim();
+
+    // 空字符串视为恢复默认
+    if (trimmed.length === 0) {
+      await this.handleResetNickname();
+      return;
+    }
+
+    // 长度校验：按字符数（支持 emoji）
+    const nicknameLength: number = Array.from(trimmed).length;
+    if (nicknameLength > 12) {
+      try {
+        this.getUIContext().getPromptAction().showToast({
+          message: '昵称短一点，星澜会更好记住。',
+          duration: 2000
+        });
+      } catch (_err) {
+        // ignore
+      }
+      return;
+    }
+
+    // 不允许换行
+    if (trimmed.includes('\n') || trimmed.includes('\r')) {
+      try {
+        this.getUIContext().getPromptAction().showToast({
+          message: '昵称不能包含换行。',
+          duration: 2000
+        });
+      } catch (_err) {
+        // ignore
+      }
+      return;
+    }
+
+    // 不允许明显控制字符
+    const controlRegex: RegExp = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/;
+    if (controlRegex.test(trimmed)) {
+      try {
+        this.getUIContext().getPromptAction().showToast({
+          message: '昵称包含不支持的字符。',
+          duration: 2000
+        });
+      } catch (_err) {
+        // ignore
+      }
+      return;
+    }
+
+    try {
+      await UserProfileStore.setNickname(trimmed, getContext(this));
+      this.nickname = trimmed;
+      this.showNicknameDialog = false;
+      try {
+        this.getUIContext().getPromptAction().showToast({
+          message: '星澜记住这个称呼了。',
+          duration: 2000
+        });
+      } catch (_err) {
+        // ignore
+      }
+    } catch (_err) {
+      try {
+        this.getUIContext().getPromptAction().showToast({
+          message: '保存失败，请稍后再试。',
+          duration: 2000
+        });
+      } catch (_err2) {
+        // ignore
+      }
+    }
+  }
+
+  /**
+   * 恢复默认昵称
+   */
+  private async handleResetNickname(): Promise<void> {
+    try {
+      await UserProfileStore.clearNickname(getContext(this));
+      this.nickname = '未命名旅者';
+      this.nicknameEditText = '';
+      this.showNicknameDialog = false;
+      try {
+        this.getUIContext().getPromptAction().showToast({
+          message: '已恢复默认昵称。',
+          duration: 2000
+        });
+      } catch (_err) {
+        // ignore
+      }
+    } catch (_err) {
+      // keep current
+    }
+  }
+
+  /**
    * 打开系统图片选择器，选择头像图片
    */
   private async openPhotoPicker(): Promise<void> {
@@ -1479,12 +1581,25 @@ struct SettingsTabContent {
           .margin({ bottom: 14 })
           .onClick(() => { this.showAvatarSheet = true; })
 
-          // 昵称
-          Text(this.nickname)
-            .fontSize(Theme.FONT_SUBTITLE)
-            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
-            .fontWeight(FontWeight.Medium)
-            .margin({ bottom: 8 })
+          // 昵称 + 编辑按钮
+          Row() {
+            Text(this.nickname)
+              .fontSize(Theme.FONT_SUBTITLE)
+              .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+              .fontWeight(FontWeight.Medium)
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+            Text('✎')
+              .fontSize(15)
+              .fontColor('#A8A3B8')
+              .margin({ left: 8 })
+              .onClick(() => {
+                this.nicknameEditText = this.nickname;
+                this.showNicknameDialog = true;
+              })
+          }
+          .margin({ bottom: 8 })
 
           // 等级标签
           Text('星钥等级：' + this.level)
@@ -1722,6 +1837,31 @@ struct SettingsTabContent {
               .width('100%')
               .textAlign(TextAlign.Center)
           }
+
+          // ═══ 查看完整星历入口 ═══
+          Row() {
+            Text('查看完整星历')
+              .fontSize(13)
+              .fontColor('#E5A50A')
+              .fontWeight(FontWeight.Medium)
+
+            Text('›')
+              .fontSize(16)
+              .fontColor('#E5A50A')
+              .fontWeight(FontWeight.Lighter)
+              .margin({ left: 4 })
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.Center)
+          .padding({ top: 14, bottom: 4 })
+          .onClick(() => {
+            try {
+              const options: router.RouterOptions = { url: Routes.STAR_CALENDAR };
+              router.pushUrl(options);
+            } catch (_err) {
+              // 跳转失败静默
+            }
+          })
 
           // ═══ 本月星光记录 ═══
           if (this.visibleMonthRecords.length > 0) {
@@ -2225,6 +2365,102 @@ struct SettingsTabContent {
             .onClick(() => { this.closeDateDetail(); })
         }
         .width('82%')
+        .padding(24)
+        .backgroundColor(Theme.BG_CARD_DARK)
+        .borderRadius(Theme.RADIUS_LG)
+        .border({ width: 1, color: 'rgba(216, 180, 90, 0.18)' })
+        .shadow(Theme.SHADOW_CARD_FLOAT)
+        .position({ x: '50%', y: '50%' })
+        .translate({ x: '-50%', y: '-50%' })
+        .zIndex(200)
+      }
+
+      // ═══ 昵称编辑弹窗 ═══
+      if (this.showNicknameDialog) {
+        // 半透明遮罩
+        Column()
+          .width('100%')
+          .height('100%')
+          .backgroundColor('rgba(8, 11, 24, 0.65)')
+          .onClick(() => { this.showNicknameDialog = false; })
+          .zIndex(150)
+          .hitTestBehavior(HitTestMode.Block)
+
+        // 居中编辑卡片
+        Column() {
+          Text('给自己取一个星钥昵称')
+            .fontSize(18)
+            .fontColor('#E5D9B6')
+            .fontWeight(FontWeight.Bold)
+            .width('100%')
+            .textAlign(TextAlign.Center)
+            .margin({ bottom: 12 })
+
+          Text('这个昵称只保存在你的设备上，用来让星澜更自然地称呼你。')
+            .fontSize(13)
+            .fontColor('#94A3B8')
+            .lineHeight(20)
+            .width('100%')
+            .textAlign(TextAlign.Center)
+            .margin({ bottom: 20 })
+
+          TextInput({ placeholder: '比如：小月、阿澜、旅人、今晚的我', text: this.nicknameEditText })
+            .width('100%')
+            .height(48)
+            .fontSize(15)
+            .fontColor('#E5D9B6')
+            .placeholderColor('#5A5A7A')
+            .backgroundColor('rgba(255, 255, 255, 0.06)')
+            .borderRadius(10)
+            .border({ width: 1, color: 'rgba(212, 172, 77, 0.25)' })
+            .padding({ left: 14, right: 14 })
+            .maxLength(12)
+            .type(InputType.Normal)
+            .onChange((value: string) => {
+              this.nicknameEditText = value;
+            })
+            .margin({ bottom: 24 })
+
+          Row() {
+            Button('恢复默认')
+              .type(ButtonType.Normal)
+              .fontSize(14)
+              .fontColor('#94A3B8')
+              .backgroundColor('rgba(255, 255, 255, 0.04)')
+              .border({ width: 1, color: 'rgba(148, 163, 184, 0.25)' })
+              .borderRadius(Theme.RADIUS_FULL)
+              .height(42)
+              .layoutWeight(1)
+              .onClick(() => { this.handleResetNickname(); })
+
+            Blank().width(12)
+
+            Button('取消')
+              .type(ButtonType.Normal)
+              .fontSize(14)
+              .fontColor('#94A3B8')
+              .backgroundColor('rgba(255, 255, 255, 0.04)')
+              .border({ width: 1, color: 'rgba(148, 163, 184, 0.25)' })
+              .borderRadius(Theme.RADIUS_FULL)
+              .height(42)
+              .layoutWeight(1)
+              .onClick(() => { this.showNicknameDialog = false; })
+
+            Blank().width(12)
+
+            Button('保存')
+              .type(ButtonType.Normal)
+              .fontSize(14)
+              .fontColor('#1A1530')
+              .backgroundColor('#E8B83D')
+              .borderRadius(Theme.RADIUS_FULL)
+              .height(42)
+              .layoutWeight(1)
+              .onClick(() => { this.handleSaveNickname(); })
+          }
+          .width('100%')
+        }
+        .width('80%')
         .padding(24)
         .backgroundColor(Theme.BG_CARD_DARK)
         .borderRadius(Theme.RADIUS_LG)

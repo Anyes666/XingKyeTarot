@@ -37,6 +37,8 @@
     "pages/CardWheelModePage",
     "pages/CardWheelDrawPage",
     "pages/UsageGuidePage",
-    "pages/AvatarCropPage"
+    "pages/AvatarCropPage",
+    "pages/XinglanChatEntrancePage",
+    "pages/StarCalendarPage"
   ]
 }

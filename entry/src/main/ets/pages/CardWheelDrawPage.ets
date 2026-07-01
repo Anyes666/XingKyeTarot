@@ -716,9 +716,9 @@ struct CardWheelDrawPage {
         .linearGradient({
           direction: GradientDirection.Bottom,
           colors: [
-            [Theme.BG_DEEP_SPACE, 0.0],
-            [Theme.BG_DEEP_INDIGO, 0.55],
-            [Theme.BG_DEEP_INDIGO, 1.0]
+            ['#060B1A', 0.0],
+            ['#0A0D1A', 0.55],
+            ['#0A0D1A', 1.0]
           ]
         })
 
@@ -730,8 +730,8 @@ struct CardWheelDrawPage {
           center: ['50%', '45%'],
           radius: '55%',
           colors: [
-            ['rgba(229, 165, 10, 0.06)', 0.0],
-            ['rgba(229, 165, 10, 0.02)', 0.45],
+            ['rgba(197, 160, 80, 0.06)', 0.0],
+            ['rgba(197, 160, 80, 0.02)', 0.45],
             ['rgba(15, 15, 35, 0)', 1.0]
           ]
         })
@@ -750,20 +750,20 @@ struct CardWheelDrawPage {
 
         // 标题
         Text('转动牌轮')
-          .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.GOLD_LIGHT)
+          .fontSize(Theme.V2C_FONT_TITLE)
+          .fontColor(Theme.V2C_GOLD_GILT)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
           .width('100%')
-          .margin({ top: Theme.SPACE_MD })
+          .margin({ top: Theme.V2_SPACE_MD })
 
         // 副标题
         Text('左右滑动牌轮，停下后确认中间的牌。')
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .width('100%')
-          .margin({ top: Theme.SPACE_SM })
+          .margin({ top: Theme.V2_SPACE_SM })
 
         // 牌轮区域（占据弹性空间）
         Column() {
@@ -777,8 +777,8 @@ struct CardWheelDrawPage {
         Column() {
           // 进度文字（不显示牌名）
           Text(this.progressText)
-            .fontSize(Theme.FONT_SUBTITLE)
-            .fontColor(Theme.GOLD_PALE)
+            .fontSize(Theme.V2C_FONT_SUBTITLE)
+            .fontColor(Theme.V2C_GOLD_GILT_SOFT)
             .fontWeight(FontWeight.Medium)
             .textAlign(TextAlign.Center)
             .width('100%')
@@ -786,21 +786,21 @@ struct CardWheelDrawPage {
 
           // 引导提示（不显示牌名）
           Text(this.instructionText)
-            .fontSize(Theme.FONT_CAPTION)
-            .fontColor(Theme.MOON_MUTED)
+            .fontSize(Theme.V2C_FONT_CAPTION)
+            .fontColor(Theme.V2C_TEXT_SECONDARY)
             .textAlign(TextAlign.Center)
             .width('100%')
             .margin({ bottom: Theme.SPACE_MD })
 
           // 确认按钮
           Button(this.confirmText)
-            .fontSize(Theme.FONT_SUBTITLE)
-            .fontColor(Theme.BTN_DARK_TEXT)
+            .fontSize(Theme.V2C_FONT_BODY)
+            .fontColor(Theme.V2C_BG_BASE)
             .fontWeight(FontWeight.Medium)
             .width('72%')
             .height(Theme.BTN_HEIGHT)
-            .backgroundColor(Theme.GOLD_LIGHT)
-            .borderRadius(Theme.RADIUS_FULL)
+            .backgroundColor(Theme.V2C_GOLD_GILT)
+            .borderRadius(Theme.V2_RADIUS_FULL)
             .opacity(this.confirmBtnEnabled ? 1.0 : 0.5)
             .onClick(() => {
               this.confirmSelection();

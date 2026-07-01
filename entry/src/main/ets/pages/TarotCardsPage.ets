@@ -21,6 +21,40 @@ interface FilterOption {
 }
 
 /**
+ * 卡牌列表懒加载数据源（LazyForEach 性能优化）
+ */
+class TarotCardDataSource implements IDataSource {
+  private list: TarotCard[] = [];
+  private listeners: DataChangeListener[] = [];
+
+  totalCount(): number {
+    return this.list.length;
+  }
+
+  getData(index: number): TarotCard {
+    return this.list[index];
+  }
+
+  registerDataChangeListener(listener: DataChangeListener): void {
+    this.listeners.push(listener);
+  }
+
+  unregisterDataChangeListener(listener: DataChangeListener): void {
+    const pos: number = this.listeners.indexOf(listener);
+    if (pos >= 0) {
+      this.listeners.splice(pos, 1);
+    }
+  }
+
+  setData(data: TarotCard[]): void {
+    this.list = data;
+    for (let i: number = 0; i < this.listeners.length; i++) {
+      this.listeners[i].onDataReloaded();
+    }
+  }
+}
+
+/**
  * Phase 6.3：卡牌总览页
  * 展示 78 张塔罗牌列表，支持按组别筛选
  */
@@ -28,7 +62,7 @@ interface FilterOption {
 @Component
 struct TarotCardsPage {
   @State selectedFilter: string = 'all';
-  @State displayedCards: TarotCard[] = TAROT_CARDS;
+  private dataSource: TarotCardDataSource = new TarotCardDataSource();
 
   private filters: FilterOption[] = [
     { label: '全部', value: 'all' },
@@ -39,19 +73,24 @@ struct TarotCardsPage {
     { label: '星币', value: 'pentacles' }
   ];
 
+  aboutToAppear(): void {
+    this.dataSource.setData(TAROT_CARDS);
+  }
+
   private applyFilter(value: string): void {
     this.selectedFilter = value;
     if (value === 'all') {
-      this.displayedCards = TAROT_CARDS;
+      this.dataSource.setData(TAROT_CARDS);
     } else if (value === 'major') {
-      this.displayedCards = TAROT_CARDS.filter((card: TarotCard) => card.arcana === ArcanaType.MAJOR);
+      this.dataSource.setData(TAROT_CARDS.filter((card: TarotCard) => card.arcana === ArcanaType.MAJOR));
     } else {
-      this.displayedCards = TAROT_CARDS.filter((card: TarotCard) => {
+      const filtered: TarotCard[] = TAROT_CARDS.filter((card: TarotCard) => {
         if (card.suit === TarotSuit.NONE) {
           return false;
         }
         return card.suit === value;
       });
+      this.dataSource.setData(filtered);
     }
   }
 
@@ -85,19 +124,19 @@ struct TarotCardsPage {
 
   private getSuitColor(card: TarotCard): string {
     if (card.arcana === ArcanaType.MAJOR) {
-      return '#E8B83D';
+      return Theme.V2C_GOLD_GILT;
     }
     switch (card.suit) {
       case TarotSuit.WANDS:
-        return '#E8A838';
+        return Theme.V2C_CRISIS;
       case TarotSuit.CUPS:
-        return '#5EA8D7';
+        return Theme.V2B_GOLD_RIPPLE;
       case TarotSuit.SWORDS:
-        return '#8B7EC8';
+        return Theme.V2C_TEXT_SECONDARY;
       case TarotSuit.PENTACLES:
-        return '#6EB87A';
+        return Theme.V2C_GOLD_GILT_SOFT;
       default:
-        return '#94A3B8';
+        return Theme.V2C_TEXT_SECONDARY;
     }
   }
 
@@ -110,9 +149,9 @@ struct TarotCardsPage {
         .linearGradient({
           direction: GradientDirection.Bottom,
           colors: [
-            [Theme.BG_DEEP_SPACE, 0.0],
-            [Theme.BG_DEEP_INDIGO, 0.55],
-            [Theme.BG_DEEP_INDIGO, 1.0]
+            [Theme.V2C_BG_BASE, 0.0],
+            [Theme.V2C_BG_BASE, 0.55],
+            [Theme.V2C_BG_BASE, 1.0]
           ]
         })
 
@@ -128,8 +167,8 @@ struct TarotCardsPage {
 
         // 标题
         Text('卡牌总览')
-          .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.GOLD_LIGHT)
+          .fontSize(Theme.V2C_FONT_TITLE)
+          .fontColor(Theme.V2C_GOLD_GILT_SOFT)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
           .width('100%')
@@ -137,8 +176,8 @@ struct TarotCardsPage {
 
         // 副标题
         Text('78 张塔罗牌，不是答案，而是看见自己的不同方式。')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .width('100%')
           .margin({ top: Theme.SPACE_SM, bottom: Theme.SPACE_MD })
@@ -149,10 +188,10 @@ struct TarotCardsPage {
             ForEach(this.filters, (filter: FilterOption, index: number) => {
               Text(filter.label)
                 .fontSize(13)
-                .fontColor(this.selectedFilter === filter.value ? Theme.BG_DEEP_INDIGO : Theme.MOON_MUTED)
+                .fontColor(this.selectedFilter === filter.value ? Theme.V2C_BG_BASE : Theme.V2C_TEXT_SECONDARY)
                 .fontWeight(this.selectedFilter === filter.value ? FontWeight.Bold : FontWeight.Normal)
-                .backgroundColor(this.selectedFilter === filter.value ? '#E8B83D' : 'rgba(27, 27, 48, 0.68)')
-                .borderRadius(16)
+                .backgroundColor(this.selectedFilter === filter.value ? Theme.V2C_GOLD_GILT : 'rgba(18, 24, 54, 0.68)')
+                .borderRadius(Theme.V2C_RADIUS_CHIP)
                 .padding({ left: 14, right: 14, top: 6, bottom: 6 })
                 .margin({ right: 8 })
                 .onClick(() => {
@@ -171,39 +210,47 @@ struct TarotCardsPage {
         // 分隔线
         Divider()
           .strokeWidth(0.5)
-          .color(Theme.DEEP_STARRY)
+          .color(Theme.V2C_SPINE_LINE)
           .margin({ bottom: Theme.SPACE_SM })
 
-        // 卡牌列表
+        // 烫金书脊线分隔
+        Row()
+          .width('60%')
+          .height(1)
+          .backgroundColor(Theme.V2C_GOLD_GILT)
+          .opacity(0.15)
+          .margin({ bottom: Theme.SPACE_SM })
+
+        // 卡牌列表（LazyForEach 懒加载优化）
         Scroll() {
           List() {
-            ForEach(this.displayedCards, (card: TarotCard, index: number) => {
+            LazyForEach(this.dataSource, (card: TarotCard) => {
               ListItem() {
                 Row() {
                   // 编号
                   Text(this.formatIndex(card.index))
-                    .fontSize(12)
-                    .fontColor(Theme.GOLD_DIM)
+                    .fontSize(Theme.V2C_FONT_CARD_NUM)
+                    .fontColor(Theme.V2C_GOLD_GILT)
                     .width(36)
                     .textAlign(TextAlign.Center)
 
                   // 卡牌信息
                   Column() {
                     Text(card.nameZh)
-                      .fontSize(Theme.FONT_BODY)
-                      .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                      .fontSize(Theme.V2C_FONT_BODY)
+                      .fontColor(Theme.V2C_TEXT_PRIMARY)
                       .fontWeight(FontWeight.Medium)
 
                     Text(card.nameEn)
-                      .fontSize(11)
-                      .fontColor(Theme.MOON_MUTED)
+                      .fontSize(Theme.V2C_FONT_CAPTION)
+                      .fontColor(Theme.V2C_TEXT_SECONDARY)
                       .margin({ top: 2 })
 
                     // 关键词
                     Row() {
                       ForEach(card.keywords, (keyword: string, ki: number) => {
                         Text(keyword)
-                          .fontSize(10)
+                          .fontSize(Theme.V2C_FONT_DISCLAIMER)
                           .fontColor(this.getSuitColor(card))
                           .padding({ left: 6, right: 6, top: 2, bottom: 2 })
                           .margin({ right: 4, top: 4 })
@@ -216,25 +263,25 @@ struct TarotCardsPage {
 
                   // 所属类别
                   Text(this.getSuitLabel(card))
-                    .fontSize(10)
+                    .fontSize(Theme.V2C_FONT_DISCLAIMER)
                     .fontColor(this.getSuitColor(card))
                     .padding({ left: 8, right: 8, top: 4, bottom: 4 })
                     .border({ width: 0.5, color: this.getSuitColor(card), style: BorderStyle.Solid })
-                    .borderRadius(8)
+                    .borderRadius(Theme.V2C_RADIUS_CHIP)
                     .margin({ right: 4 })
 
                   // 箭头
                   Text('›')
-                    .fontSize(20)
-                    .fontColor(Theme.GOLD_DIM)
+                    .fontSize(Theme.V2C_FONT_SUBTITLE)
+                    .fontColor(Theme.V2C_GOLD_GILT)
                 }
                 .width('100%')
-                .padding({ left: Theme.STARKEY_CARD_PADDING_H, right: Theme.STARKEY_CARD_PADDING_H, top: Theme.SPACE_SM, bottom: Theme.SPACE_SM })
+                .padding({ left: Theme.V2_SPACE_MD_B, right: Theme.V2_SPACE_MD_B, top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_SM })
                 .alignItems(VerticalAlign.Center)
-                .backgroundColor(Theme.STARKEY_CARD_BG)
-                .borderRadius(Theme.STARKEY_CARD_RADIUS)
-                .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
-                .margin({ bottom: 6, left: Theme.SPACE_MD, right: Theme.SPACE_MD })
+                .backgroundColor(Theme.V2C_BG_CARD)
+                .borderRadius(Theme.V2C_RADIUS_CARD)
+                .border({ width: 1, color: Theme.V2C_SPINE_LINE })
+                .margin({ bottom: 6, left: Theme.V2_SPACE_MD, right: Theme.V2_SPACE_MD })
                 .onClick(() => {
                   this.navigateToDetail(card);
                 })
@@ -242,7 +289,7 @@ struct TarotCardsPage {
             }, (card: TarotCard) => card.id)
           }
           .width('100%')
-          .padding({ top: Theme.SPACE_SM, bottom: Theme.SPACE_LG })
+          .padding({ top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_LG })
           .listDirection(Axis.Vertical)
           .divider({ strokeWidth: 0 })
         }

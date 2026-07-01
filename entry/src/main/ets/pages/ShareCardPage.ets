@@ -165,7 +165,7 @@ struct ShareCardPage {
           LoadingProgress()
             .width(36)
             .height(36)
-            .color(Theme.GOLD_AMBER)
+            .color(Theme.V2C_GOLD_GILT)
         } else if (!this.record) {
           Text('记录不存在')
             .fontSize(Theme.FONT_BODY)
@@ -487,8 +487,8 @@ struct ShareCardPage {
       .width(180)
       .height(48)
       .borderRadius(24)
-      .backgroundColor(Theme.GOLD_MAIN)
-      .fontColor(Theme.BG_DEEP_INDIGO)
+      .backgroundColor(Theme.V2C_GOLD_GILT)
+      .fontColor(Theme.V2C_BG_BASE)
       .fontSize(18)
       .fontWeight(FontWeight.Bold)
       .enabled(!this.isSaving)
@@ -507,10 +507,10 @@ struct ShareCardPage {
         ForEach(cards, (cardRecord: DrawnCardRecord) => {
           Column() {
             Text(cardRecord.positionTitle)
-              .fontSize(Theme.FONT_CAPTION)
-              .fontColor(Theme.GOLD_AMBER)
+              .fontSize(Theme.V2C_FONT_CAPTION)
+              .fontColor(Theme.V2C_GOLD_GILT)
               .fontWeight(FontWeight.Bold)
-              .margin({ bottom: Theme.SPACE_XS })
+              .margin({ bottom: Theme.V2_SPACE_XS })
 
             TarotCardImage({
               cardId: cardRecord.cardId,
@@ -519,15 +519,15 @@ struct ShareCardPage {
             })
 
             Text(cardRecord.cardName)
-              .fontSize(Theme.FONT_CAPTION)
-              .fontColor(Theme.TEXT_PRIMARY_LIGHT)
-              .margin({ top: Theme.SPACE_XS })
+              .fontSize(Theme.V2C_FONT_CAPTION)
+              .fontColor(Theme.V2C_TEXT_PRIMARY)
+              .margin({ top: Theme.V2_SPACE_XS })
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
             Text(cardRecord.keyword)
               .fontSize(10)
-              .fontColor(Theme.MOON_MUTED)
+              .fontColor(Theme.V2C_TEXT_SECONDARY)
               .margin({ top: 2 })
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })

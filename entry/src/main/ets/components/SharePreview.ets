@@ -117,7 +117,7 @@ export struct SharePreview {
                 if (card.isReversed) {
                   Text('（逆位）')
                     .fontSize(20)
-                    .fontColor(Theme.DANGER_SOFT)
+                    .fontColor(Theme.V2C_GOLD_GILT_SOFT)
                     .margin({ left: 8 })
                 }
               }
@@ -148,9 +148,9 @@ export struct SharePreview {
             }
             .width('88%')
             .padding(20)
-            .backgroundColor(Theme.BG_CARD)
+            .backgroundColor(Theme.V2C_BG_FLOATING)
             .borderRadius(12)
-            .border({ width: 1, color: 'rgba(216, 180, 90, 0.15)' })
+            .border({ width: 1, color: Theme.V2C_SPINE_LINE })
             .margin({ bottom: 16 })
           }, (card: DrawnCard, index: number) => `interp_${index}`)
         }
@@ -171,13 +171,13 @@ export struct SharePreview {
 
         Text(Constants.COMPLIANCE_FOOTER)
           .fontSize(22)
-          .fontColor(Theme.TEXT_MUTED)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .opacity(0.7)
           .textAlign(TextAlign.Center)
 
         Text('— 星钥塔罗 —')
           .fontSize(18)
-          .fontColor(Theme.GOLD_DIM)
+          .fontColor(Theme.V2C_GOLD_GILT_SOFT)
           .opacity(0.5)
           .margin({ top: 8 })
       }
@@ -190,11 +190,11 @@ export struct SharePreview {
     .linearGradient({
       direction: GradientDirection.Bottom,
       colors: [
-        [Theme.BG_DEEP, 0.0],
-        [Theme.BG_PRIMARY, 0.4],
-        [Theme.BG_DEEP, 1.0]
+        [Theme.V2C_BG_BASE, 0.0],
+        [Theme.V2C_BG_CARD, 0.4],
+        [Theme.V2C_BG_BASE, 1.0]
       ]
     })
-    .border({ width: 1, color: 'rgba(216, 180, 90, 0.2)' })
+    .border({ width: 1, color: Theme.V2C_SPINE_LINE })
   }
 }

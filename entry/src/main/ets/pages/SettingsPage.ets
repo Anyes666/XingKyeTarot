@@ -1,9 +1,10 @@
 import { router } from '@kit.ArkUI';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { Theme } from '../common/Theme';
-import { Constants } from '../common/Constants';
 import { Routes } from '../common/Routes';
 import { AppBackButton } from '../components/AppBackButton';
+import { MoonlightLayer } from '../components/MoonlightLayer';
+import { ComplianceFooter } from '../components/ComplianceFooter';
 import { PreferenceStore } from '../data/PreferenceStore';
 import { ENABLE_XINGLAN_CHAT_MVP } from '../xinglan/data/XinglanTemplates';
 import { GlobalBgmManager } from '../common/GlobalBgmManager';
@@ -137,11 +138,14 @@ struct SettingsPage {
 
   build() {
     Stack() {
-      // 背景
+      // 背景（A方案星图档案底色 + B方案顶部月光光晕）
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .backgroundColor(Theme.V2A_BG_BASE)
+
+      // B方案月光呼吸层（引入公共组件，6s 无限循环呼吸动画）
+      MoonlightLayer({ strong: false })
 
       // 主内容
       Column() {
@@ -156,8 +160,8 @@ struct SettingsPage {
 
         // 标题
         Text('设置')
-          .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.GOLD_LIGHT)
+          .fontSize(Theme.V2A_FONT_TITLE)
+          .fontColor(Theme.V2A_GOLD_GLOW)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
           .width('100%')
@@ -166,20 +170,20 @@ struct SettingsPage {
         // 设置项卡片：重新听听星澜的介绍
         Column() {
           Text('重新听听星澜的介绍')
-            .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+            .fontSize(Theme.V2A_FONT_BODY)
+            .fontColor(Theme.V2A_TEXT_PRIMARY)
             .width('100%')
             .padding({ top: 16, bottom: 16, left: 20, right: 20 })
 
           Text('星澜会重新陪你走一遍首页的第一次介绍。')
             .fontSize(13)
-            .fontColor(Theme.MOON_MUTED)
+            .fontColor(Theme.V2A_TEXT_SECONDARY)
             .width('100%')
             .padding({ left: 20, right: 20, bottom: 16 })
         }
         .width('92%')
-        .backgroundColor('rgba(27, 27, 48, 0.68)')
-        .borderRadius(Theme.RADIUS_MD)
+        .backgroundColor(Theme.V2A_BG_CARD)
+        .borderRadius(Theme.V2A_RADIUS_BTN)
         .margin({ bottom: Theme.SPACE_MD })
         .onClick(() => { this.resetAllGuides(); })
 
@@ -188,20 +192,20 @@ struct SettingsPage {
           Row() {
             Column() {
               Text('背景音乐')
-                .fontSize(Theme.FONT_BODY)
-                .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                .fontSize(Theme.V2A_FONT_BODY)
+                .fontColor(Theme.V2A_TEXT_PRIMARY)
                 .width('100%')
 
               Text('开启后，星钥塔罗会播放一首低音量的全局主旋律。')
                 .fontSize(13)
-                .fontColor(Theme.MOON_MUTED)
+                .fontColor(Theme.V2A_TEXT_SECONDARY)
                 .width('100%')
                 .margin({ top: 4 })
             }
             .layoutWeight(1)
 
             Toggle({ type: ToggleType.Switch, isOn: this.bgmEnabled })
-              .selectedColor('#E8B83D')
+              .selectedColor(Theme.V2A_GOLD_ACCENT)
               .onChange((isOn: boolean) => {
                 this.toggleBgm(isOn);
               })
@@ -211,27 +215,27 @@ struct SettingsPage {
           .padding({ top: 16, bottom: 16, left: 20, right: 20 })
         }
         .width('92%')
-        .backgroundColor('rgba(27, 27, 48, 0.68)')
-        .borderRadius(Theme.RADIUS_MD)
+        .backgroundColor(Theme.V2A_BG_CARD)
+        .borderRadius(Theme.V2A_RADIUS_BTN)
         .margin({ bottom: Theme.SPACE_MD })
 
         // 使用说明
         Column() {
           Text('使用说明')
-            .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+            .fontSize(Theme.V2A_FONT_BODY)
+            .fontColor(Theme.V2A_TEXT_PRIMARY)
             .width('100%')
             .padding({ top: 16, bottom: 16, left: 20, right: 20 })
 
           Text('了解星钥塔罗每个板块的用法和设计初衷。')
             .fontSize(13)
-            .fontColor(Theme.MOON_MUTED)
+            .fontColor(Theme.V2A_TEXT_SECONDARY)
             .width('100%')
             .padding({ left: 20, right: 20, bottom: 16 })
         }
         .width('92%')
-        .backgroundColor('rgba(27, 27, 48, 0.68)')
-        .borderRadius(Theme.RADIUS_MD)
+        .backgroundColor(Theme.V2A_BG_CARD)
+        .borderRadius(Theme.V2A_RADIUS_BTN)
         .margin({ bottom: Theme.SPACE_MD })
         .onClick(() => {
           try {
@@ -246,24 +250,24 @@ struct SettingsPage {
         if (ENABLE_XINGLAN_CHAT_MVP) {
           Column() {
             Text('🌙 星澜聊天 · 测试入口')
-              .fontSize(Theme.FONT_BODY)
-              .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+              .fontSize(Theme.V2A_FONT_BODY)
+              .fontColor(Theme.V2A_TEXT_PRIMARY)
               .width('100%')
               .padding({ top: 16, bottom: 16, left: 20, right: 20 })
 
-            Text('进入星澜离线陪伴聊天。')
+            Text('进入星澜聊天入口页，再走进月光门廊。')
               .fontSize(13)
-              .fontColor(Theme.MOON_MUTED)
+              .fontColor(Theme.V2A_TEXT_SECONDARY)
               .width('100%')
               .padding({ left: 20, right: 20, bottom: 16 })
           }
           .width('92%')
-          .backgroundColor('rgba(27, 27, 48, 0.68)')
-          .borderRadius(Theme.RADIUS_MD)
+          .backgroundColor(Theme.V2A_BG_CARD)
+          .borderRadius(Theme.V2A_RADIUS_BTN)
           .margin({ bottom: Theme.SPACE_MD })
           .onClick(() => {
             try {
-              const options: router.RouterOptions = { url: Routes.XINGLAN_CHAT };
+              const options: router.RouterOptions = { url: Routes.XINGLAN_CHAT_ENTRANCE };
               router.pushUrl(options);
             } catch (_err) {
               // ignore
@@ -273,14 +277,12 @@ struct SettingsPage {
 
         Blank()
 
-        // 合规页脚
-        Text(Constants.COMPLIANCE_FOOTER)
-          .fontSize(11)
-          .fontColor(Theme.MOON_MUTED)
-          .textAlign(TextAlign.Center)
-          .lineHeight(16)
-          .width('100%')
-          .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, bottom: 24 })
+        // 合规页脚（引入公共组件）
+        ComplianceFooter({
+          fontSize: Theme.V2A_FONT_DISCLAIMER,
+          textColor: Theme.V2A_TEXT_SECONDARY,
+          showDivider: false,
+        })
       }
       .width('100%')
       .height('100%')

@@ -239,14 +239,14 @@ struct HistoryPage {
         Blank()
 
         Text('历史查询')
-          .fontSize(Theme.FONT_SUBTITLE)
-          .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+          .fontSize(Theme.V2A_FONT_TITLE)
+          .fontColor(Theme.V2A_TEXT_PRIMARY)
           .fontWeight(FontWeight.Bold)
 
         Blank()
 
         Text('清空')
-          .fontSize(Theme.FONT_CAPTION)
+          .fontSize(Theme.V2A_FONT_CAPTION)
           .fontColor('#E5998A')
           .opacity(this.records.length > 0 ? 1.0 : 0.35)
           .onClick(() => {
@@ -259,17 +259,17 @@ struct HistoryPage {
       .padding({ left: 14, right: Theme.SPACE_MD, top: Theme.SAFE_TOP, bottom: Theme.SPACE_SM })
 
       Text('回看最近的星钥记录，看看那些反复出现的心事。')
-        .fontSize(Theme.FONT_CAPTION)
-        .fontColor(Theme.MOON_MUTED)
-        .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: Theme.SPACE_MD })
+        .fontSize(Theme.V2A_FONT_CAPTION)
+        .fontColor(Theme.V2A_TEXT_SECONDARY)
+        .padding({ left: Theme.V2_SPACE_LG, right: Theme.V2_SPACE_LG, bottom: Theme.V2_SPACE_MD })
         .width('100%')
 
       // ── 阶段5：首次进入记录页引导（仅首次显示）──
       if (this.showFirstGuide) {
         Text(HISTORY_FIRST_GUIDE)
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.TEXT_SECONDARY)
-          .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: Theme.SPACE_SM })
+          .fontSize(Theme.V2A_FONT_CAPTION)
+          .fontColor(Theme.V2A_TEXT_SECONDARY)
+          .padding({ left: Theme.V2_SPACE_LG, right: Theme.V2_SPACE_LG, bottom: Theme.V2_SPACE_SM })
           .width('100%')
       }
 
@@ -280,15 +280,15 @@ struct HistoryPage {
         Row({ space: Theme.SPACE_SM }) {
           ForEach(this.filterOptions, (opt: string) => {
             Text(opt)
-              .fontSize(Theme.FONT_BODY)
-              .fontColor(this.filterType === opt ? Theme.BG_DEEP_INDIGO : Theme.GOLD_AMBER)
+              .fontSize(Theme.V2A_FONT_BODY)
+              .fontColor(this.filterType === opt ? Color.White : Theme.V2A_GOLD_ACCENT)
               .fontWeight(FontWeight.Medium)
               .height(38)
               .padding({ left: 18, right: 18, top: 0, bottom: 0 })
               .textAlign(TextAlign.Center)
-              .backgroundColor(this.filterType === opt ? Theme.GOLD_AMBER : Theme.BG_CARD_DARK)
-              .borderRadius(Theme.RADIUS_FULL)
-              .border({ width: 1, color: this.filterType === opt ? Theme.GOLD_AMBER : 'rgba(202, 138, 4, 0.25)' })
+              .backgroundColor(this.filterType === opt ? Theme.V2A_GOLD_ACCENT : Theme.V2A_BG_CARD)
+              .borderRadius(Theme.V2A_RADIUS_CHIP)
+              .border({ width: 1, color: this.filterType === opt ? Theme.V2A_GOLD_ACCENT : Theme.V2A_ORBIT_LINE })
               .onClick(() => {
                 this.filterType = opt;
               })
@@ -307,7 +307,7 @@ struct HistoryPage {
           LoadingProgress()
             .width(36)
             .height(36)
-            .color(Theme.GOLD_AMBER)
+            .color(Theme.V2A_GOLD_ACCENT)
             .margin({ top: 80 })
         }
         .width('100%')
@@ -334,7 +334,7 @@ struct HistoryPage {
     .width('100%')
     .height('100%')
     .padding({ top: 0, bottom: Theme.SAFE_BOTTOM })
-    .background(Theme.BG_DEEP_INDIGO)
+    .background(Theme.V2A_BG_BASE)
 
       // 顶部渐变遮罩（消除状态栏硬边）
       Column()
@@ -342,7 +342,7 @@ struct HistoryPage {
         .height(Theme.SAFE_TOP + 64)
         .linearGradient({
           direction: GradientDirection.Bottom,
-          colors: [['#0A0E1C', 0], ['rgba(15,15,35,0)', 1]]
+          colors: [['#080B18', 0], ['rgba(15,15,35,0)', 1]]
         })
         .hitTestBehavior(HitTestMode.Transparent)
         .position({ x: 0, y: 0 })
@@ -360,27 +360,27 @@ struct HistoryPage {
       // 小星钥图标（居中装饰）
       Text('☽')
         .fontSize(48)
-        .fontColor(Theme.GOLD_PALE)
+        .fontColor(Theme.V2A_GOLD_GLOW)
         .opacity(0.35)
 
       Text('还没有占卜记录')
-        .fontSize(Theme.FONT_BODY)
-        .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+        .fontSize(Theme.V2A_FONT_BODY)
+        .fontColor(Theme.V2A_TEXT_PRIMARY)
         .fontWeight(FontWeight.Medium)
 
       Text('还没有记录。等你愿意的时候，再从一张星钥开始。')
-        .fontSize(Theme.FONT_CAPTION)
-        .fontColor(Theme.MOON_MUTED)
+        .fontSize(Theme.V2A_FONT_CAPTION)
+        .fontColor(Theme.V2A_TEXT_SECONDARY)
         .textAlign(TextAlign.Center)
         .maxLines(2)
 
       Button(this.getEmptyActionText())
         .type(ButtonType.Normal)
-        .fontSize(Theme.FONT_BODY)
+        .fontSize(Theme.V2A_FONT_BODY)
         .fontColor(Color.White)
         .fontWeight(FontWeight.Medium)
-        .backgroundColor(Theme.GOLD_AMBER)
-        .borderRadius(Theme.RADIUS_FULL)
+        .backgroundColor(Theme.V2A_GOLD_ACCENT)
+        .borderRadius(Theme.V2_RADIUS_FULL)
         .padding({ left: 28, right: 28, top: 10, bottom: 10 })
         .margin({ top: Theme.SPACE_SM })
         .onClick(() => {
@@ -400,22 +400,22 @@ struct HistoryPage {
         Column() {
           // 记录类型
           Text(record.modeTitle)
-            .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.GOLD_AMBER)
+            .fontSize(Theme.V2A_FONT_BODY)
+            .fontColor(Theme.V2A_GOLD_ACCENT)
             .fontWeight(FontWeight.Bold)
             .margin({ bottom: 4 })
 
           // 时间
           Text(this.formatDate(record.timestamp))
-            .fontSize(Theme.FONT_CAPTION)
-            .fontColor(Theme.MOON_MUTED)
+            .fontSize(Theme.V2A_FONT_CAPTION)
+            .fontColor(Theme.V2A_TEXT_SECONDARY)
             .margin({ bottom: 4 })
 
           // 牌名摘要
           if (this.getCardSummary(record).length > 0) {
             Text(this.getCardSummary(record))
-              .fontSize(Theme.FONT_CAPTION)
-              .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+              .fontSize(Theme.V2A_FONT_CAPTION)
+              .fontColor(Theme.V2A_TEXT_PRIMARY)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
               .margin({ bottom: 4 })
@@ -424,8 +424,8 @@ struct HistoryPage {
           // 问题摘要
           if (record.questionText && record.questionText.length > 0) {
             Text(record.questionText)
-              .fontSize(Theme.FONT_CAPTION)
-              .fontColor(Theme.MOON_MUTED)
+              .fontSize(Theme.V2A_FONT_CAPTION)
+              .fontColor(Theme.V2A_TEXT_SECONDARY)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
           }
@@ -436,7 +436,7 @@ struct HistoryPage {
         // 右箭头
         Text('›')
           .fontSize(24)
-          .fontColor(Theme.MOON_MUTED)
+          .fontColor(Theme.V2A_TEXT_SECONDARY)
           .opacity(0.4)
           .margin({ left: Theme.SPACE_SM })
 
@@ -456,10 +456,10 @@ struct HistoryPage {
       .padding({ top: 18, bottom: 18, left: 20, right: 20 })
     }
     .width('100%')
-    .backgroundColor(Theme.STARKEY_CARD_BG)
-    .borderRadius(Theme.STARKEY_CARD_RADIUS)
-    .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
-    .shadow(Theme.SHADOW_CARD_SUBTLE)
+    .backgroundColor(Theme.V2A_BG_CARD)
+    .borderRadius(Theme.V2A_RADIUS_CARD)
+    .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+    .shadow(Theme.V2A_SHADOW_CARD)
     .onClick(() => {
       const detailParams: HistoryDetailRouteParams = {
         recordId: record.id,

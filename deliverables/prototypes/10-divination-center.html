@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<!--
+  星钥塔罗 · 占卜中心
+  设计系统：C 方案「星钥之书」为主 + B「月湖映心」月光氛围（顶部）
+  基准尺寸：390×844 (iPhone 14 / HarmonyOS 主流机型)
+  原型构建师：筑原型（Zhu）
+
+  ▸ 设计意图：陪伴式自我整理——把五种占卜方式收进一级入口，像翻开一本旧书的目录
+  ▸ 铁律执行：
+    1. 去 emoji：源码 ◇△◎☰ 等几何符号保留（非 emoji），符合旧书质感
+    2. 去算命感：标题"占卜"而非"占卜算命"，副标题用"轻轻照见"
+    3. 去博彩感：烫金仅用于细线符号+箭头，覆盖率 < 3%
+    4. 陪伴式：按钮文案"轻轻照见此刻的心事"
+    5. 合规免责：底部 footer
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>占卜中心 · 星钥塔罗</title>
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       C 方案 + B 月光氛围 设计令牌（与 04-card-result.html 完全一致）
+       ═══════════════════════════════════════════════════════════════ */
+    :root {
+      /* ── C 方案色彩 ── */
+      --bg-base-C: #0A0D1A;
+      --bg-card-C: #121836;
+      --bg-floating-C: #181F40;
+      --bg-hover-C: #1C2450;
+      --text-primary-C: #EBE3CD;
+      --text-secondary-C: #8B869B;
+      --text-tertiary-C: #5C5870;
+      --gold-gilt-C: #C5A050;
+      --gold-gilt-soft-C: #E0CD95;
+      --spine-line-C: #1D2342;
+      --crisis-C: #C8826A;
+
+      /* ── B 方案月光光晕色 ── */
+      --moonlight-glow-page: radial-gradient(ellipse 300px 200px at 50% 8%, rgba(212,172,77,0.04) 0%, transparent 70%);
+
+      /* ── C 方案烫金线色 ── */
+      --gilt-line-top: rgba(197,160,80,0.4);
+      --spine-center-C: rgba(197,160,80,0.15);
+
+      /* ── 字体栈 ── */
+      --font-sans: "HarmonyOS Sans", "Source Sans 3", "Inter", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      --font-serif: "HarmonyOS Serif", "Source Serif 4", "Noto Serif SC", Georgia, serif;
+      --font-mono: "HarmonyOS Sans Mono", "JetBrains Mono", "Consolas", monospace;
+
+      /* ── 排版 ── */
+      --text-card-name-C: 32px;
+      --text-title-C: 28px;
+      --text-subtitle-C: 20px;
+      --text-body-C: 15px;
+      --text-lead-C: 20px;
+      --text-caption-C: 13px;
+      --text-disclaimer-C: 11px;
+
+      /* ── 间距 ── */
+      --space-2xs: 4px;
+      --space-xs: 8px;
+      --space-sm: 12px;
+      --space-md: 16px;
+      --space-md-b: 20px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+
+      /* ── 圆角 ── */
+      --radius-btn-C: 8px;
+      --radius-card-C: 12px;
+      --radius-sm-C: 8px;
+      --radius-full: 9999px;
+
+      /* ── 阴影 ── */
+      --shadow-card-c: 0 2px 16px rgba(0,0,0,0.35);
+
+      /* ── 缓动函数 ── */
+      --ease-out: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.6, 1);
+      --ease-overshoot: cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+
+    /* ═══ 全局重置 ═══ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 390px; height: 844px; overflow: hidden;
+      font-family: var(--font-sans);
+      background-color: var(--bg-base-C);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ═══ 主容器 ═══ */
+    .page {
+      position: relative;
+      width: 390px; height: 844px;
+      background-color: var(--bg-base-C);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      animation: pageEnter 300ms var(--ease-out) both;
+    }
+    @keyframes pageEnter {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══ B 方案月光光晕 ═══ */
+    .moonlight-top {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 200px;
+      background: var(--moonlight-glow-page);
+      animation: moonlightBreath 6s var(--ease-in-out) infinite;
+      pointer-events: none; z-index: 0;
+    }
+    @keyframes moonlightBreath {
+      0%, 100% { opacity: 0.6; }
+      50%      { opacity: 1.0; }
+    }
+
+    /* ═══ 顶部导航栏 ═══ */
+    .nav-bar {
+      position: relative; z-index: 10;
+      height: 56px;
+      display: flex; align-items: center;
+      padding: 8px var(--space-md) 0 var(--space-md);
+      flex-shrink: 0;
+    }
+    .nav-back {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border: none; background: none; padding: 0;
+      flex-shrink: 0;
+    }
+    .nav-back svg { width: 20px; height: 20px; }
+    .nav-spacer { flex: 1; }
+
+    /* ═══ 可滚动内容区 ═══ */
+    .scroll-area {
+      position: relative; z-index: 5;
+      flex: 1; overflow-y: auto;
+      padding: var(--space-sm) var(--space-lg) var(--space-lg) var(--space-lg);
+    }
+    .scroll-area::-webkit-scrollbar { display: none; }
+    .scroll-area { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* ═══ 页面标题区 ═══ */
+    .page-title-area {
+      text-align: center;
+      margin-bottom: var(--space-lg);
+      animation: fadeIn 500ms var(--ease-out) 100ms both;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .page-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-title-C);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+      color: var(--gold-gilt-C);
+      margin-bottom: var(--space-sm);
+    }
+    .page-subtitle {
+      font-size: var(--text-body-C);
+      font-weight: 400;
+      line-height: 1.6;
+      color: var(--text-secondary-C);
+    }
+
+    /* ═══ 功能入口卡片 ═══ */
+    .entry-list {
+      display: flex; flex-direction: column;
+      gap: var(--space-sm);
+    }
+    .entry-card {
+      display: flex; align-items: center;
+      width: 100%;
+      padding: var(--space-md-b) var(--space-lg);
+      background-color: var(--bg-card-C);
+      border: 1px solid var(--spine-line-C);
+      border-radius: var(--radius-card-C);
+      box-shadow: var(--shadow-card-c);
+      cursor: pointer;
+      transition: transform 200ms var(--ease-out),
+                  background-color 200ms var(--ease-out),
+                  border-color 200ms var(--ease-out);
+      animation: cardSlideIn 400ms var(--ease-out) both;
+    }
+    .entry-card:nth-child(1) { animation-delay: 150ms; }
+    .entry-card:nth-child(2) { animation-delay: 220ms; }
+    .entry-card:nth-child(3) { animation-delay: 290ms; }
+    .entry-card:nth-child(4) { animation-delay: 360ms; }
+    .entry-card:nth-child(5) { animation-delay: 430ms; }
+
+    @keyframes cardSlideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .entry-card:active {
+      transform: scale(0.97);
+      background-color: var(--bg-hover-C);
+      border-color: rgba(197,160,80,0.2);
+    }
+
+    .entry-icon {
+      width: 56px; height: 56px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-family: var(--font-serif);
+      font-size: 28px;
+      color: var(--gold-gilt-C);
+      line-height: 1;
+    }
+
+    .entry-text {
+      flex: 1;
+      margin-left: var(--space-sm);
+    }
+    .entry-title {
+      font-family: var(--font-sans);
+      font-size: var(--text-subtitle-C);
+      font-weight: 500;
+      color: var(--text-primary-C);
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+    .entry-subtitle {
+      font-size: var(--text-caption-C);
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--text-secondary-C);
+    }
+
+    .entry-arrow {
+      flex-shrink: 0;
+      margin-left: var(--space-sm);
+      font-family: var(--font-serif);
+      font-size: 24px;
+      color: var(--gold-gilt-C);
+      line-height: 1;
+    }
+
+    /* ═══ 底部合规 footer ═══ */
+    .compliance-footer {
+      text-align: center;
+      padding: var(--space-lg) var(--space-md) var(--space-lg);
+      margin-top: var(--space-md);
+    }
+    .compliance-footer p {
+      font-size: var(--text-disclaimer-C);
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--text-tertiary-C);
+    }
+
+    /* ═══ 降级：prefers-reduced-motion ═══ */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+      .moonlight-top { opacity: 0.8; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- B 方案月光光晕 -->
+    <div class="moonlight-top"></div>
+
+    <!-- ═══ 顶部导航栏 ═══ -->
+    <nav class="nav-bar">
+      <button class="nav-back" type="button" aria-label="返回">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 4 L6 10 L12 16" stroke="#EBE3CD" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="nav-spacer"></div>
+    </nav>
+
+    <!-- ═══ 可滚动内容区 ═══ -->
+    <main class="scroll-area">
+
+      <!-- 页面标题 -->
+      <div class="page-title-area">
+        <h1 class="page-title">占卜</h1>
+        <p class="page-subtitle">用一张牌、一组牌阵，轻轻照见此刻的心事。</p>
+      </div>
+
+      <!-- 功能入口卡片列表 -->
+      <div class="entry-list">
+
+        <!-- 每日一占 -->
+        <div class="entry-card" role="button" tabindex="0">
+          <div class="entry-icon">◇</div>
+          <div class="entry-text">
+            <div class="entry-title">每日一占</div>
+            <div class="entry-subtitle">一句心事，一张星钥。</div>
+          </div>
+          <div class="entry-arrow">›</div>
+        </div>
+
+        <!-- 圣三角牌阵 -->
+        <div class="entry-card" role="button" tabindex="0">
+          <div class="entry-icon">△</div>
+          <div class="entry-text">
+            <div class="entry-title">圣三角牌阵</div>
+            <div class="entry-subtitle">过去、现在、可能的方向。</div>
+          </div>
+          <div class="entry-arrow">›</div>
+        </div>
+
+        <!-- 关系探索 -->
+        <div class="entry-card" role="button" tabindex="0">
+          <div class="entry-icon">◎</div>
+          <div class="entry-text">
+            <div class="entry-title">关系探索</div>
+            <div class="entry-subtitle">不替你判断谁对谁错，只陪你看清感受。</div>
+          </div>
+          <div class="entry-arrow">›</div>
+        </div>
+
+        <!-- 旋转牌轮 -->
+        <div class="entry-card" role="button" tabindex="0">
+          <div class="entry-icon">◯</div>
+          <div class="entry-text">
+            <div class="entry-title">旋转牌轮</div>
+            <div class="entry-subtitle">亲手转动牌轮，选择此刻靠近你的牌。</div>
+          </div>
+          <div class="entry-arrow">›</div>
+        </div>
+
+        <!-- 历史查看 -->
+        <div class="entry-card" role="button" tabindex="0">
+          <div class="entry-icon">☰</div>
+          <div class="entry-text">
+            <div class="entry-title">历史查看</div>
+            <div class="entry-subtitle">回看曾经抽到的星钥和那时的自己。</div>
+          </div>
+          <div class="entry-arrow">›</div>
+        </div>
+
+      </div>
+
+      <!-- 底部合规 footer -->
+      <div class="compliance-footer">
+        <p>星澜的回应仅供陪伴与自我探索参考，不构成任何专业建议。</p>
+      </div>
+
+    </main>
+
+  </div>
+</body>
+</html>

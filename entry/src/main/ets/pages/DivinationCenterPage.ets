@@ -1,9 +1,8 @@
 import { router } from '@kit.ArkUI';
 import { Theme } from '../common/Theme';
-import { Constants } from '../common/Constants';
 import { Routes } from '../common/Routes';
+import { ComplianceFooter } from '../components/ComplianceFooter';
 import { AppBackButton } from '../components/AppBackButton';
-import { Animator } from '@kit.ArkUI';
 
 /**
  * AskHeart 页面路由参数
@@ -30,6 +29,19 @@ interface DivinationEntry {
 @Component
 struct DivinationCenterPage {
   @State private pressedIndex: number = -1;
+  // ── B 方案月光呼吸动画状态 ──
+  @State private moonlightOpacity: number = 0.6;
+
+  aboutToAppear(): void {
+    // B 方案月光呼吸动画（6s 无限循环）
+    animateTo({
+      duration: Theme.V2_ANIM_MOONLIGHT_BREATH,
+      iterations: -1,
+      curve: Curve.EaseInOut
+    }, () => {
+      this.moonlightOpacity = 1.0;
+    });
+  }
 
   private buildEntries(): DivinationEntry[] {
     const entries: DivinationEntry[] = [
@@ -112,9 +124,9 @@ struct DivinationCenterPage {
         .linearGradient({
           direction: GradientDirection.Bottom,
           colors: [
-            [Theme.BG_DEEP_SPACE, 0.0],
-            [Theme.BG_DEEP_INDIGO, 0.55],
-            [Theme.BG_DEEP_INDIGO, 1.0]
+            [Theme.V2C_BG_BASE, 0.0],
+            [Theme.V2C_BG_BASE, 0.55],
+            [Theme.V2C_BG_BASE, 1.0]
           ]
         })
 
@@ -125,7 +137,7 @@ struct DivinationCenterPage {
         .linearGradient({
           direction: GradientDirection.Bottom,
           colors: [
-            [Theme.BG_DEEP_SPACE, 0.0],
+            [Theme.V2C_BG_BASE, 0.0],
             ['rgba(15, 15, 35, 0)', 1.0]
           ]
         })
@@ -140,12 +152,28 @@ struct DivinationCenterPage {
           center: ['50%', '85%'],
           radius: '60%',
           colors: [
-            ['rgba(202, 138, 4, 0.04)', 0.0],
-            ['rgba(202, 138, 4, 0.02)', 0.45],
+            ['rgba(197, 160, 80, 0.04)', 0.0],
+            ['rgba(197, 160, 80, 0.02)', 0.45],
             ['rgba(0, 0, 0, 0)', 1.0]
           ]
         })
         .hitTestBehavior(HitTestMode.Transparent)
+
+      // ── B 方案月光呼吸光晕层（顶部 6s 循环）──
+      Column()
+        .width('100%')
+        .height(220)
+        .radialGradient({
+          center: ['50%', '20%'],
+          radius: '55%',
+          colors: [
+            ['rgba(212,172,77,0.04)', 0.0],
+            ['rgba(212,172,77,0.01)', 0.6],
+            ['rgba(10,13,26,0)', 1.0]
+          ]
+        })
+        .opacity(this.moonlightOpacity)
+        .hitTestBehavior(HitTestMode.None)
 
       // 主内容
       Column() {
@@ -160,8 +188,8 @@ struct DivinationCenterPage {
 
         // 标题
         Text('占卜')
-          .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.GOLD_LIGHT)
+          .fontSize(Theme.V2C_FONT_TITLE)
+          .fontColor(Theme.V2C_GOLD_GILT_SOFT)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
           .width('100%')
@@ -169,8 +197,8 @@ struct DivinationCenterPage {
 
         // 副标题
         Text('用一张牌、一组牌阵，轻轻照见此刻的心事。')
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .width('100%')
           .margin({ top: Theme.SPACE_SM, bottom: Theme.SPACE_LG })
@@ -183,20 +211,20 @@ struct DivinationCenterPage {
                 // 图标
                 Text(entry.icon)
                   .fontSize(28)
-                  .fontColor('#E8B83D')
+                  .fontColor(Theme.V2C_GOLD_GILT)
                   .width(56)
                   .textAlign(TextAlign.Center)
 
                 // 文字
                 Column() {
                   Text(entry.title)
-                    .fontSize(Theme.FONT_SUBTITLE)
-                    .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                    .fontSize(Theme.V2C_FONT_SUBTITLE)
+                    .fontColor(Theme.V2C_TEXT_PRIMARY)
                     .fontWeight(FontWeight.Medium)
 
                   Text(entry.subtitle)
-                    .fontSize(Theme.FONT_CAPTION)
-                    .fontColor(Theme.MOON_MUTED)
+                    .fontSize(Theme.V2C_FONT_CAPTION)
+                    .fontColor(Theme.V2C_TEXT_SECONDARY)
                     .margin({ top: 4 })
                     .lineHeight(18)
                 }
@@ -207,15 +235,15 @@ struct DivinationCenterPage {
                 // 箭头
                 Text('›')
                   .fontSize(24)
-                  .fontColor(Theme.GOLD_DIM)
+                  .fontColor(Theme.V2C_GOLD_GILT)
               }
               .width('92%')
               .padding({ left: Theme.STARKEY_CARD_PADDING_H, right: Theme.STARKEY_CARD_PADDING_H, top: Theme.STARKEY_CARD_PADDING_V, bottom: Theme.STARKEY_CARD_PADDING_V })
               .margin({ bottom: Theme.SPACE_SM })
-              .backgroundColor(Theme.STARKEY_CARD_BG)
-              .borderRadius(Theme.STARKEY_CARD_RADIUS)
-              .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
-              .shadow(Theme.SHADOW_CARD_FLOAT)
+              .backgroundColor(Theme.V2C_BG_CARD)
+              .borderRadius(Theme.V2C_RADIUS_CARD)
+              .border({ width: 1, color: Theme.V2C_SPINE_LINE })
+              .shadow(Theme.V2C_SHADOW_CARD)
               .scale({
                 x: this.pressedIndex === index ? Theme.PRESS_SCALE : 1.0,
                 y: this.pressedIndex === index ? Theme.PRESS_SCALE : 1.0
@@ -244,14 +272,12 @@ struct DivinationCenterPage {
         .layoutWeight(1)
         .scrollBar(BarState.Off)
 
-        // 底部合规
-        Text(Constants.COMPLIANCE_FOOTER)
-          .fontSize(11)
-          .fontColor(Theme.MOON_MUTED)
-          .textAlign(TextAlign.Center)
-          .lineHeight(16)
-          .width('100%')
-          .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, bottom: 24 })
+        // 底部合规页脚
+        ComplianceFooter({
+          fontSize: Theme.V2C_FONT_CAPTION,
+          textColor: Theme.V2C_TEXT_SECONDARY,
+          showDivider: false,
+        })
       }
       .width('100%')
       .height('100%')

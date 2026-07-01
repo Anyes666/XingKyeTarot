@@ -46,6 +46,8 @@ struct AskHeartPage {
   @State private showFirstGuide: boolean = false;
   // 积极方向模式：false=原6选项（接住模式），true=新6选项（看见光模式）
   @State private isPositiveMode: boolean = false;
+  // ── 按压态索引（C 方案按压动画 scale(0.97)）──
+  @State private pressedIndex: number = -1;
 
   aboutToAppear(): void {
     this.prepareFirstGuide();
@@ -122,15 +124,15 @@ struct AskHeartPage {
       // ── 标题区 ──
       Column() {
         Text(this.getTitle())
-          .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+          .fontSize(Theme.V2C_FONT_TITLE)
+          .fontColor(Theme.V2C_TEXT_PRIMARY)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
           .width('100%')
 
         Text(this.getSubtitle())
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .width('100%')
           .margin({ top: Theme.SPACE_SM })
@@ -141,8 +143,8 @@ struct AskHeartPage {
       // ── 阶段3A：首次进入单牌入口页引导（仅首次显示）──
       if (this.showFirstGuide) {
         Text(SINGLE_FIRST_GUIDE)
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.TEXT_SECONDARY)
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .width('100%')
           .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: Theme.SPACE_SM })
@@ -174,13 +176,13 @@ struct AskHeartPage {
 
       // ── 确认按钮 ──
       Button(this.getButtonText())
-        .fontSize(Theme.FONT_SUBTITLE)
+        .fontSize(Theme.V2C_FONT_SUBTITLE)
         .fontColor(Color.White)
         .fontWeight(FontWeight.Medium)
         .width('85%')
         .height(52)
-        .backgroundColor(this.selectedIndex >= 0 ? Theme.GOLD_AMBER : Theme.DEEP_STARRY)
-        .borderRadius(Theme.RADIUS_FULL)
+        .backgroundColor(this.selectedIndex >= 0 ? Theme.V2C_GOLD_GILT : Theme.V2C_SPINE_LINE)
+        .borderRadius(Theme.V2C_RADIUS_BTN)
         .enabled(this.selectedIndex >= 0 && !this.isTransitioning)
         .opacity(this.selectedIndex >= 0 ? 1.0 : 0.4)
         .margin({ bottom: Theme.SPACE_SM })
@@ -193,7 +195,7 @@ struct AskHeartPage {
         Button('暂时跳过，先逛首页')
           .type(ButtonType.Normal)
           .fontSize(14)
-          .fontColor('#94A3B8')
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .backgroundColor(Color.Transparent)
           .width('auto')
           .height(40)
@@ -204,11 +206,11 @@ struct AskHeartPage {
       }
 
       // ── 合规页脚 ──
-      ComplianceFooter({ fontSize: Theme.FONT_CAPTION, textColor: Theme.MOON_MUTED, showDivider: false })
+      ComplianceFooter({ fontSize: Theme.V2C_FONT_CAPTION, textColor: Theme.V2C_TEXT_SECONDARY, showDivider: false })
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(Theme.BG_DEEP_INDIGO)
+    .backgroundColor(Theme.V2C_BG_BASE)
     .padding({ top: 0, bottom: Theme.SAFE_BOTTOM })
 
       // 顶部渐变遮罩（消除状态栏硬边）
@@ -217,7 +219,7 @@ struct AskHeartPage {
         .height(Theme.SAFE_TOP + 64)
         .linearGradient({
           direction: GradientDirection.Bottom,
-          colors: [['#0A0E1C', 0], ['rgba(15,15,35,0)', 1]]
+          colors: [[Theme.V2C_BG_BASE, 0], ['rgba(15,15,35,0)', 1]]
         })
         .hitTestBehavior(HitTestMode.Transparent)
         .position({ x: 0, y: 0 })
@@ -234,13 +236,13 @@ struct AskHeartPage {
     Row() {
       Button('今天我想被接住')
         .fontSize(13)
-        .fontColor(this.isPositiveMode ? Theme.MOON_MUTED : Color.White)
+        .fontColor(this.isPositiveMode ? Theme.V2C_TEXT_SECONDARY : Color.White)
         .fontWeight(this.isPositiveMode ? FontWeight.Normal : FontWeight.Bold)
-        .backgroundColor(this.isPositiveMode ? Color.Transparent : Theme.GOLD_AMBER)
-        .borderRadius(Theme.RADIUS_FULL)
+        .backgroundColor(this.isPositiveMode ? Color.Transparent : Theme.V2C_GOLD_GILT)
+        .borderRadius(Theme.V2C_RADIUS_BTN)
         .height(36)
         .padding({ left: 16, right: 16 })
-        .border({ width: 1, color: this.isPositiveMode ? 'rgba(148,163,184,0.3)' : Theme.GOLD_AMBER })
+        .border({ width: 1, color: this.isPositiveMode ? Theme.V2C_SPINE_LINE : Theme.V2C_GOLD_GILT })
         .onClick(() => {
           this.isPositiveMode = false;
           this.selectedIndex = -1;
@@ -248,14 +250,14 @@ struct AskHeartPage {
 
       Button('今天我想看见光')
         .fontSize(13)
-        .fontColor(this.isPositiveMode ? Color.White : Theme.MOON_MUTED)
+        .fontColor(this.isPositiveMode ? Color.White : Theme.V2C_TEXT_SECONDARY)
         .fontWeight(this.isPositiveMode ? FontWeight.Bold : FontWeight.Normal)
-        .backgroundColor(this.isPositiveMode ? Theme.GOLD_AMBER : Color.Transparent)
-        .borderRadius(Theme.RADIUS_FULL)
+        .backgroundColor(this.isPositiveMode ? Theme.V2C_GOLD_GILT : Color.Transparent)
+        .borderRadius(Theme.V2C_RADIUS_BTN)
         .height(36)
         .padding({ left: 16, right: 16 })
         .margin({ left: Theme.SPACE_SM })
-        .border({ width: 1, color: this.isPositiveMode ? Theme.GOLD_AMBER : 'rgba(148,163,184,0.3)' })
+        .border({ width: 1, color: this.isPositiveMode ? Theme.V2C_GOLD_GILT : Theme.V2C_SPINE_LINE })
         .onClick(() => {
           this.isPositiveMode = true;
           this.selectedIndex = -1;
@@ -279,15 +281,15 @@ struct AskHeartPage {
 
         Column() {
           Text(option.label)
-            .fontSize(Theme.FONT_BODY)
-            .fontColor(this.selectedIndex === index ? Theme.TEXT_PRIMARY_LIGHT : Theme.MOON_MUTED)
+            .fontSize(Theme.V2C_FONT_BODY)
+            .fontColor(this.selectedIndex === index ? Theme.V2C_TEXT_PRIMARY : Theme.V2C_TEXT_SECONDARY)
             .fontWeight(this.selectedIndex === index ? FontWeight.Bold : FontWeight.Normal)
             .textAlign(TextAlign.Start)
             .width('100%')
 
           Text(option.description)
             .fontSize(12)
-            .fontColor(this.selectedIndex === index ? 'rgba(202, 138, 4, 0.7)' : Theme.TEXT_MUTED)
+            .fontColor(this.selectedIndex === index ? 'rgba(197, 160, 80, 0.7)' : Theme.V2C_TEXT_SECONDARY)
             .textAlign(TextAlign.Start)
             .width('100%')
             .margin({ top: 4 })
@@ -300,18 +302,29 @@ struct AskHeartPage {
     }
     .width('100%')
     .padding({ left: Theme.SPACE_LG, right: Theme.SPACE_LG, top: 14, bottom: 14 })
-    .backgroundColor(this.selectedIndex === index ? Theme.BG_CARD_LIGHTER : Theme.BG_CARD_DARK)
-    .borderRadius(Theme.RADIUS_MD)
+    .backgroundColor(this.selectedIndex === index ? Theme.V2C_BG_FLOATING : Theme.V2C_BG_CARD)
+    .borderRadius(Theme.V2C_RADIUS_CARD)
     .border({
       width: this.selectedIndex === index ? 2 : 0,
-      color: this.selectedIndex === index ? Theme.GOLD_AMBER : Color.Transparent,
+      color: this.selectedIndex === index ? Theme.V2C_GOLD_GILT : Color.Transparent,
       style: BorderStyle.Solid,
+    })
+    .scale({
+      x: this.pressedIndex === index ? Theme.PRESS_SCALE : 1.0,
+      y: this.pressedIndex === index ? Theme.PRESS_SCALE : 1.0
+    })
+    .onTouch((event: TouchEvent) => {
+      if (event.type === TouchType.Down) {
+        this.pressedIndex = index;
+      } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+        this.pressedIndex = -1;
+      }
     })
     .onClick(() => {
       this.selectedIndex = index;
     })
     .animation({
-      duration: 200,
+      duration: Theme.ANIM_PRESS_DURATION,
       curve: Curve.EaseOut,
     })
   }
@@ -327,8 +340,8 @@ struct AskHeartPage {
         .margin({ right: Theme.SPACE_MD })
 
       Text(option.label)
-        .fontSize(Theme.FONT_BODY)
-        .fontColor(this.selectedIndex === index ? Theme.TEXT_PRIMARY_LIGHT : Theme.MOON_MUTED)
+        .fontSize(Theme.V2C_FONT_BODY)
+        .fontColor(this.selectedIndex === index ? Theme.V2C_TEXT_PRIMARY : Theme.V2C_TEXT_SECONDARY)
         .fontWeight(this.selectedIndex === index ? FontWeight.Bold : FontWeight.Normal)
         .layoutWeight(1)
         .textAlign(TextAlign.Start)
@@ -336,18 +349,29 @@ struct AskHeartPage {
     .width('100%')
     .height(64)
     .padding({ left: Theme.SPACE_LG, right: Theme.SPACE_LG })
-    .backgroundColor(this.selectedIndex === index ? Theme.BG_CARD_LIGHTER : Theme.BG_CARD_DARK)
-    .borderRadius(Theme.RADIUS_MD)
+    .backgroundColor(this.selectedIndex === index ? Theme.V2C_BG_FLOATING : Theme.V2C_BG_CARD)
+    .borderRadius(Theme.V2C_RADIUS_CARD)
     .border({
       width: this.selectedIndex === index ? 2 : 0,
-      color: this.selectedIndex === index ? Theme.GOLD_AMBER : Color.Transparent,
+      color: this.selectedIndex === index ? Theme.V2C_GOLD_GILT : Color.Transparent,
       style: BorderStyle.Solid,
+    })
+    .scale({
+      x: this.pressedIndex === index ? Theme.PRESS_SCALE : 1.0,
+      y: this.pressedIndex === index ? Theme.PRESS_SCALE : 1.0
+    })
+    .onTouch((event: TouchEvent) => {
+      if (event.type === TouchType.Down) {
+        this.pressedIndex = index;
+      } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+        this.pressedIndex = -1;
+      }
     })
     .onClick(() => {
       this.selectedIndex = index;
     })
     .animation({
-      duration: 200,
+      duration: Theme.ANIM_PRESS_DURATION,
       curve: Curve.EaseOut,
     })
   }

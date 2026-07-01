@@ -1,5 +1,4 @@
 import { router } from '@kit.ArkUI';
-import { promptAction } from '@kit.ArkUI';
 import { Theme } from '../common/Theme';
 import { Routes } from '../common/Routes';
 import { ComplianceFooter } from '../components/ComplianceFooter';
@@ -178,14 +177,14 @@ struct TriangleResultPage {
         // ── 标题 ──
         Column() {
           Text('🔺 圣三角结果')
-            .fontSize(Theme.FONT_HEADLINE)
-            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+            .fontSize(Theme.V2C_FONT_TITLE)
+            .fontColor(Theme.V2C_TEXT_PRIMARY)
             .fontWeight(FontWeight.Bold)
             .margin({ top: 0 })
 
           Text('星澜为你展开了这件事的三段线索')
-            .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.MOON_MUTED)
+            .fontSize(Theme.V2C_FONT_BODY)
+            .fontColor(Theme.V2C_TEXT_SECONDARY)
             .margin({ top: Theme.SPACE_SM })
         }
         .width('100%')
@@ -193,8 +192,8 @@ struct TriangleResultPage {
         // ── 问题展示 ──
         if (this.questionText) {
           Text('「' + this.questionText + '」')
-            .fontSize(Theme.FONT_SUBTITLE)
-            .fontColor(Theme.GOLD_AMBER)
+            .fontSize(Theme.V2C_FONT_SUBTITLE)
+            .fontColor(Theme.V2C_GOLD_GILT)
             .fontStyle(FontStyle.Italic)
             .textAlign(TextAlign.Center)
             .width('100%')
@@ -211,19 +210,19 @@ struct TriangleResultPage {
         // ── 行动建议 ──
         this.buildAdviceSection()
 
-        Divider().strokeWidth(0.5).color(Theme.DEEP_STARRY)
+        Divider().strokeWidth(0.5).color(Theme.V2C_SPINE_LINE)
 
         // ── 操作按钮 ──
         this.buildActionButtons()
 
-        ComplianceFooter({ fontSize: Theme.FONT_CAPTION, textColor: Theme.MOON_MUTED, showDivider: true })
+        ComplianceFooter({ fontSize: Theme.V2C_FONT_CAPTION, textColor: Theme.V2C_TEXT_SECONDARY, showDivider: true })
       }
       .width('100%')
       .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: Theme.SAFE_BOTTOM })
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(Theme.BG_DEEP_INDIGO)
+    .backgroundColor(Theme.V2C_BG_BASE)
     .scrollBar(BarState.Off)
   }
 
@@ -232,8 +231,8 @@ struct TriangleResultPage {
     Column() {
       Row() {
         Text('📍 ' + card.positionTitle)
-          .fontSize(Theme.FONT_SUBTITLE)
-          .fontColor(Theme.GOLD_AMBER)
+          .fontSize(Theme.V2C_FONT_SUBTITLE)
+          .fontColor(Theme.V2C_GOLD_GILT)
           .fontWeight(FontWeight.Bold)
       }
       .width('100%')
@@ -248,18 +247,18 @@ struct TriangleResultPage {
 
         Column() {
           Text(card.cardName)
-            .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+            .fontSize(Theme.V2C_FONT_BODY)
+            .fontColor(Theme.V2C_TEXT_PRIMARY)
             .fontWeight(FontWeight.Bold)
             .margin({ bottom: Theme.SPACE_XS })
 
           Text(card.keyword)
-            .fontSize(Theme.FONT_CAPTION)
-            .fontColor(Theme.GOLD_AMBER)
+            .fontSize(Theme.V2C_FONT_CAPTION)
+            .fontColor(Theme.V2C_GOLD_GILT)
 
           Text(card.goldenSentence)
-            .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+            .fontSize(Theme.V2C_FONT_BODY)
+            .fontColor(Theme.V2C_TEXT_PRIMARY)
             .maxLines(3)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .margin({ top: Theme.SPACE_SM })
@@ -273,60 +272,60 @@ struct TriangleResultPage {
     }
     .width('100%')
     .padding(Theme.SPACE_LG)
-    .backgroundColor(Theme.BG_CARD_DARK)
-    .borderRadius(Theme.RADIUS_MD)
-    .border({ width: 1, color: 'rgba(202, 138, 4, 0.15)' })
+    .backgroundColor(Theme.V2C_BG_CARD)
+    .borderRadius(Theme.V2C_RADIUS_CARD)
+    .border({ width: 1, color: 'rgba(197, 160, 80, 0.15)' })
   }
 
   @Builder
   buildSummarySection(): void {
     Column() {
       Text('🔮 综合解读')
-        .fontSize(Theme.FONT_SUBTITLE)
-        .fontColor(Theme.GOLD_AMBER)
+        .fontSize(Theme.V2C_FONT_SUBTITLE)
+        .fontColor(Theme.V2C_GOLD_GILT)
         .fontWeight(FontWeight.Bold)
         .width('100%')
         .margin({ bottom: Theme.SPACE_MD })
 
       Text(this.buildSummaryText())
-        .fontSize(Theme.FONT_BODY)
-        .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+        .fontSize(Theme.V2C_FONT_BODY)
+        .fontColor(Theme.V2C_TEXT_PRIMARY)
         .lineHeight(24)
         .width('100%')
 
       Text('圣三角不是命运预言，而是一种趋势提醒。它提示你：如果沿着现在的方式继续，接下来最需要留意什么。')
-        .fontSize(Theme.FONT_CAPTION)
-        .fontColor(Theme.MOON_MUTED)
+        .fontSize(Theme.V2C_FONT_CAPTION)
+        .fontColor(Theme.V2C_TEXT_SECONDARY)
         .margin({ top: Theme.SPACE_SM })
         .width('100%')
     }
     .width('100%')
     .padding(Theme.SPACE_LG)
-    .backgroundColor(Theme.BG_CARD_DARK)
-    .borderRadius(Theme.RADIUS_MD)
-    .border({ width: 1, color: 'rgba(202, 138, 4, 0.15)' })
+    .backgroundColor(Theme.V2C_BG_CARD)
+    .borderRadius(Theme.V2C_RADIUS_CARD)
+    .border({ width: 1, color: 'rgba(197, 160, 80, 0.15)' })
   }
 
   @Builder
   buildAdviceSection(): void {
     Column() {
       Text('✅ 行动建议')
-        .fontSize(Theme.FONT_SUBTITLE)
-        .fontColor(Theme.GOLD_AMBER)
+        .fontSize(Theme.V2C_FONT_SUBTITLE)
+        .fontColor(Theme.V2C_GOLD_GILT)
         .fontWeight(FontWeight.Bold)
         .width('100%')
         .margin({ bottom: Theme.SPACE_MD })
 
       Text(this.buildAdviceText())
-        .fontSize(Theme.FONT_BODY)
-        .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+        .fontSize(Theme.V2C_FONT_BODY)
+        .fontColor(Theme.V2C_TEXT_PRIMARY)
         .lineHeight(24)
         .width('100%')
     }
     .width('100%')
     .padding(Theme.SPACE_LG)
-    .backgroundColor(Theme.BG_CARD_LIGHTER)
-    .borderRadius(Theme.RADIUS_MD)
+    .backgroundColor(Theme.V2C_BG_FLOATING)
+    .borderRadius(Theme.V2C_RADIUS_CARD)
   }
 
   @Builder
@@ -334,13 +333,14 @@ struct TriangleResultPage {
     Column({ space: Theme.SPACE_MD }) {
       // 生成分享卡
       Button('📤 生成分享卡')
-        .fontSize(Theme.FONT_BODY)
-        .fontColor(Color.White)
+        .fontSize(Theme.V2C_FONT_BODY)
+        .fontColor(Theme.V2C_GOLD_GILT)
         .fontWeight(FontWeight.Medium)
         .width('100%')
         .height(48)
-        .backgroundColor(Theme.GOLD_AMBER)
-        .borderRadius(Theme.RADIUS_FULL)
+        .backgroundColor(Theme.V2C_BG_CARD)
+        .borderRadius(Theme.V2C_RADIUS_BTN)
+        .border({ width: 1, color: Theme.V2C_GOLD_GILT })
         .onClick(() => {
           const shareParams: ShareCardRouteParams = {
             sourceRecordId: this.historyRecordId,
@@ -355,14 +355,14 @@ struct TriangleResultPage {
 
       // 保存到历史（Toast）
       Button('📋 已保存到历史')
-        .fontSize(Theme.FONT_BODY)
-        .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+        .fontSize(Theme.V2C_FONT_BODY)
+        .fontColor(Theme.V2C_TEXT_PRIMARY)
         .fontWeight(FontWeight.Medium)
         .width('100%')
         .height(48)
         .backgroundColor(Color.Transparent)
-        .borderRadius(Theme.RADIUS_FULL)
-        .border({ width: 1.5, color: Theme.GOLD_AMBER })
+        .borderRadius(Theme.V2C_RADIUS_BTN)
+        .border({ width: 1.5, color: Theme.V2C_GOLD_GILT })
         .onClick(() => {
           // 已自动保存，Toast 提示即可
           try {
@@ -374,14 +374,14 @@ struct TriangleResultPage {
 
       // 回到首页
       Button('🏠 回到首页')
-        .fontSize(Theme.FONT_BODY)
-        .fontColor(Theme.MOON_MUTED)
+        .fontSize(Theme.V2C_FONT_BODY)
+        .fontColor(Theme.V2C_TEXT_SECONDARY)
         .fontWeight(FontWeight.Normal)
         .width('100%')
         .height(48)
         .backgroundColor(Color.Transparent)
-        .borderRadius(Theme.RADIUS_FULL)
-        .border({ width: 1, color: Theme.DEEP_STARRY })
+        .borderRadius(Theme.V2C_RADIUS_BTN)
+        .border({ width: 1, color: Theme.V2C_SPINE_LINE })
         .onClick(() => {
           try {
             router.replaceUrl({ url: Routes.MAIN_FRAME });
@@ -394,7 +394,7 @@ struct TriangleResultPage {
       if (this.companionResultLine.length > 0) {
         Text(this.companionResultLine)
           .fontSize(14)
-          .fontColor(Theme.TEXT_MUTED)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .lineHeight(22)
           .padding({ left: 24, right: 24, top: 12, bottom: 12 })
@@ -403,7 +403,7 @@ struct TriangleResultPage {
       // ── 阶段4B："再听星澜说一句"入口（轻文字风格，弱于主操作）──
       Text('再听星澜说一句')
         .fontSize(14)
-        .fontColor(this.hasHeardCompanionResult ? Theme.TEXT_MUTED : Theme.TEXT_SECONDARY)
+        .fontColor(this.hasHeardCompanionResult ? Theme.V2C_TEXT_SECONDARY : Theme.V2C_TEXT_SECONDARY)
         .opacity(this.hasHeardCompanionResult ? 0.35 : 0.85)
         .textAlign(TextAlign.Center)
         .width('100%')

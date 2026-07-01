@@ -51,4 +51,8 @@ export class Routes {
 
   // ── 头像裁剪 ──
   static readonly AVATAR_CROP: string = 'pages/AvatarCropPage';
+
+  // ── Phase 5 P2: 聊天入口 + 星澜星历 ──
+  static readonly XINGLAN_CHAT_ENTRANCE: string = 'pages/XinglanChatEntrancePage';
+  static readonly STAR_CALENDAR: string = 'pages/StarCalendarPage';
 }

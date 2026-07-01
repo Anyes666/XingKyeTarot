@@ -1,0 +1,25 @@
+{
+  "task_id": "20260701-102221-11-154-begin-11-154-text-phase-6-a-xinglanquotestabconte",
+  "goal": "[已粘贴文本 #11 · 154 行]\n\n--- Begin [已粘贴文本 #11 · 154 行] ---\n很好，这一步可以收口：\r\n\r\n```text\r\nPhase 6-A：XinglanQuotesTabContent v2 迁移完成\r\n状态：通过\r\n方案：B「月湖映心」\r\n编译：BUILD SUCCESSFUL，ERROR=0\r\n```\r\n\r\n它现在是真正的底部 Tab「星澜语录」，不是旧的 `HomePage.ets`，所以这次迁移是有效的。\r\n\r\n那个提示：\r\n\r\n```text\r\nfinal-answer readiness blocked...\r\n```\r\n\r\n只是 Agent 自己的 todo 状态没同步完成，不是项目问题。让它把 todo 标成 completed 即可，不需要改代码。\r\n\r\n---\r\n\r\n## 下一步建议\r\n\r\n继续做：\r\n\r\n```text\r\nPhase 6-B：HistoryPage + HistoryDetailPage v2 迁移\r\n```\r\n\r\n目标方案：\r\n\r\n```text\r\nA「星图档案」\r\n```\r\n\r\n原因：历史记录属于“时间记录层”，应该像私人星图档案，不应该像旧版占卜列表。\r\n\r\n---\r\n\r\n## 给 Agent 的下一步提示词\r\n\r\n```text\r\n当前 Phase 6-A 已完成：\r\n\r\nXinglanQuotesTabContent 已迁移到 v2 B「月湖映心」方案。\r\nBUILD SUCCESSFUL，ERROR=0。\r\n\r\n现在请执行 Phase 6-B：\r\n\r\nHistoryPage + HistoryDetailPage v2 迁移。\r\n\r\n本轮只迁移两个页面：\r\n\r\n1. entry/src/main/ets/pages/HistoryPage.ets\r\n2. entry/src/main/ets/pages/HistoryDetailPage.ets\r\n\r\n使用方案：\r\n\r\nA「星图档案」\r\n\r\n目标：\r\n\r\n让历史记录页面从旧黑金风格升级为“私人星图档案”风格。\r\n历史记录不是成绩单，不是占卜战绩，而是用户曾经认真看见自己的记录。\r\n\r\n优先使用 Token：\r\n\r\nTheme.V2A_BG_BASE\r\nTheme.V2A_BG_CARD\r\nTheme.V2A_BG_FLOATING\r\nTheme.V2A_TEXT_PRIMARY\r\nTheme.V2A_TEXT_SECONDARY\r\nTheme.V2A_GOLD_ACCENT\r\nTheme.V2A_GOLD_GLOW\r\nTheme.V2A_ORBIT_LINE\r\n\r\n可使用通用 Token：\r\n\r\nTheme.V2_SPACE_XS\r\nTheme.V2_SPACE_SM\r\nTheme.V2_SPACE_MD\r\nTheme.V2_SPACE_LG\r\nTheme.V2_SPACE_XL\r\nTheme.V2_TEXT_PRIMARY\r\nTheme.V2_TEXT_SECONDARY\r\nTheme.V2_GOLD_PRIMARY\r\n\r\n迁移范围：\r\n\r\n1. 背景色\r\n2. 页面标题\r\n3. 筛选 chips\r\n4. 历史记录卡片\r\n5. 空状态\r\n6. 日期 / 时间文本\r\n7. 卡牌名称 / 牌阵类型\r\n8. 详情页卡片层级\r\n9. 免责声明 / 辅助说明\r\n10. 边框、圆角、阴影\r\n\r\n设计要求：\r\n\r\n1. 历史记录像“星图档案”，不是打卡表。\r\n2. 已记录内容像被安静保存下来的星点。\r\n3. 金色只做标记和重点，不要大面积使用。\r\n4. 文字对比度必须足够。\r\n5. 不要出现赌场金、霓虹紫、恐怖玄学感。\r\n6. 不要新增任何功能。\r\n7. 不要修改历史数据结构。\r\n8. 不要修改历史记录读取 / 删除 / 筛选逻辑。\r\n9. 不要修改抽牌算法。\r\n10. 不要修改卡牌数据。\r\n\r\n禁止：\r\n\r\n不要迁移 HomePage.ets。\r\n不要修改 MainFramePage.ets。\r\n不要修改聊天页。\r\n不要修改星澜语录页。\r\n不要修改 BGM。\r\n不要修改头像。\r\n不要修改昵称。\r\n不要修改星历。\r\n不要修改图标配置。\r\n不要清理旧 Token。\r\n不要处理 deprecation WARN。\r\n\r\n验收标准：\r\n\r\n1. HistoryPage 使用 A「星图档案」视觉。\r\n2. HistoryDetailPage 使用 A「星图档案」视觉。\r\n3. 历史记录筛选功能正常。\r\n4. 历史列表正常显示。\r\n5. 历史详情正常进入。\r\n6. 空状态正常。\r\n7. 删除 / 返回 / 路由逻辑不变。\r\n8. 无旧紫色残留。\r\n9. 无大面积亮金。\r\n10. BUILD SUCCESSFUL，ERROR=0。\r\n\r\n完成后输出：\r\n\r\n1. 修改了哪些文件。\r\n2. 替换了哪些旧 Token。\r\n3. 使用了哪些 v2 A 方案 Token。\r\n4. 是否确认未修改历史数据逻辑。\r\n5. 是否确认未影响 BGM、聊天、抽牌、卡牌、头像、昵称、星历、图标。\r\n6. 编译结果。\r\n```\r\n\r\n---\r\n\r\n建议这次也保持“小步迁移”：只做 `HistoryPage` 和 `HistoryDetailPage`，通过后再碰 `CardWheelModePage / CardWheelDrawPage`。\r\n\n--- End [已粘贴文本 #11 · 154 行] ---",
+  "scope": null,
+  "non_goals": null,
+  "allowed_operations": {
+    "write": true,
+    "network": false,
+    "publish": false
+  },
+  "success_criteria": [
+    {
+      "id": "objective_evidence",
+      "description": "The goal outcome is supported by direct evidence, such as inspected code, reproduced behavior, source material, or concrete findings.",
+      "required": true,
+      "evidence_ids": null
+    },
+    {
+      "id": "verification",
+      "description": "The result has relevant verification evidence, such as tests, commands, benchmarks, manual checks, or a documented reason why verification is not applicable.",
+      "required": true,
+      "evidence_ids": null
+    }
+  ]
+}

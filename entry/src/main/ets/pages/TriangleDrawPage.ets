@@ -209,13 +209,13 @@ struct TriangleDrawPage {
         // ── TopBar 标题区（layoutWeight 14）──
       Column() {
         Text('正在展开圣三角')
-          .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+          .fontSize(Theme.V2C_FONT_TITLE)
+          .fontColor(Theme.V2C_TEXT_PRIMARY)
           .fontWeight(FontWeight.Bold)
 
         Text('过去 · 现在 · 未来')
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .margin({ top: Theme.SPACE_SM })
       }
       .width('100%')
@@ -228,8 +228,8 @@ struct TriangleDrawPage {
         ForEach(this.cardSlots, (slot: CardSlotInfo, index: number) => {
           Column() {
             Text(slot.positionTitle)
-              .fontSize(Theme.FONT_BODY)
-              .fontColor(this.revealedSlots[index] ? Theme.GOLD_AMBER : Theme.MOON_MUTED)
+              .fontSize(Theme.V2C_FONT_BODY)
+              .fontColor(this.revealedSlots[index] ? Theme.V2C_GOLD_GILT : Theme.V2C_TEXT_SECONDARY)
               .fontWeight(FontWeight.Bold)
               .margin({ bottom: Theme.SPACE_SM })
 
@@ -249,8 +249,8 @@ struct TriangleDrawPage {
 
             if (this.revealedSlots[index]) {
               Text(slot.cardName)
-                .fontSize(Theme.FONT_CAPTION)
-                .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                .fontSize(Theme.V2C_FONT_CAPTION)
+                .fontColor(Theme.V2C_TEXT_PRIMARY)
                 .margin({ top: Theme.SPACE_XS })
                 .maxLines(1)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -271,14 +271,14 @@ struct TriangleDrawPage {
       // ── Prompt + Action 区（layoutWeight 26，底部安全区）──
       Column() {
         Text('星澜正在解读...')
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .margin({ bottom: Theme.SPACE_MD })
 
         LoadingProgress()
           .width(40)
           .height(40)
-          .color(Theme.GOLD_AMBER)
+          .color(Theme.V2C_GOLD_GILT)
       }
       .width('100%')
       .layoutWeight(26)
@@ -288,6 +288,6 @@ struct TriangleDrawPage {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(Theme.BG_DEEP_INDIGO)
+    .backgroundColor(Theme.V2C_BG_BASE)
   }
 }

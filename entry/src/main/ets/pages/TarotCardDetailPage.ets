@@ -1,6 +1,7 @@
 import { router } from '@kit.ArkUI';
 import { Theme } from '../common/Theme';
 import { Routes } from '../common/Routes';
+import { ComplianceFooter } from '../components/ComplianceFooter';
 import { AppBackButton } from '../components/AppBackButton';
 import { TAROT_CARDS } from '../data/TarotCardData';
 import { TarotCard, ArcanaType, TarotSuit } from '../model/TarotCard';
@@ -193,19 +194,19 @@ struct TarotCardDetailPage {
 
   private getSuitColor(card: TarotCard): string {
     if (card.arcana === ArcanaType.MAJOR) {
-      return '#E8B83D';
+      return Theme.V2C_GOLD_GILT;
     }
     switch (card.suit) {
       case TarotSuit.WANDS:
-        return '#E8A838';
+        return Theme.V2C_CRISIS;
       case TarotSuit.CUPS:
-        return '#5EA8D7';
+        return Theme.V2B_GOLD_RIPPLE;
       case TarotSuit.SWORDS:
-        return '#8B7EC8';
+        return Theme.V2C_TEXT_SECONDARY;
       case TarotSuit.PENTACLES:
-        return '#6EB87A';
+        return Theme.V2C_GOLD_GILT_SOFT;
       default:
-        return '#94A3B8';
+        return Theme.V2C_TEXT_SECONDARY;
     }
   }
 
@@ -220,9 +221,9 @@ struct TarotCardDetailPage {
         .linearGradient({
           direction: GradientDirection.Bottom,
           colors: [
-            [Theme.BG_DEEP_SPACE, 0.0],
-            [Theme.BG_DEEP_INDIGO, 0.55],
-            [Theme.BG_DEEP_INDIGO, 1.0]
+            [Theme.V2C_BG_BASE, 0.0],
+            [Theme.V2C_BG_BASE, 0.55],
+            [Theme.V2C_BG_BASE, 1.0]
           ]
         })
 
@@ -248,14 +249,14 @@ struct TarotCardDetailPage {
                   .objectFit(ImageFit.Contain)
                   .height(320)
                   .constraintSize({ maxWidth: '78%' })
-                  .borderRadius(Theme.TAROT_CARD_RADIUS)
-                  .border({ width: 1, color: 'rgba(232, 184, 61, 0.35)' })
-                  .shadow(Theme.SHADOW_CARD_HERO)
+                  .borderRadius(Theme.V2C_RADIUS_CARD)
+                  .border({ width: 1, color: 'rgba(197, 160, 80, 0.35)' })
+                  .shadow(Theme.V2C_SHADOW_CARD)
 
                 // 点击提示
                 Text('轻触查看大图')
                   .fontSize(11)
-                  .fontColor(Theme.GOLD_DIM)
+                  .fontColor(Theme.V2C_GOLD_GILT)
                   .margin({ top: 6 })
               }
               .width('100%')
@@ -268,14 +269,14 @@ struct TarotCardDetailPage {
               // ── 卡牌标题区 ──
               Column() {
                 Text(this.card.nameZh)
-                  .fontSize(Theme.FONT_HEADLINE)
-                  .fontColor(Theme.GOLD_LIGHT)
+                  .fontSize(Theme.V2C_FONT_TITLE)
+                  .fontColor(Theme.V2C_GOLD_GILT_SOFT)
                   .fontWeight(FontWeight.Bold)
                   .textAlign(TextAlign.Center)
 
                 Text(this.card.nameEn)
-                  .fontSize(Theme.FONT_BODY)
-                  .fontColor(Theme.MOON_MUTED)
+                  .fontSize(Theme.V2C_FONT_BODY)
+                  .fontColor(Theme.V2C_TEXT_SECONDARY)
                   .textAlign(TextAlign.Center)
                   .margin({ top: Theme.SPACE_XS })
 
@@ -293,7 +294,7 @@ struct TarotCardDetailPage {
                   ForEach(this.card.keywords, (keyword: string, ki: number) => {
                     Text(keyword)
                       .fontSize(12)
-                      .fontColor(Theme.GOLD_LIGHT)
+                      .fontColor(Theme.V2C_GOLD_GILT_SOFT)
                       .padding({ left: 8, right: 8, top: 3, bottom: 3 })
                       .margin({ right: 6, top: 8 })
                   }, (_kw: string, ki: number) => 'detail_kw_' + ki.toString())
@@ -305,22 +306,29 @@ struct TarotCardDetailPage {
               .margin({ top: Theme.SPACE_LG, bottom: Theme.SPACE_LG })
 
               // ── 正位含义 ──
-              this.buildReadingSection('正位含义', this.reading.uprightMeaning, '#E8B83D')
+              this.buildReadingSection('正位含义', this.reading.uprightMeaning, Theme.V2C_GOLD_GILT)
 
               // ── 逆位含义 ──
-              this.buildReadingSection('逆位含义', this.reading.reversedMeaning, '#8B7EC8')
+              this.buildReadingSection('逆位含义', this.reading.reversedMeaning, Theme.V2C_TEXT_SECONDARY)
 
               // ── 情绪陪伴式解读 ──
-              this.buildReadingSection('情绪陪伴式解读', this.reading.companionReading, '#5ED7D2')
+              this.buildReadingSection('情绪陪伴式解读', this.reading.companionReading, Theme.V2B_GOLD_RIPPLE)
 
               // ── 关系提示 ──
-              this.buildReadingSection('关系提示', this.reading.relationHint, '#E8A838')
+              this.buildReadingSection('关系提示', this.reading.relationHint, Theme.V2C_CRISIS)
 
               // ── 工作 / 学习提示 ──
-              this.buildReadingSection('工作 / 学习提示', this.reading.workHint, '#6EB87A')
+              this.buildReadingSection('工作 / 学习提示', this.reading.workHint, Theme.V2C_GOLD_GILT_SOFT)
 
               // ── 自我探索问题 ──
-              this.buildReadingSection('自我探索', this.reading.selfExploration, '#94A3B8')
+              this.buildReadingSection('自我探索', this.reading.selfExploration, Theme.V2C_TEXT_SECONDARY)
+
+              // 合规页脚
+              ComplianceFooter({
+                fontSize: Theme.V2C_FONT_CAPTION,
+                textColor: Theme.V2C_TEXT_SECONDARY,
+                showDivider: true,
+              })
 
               // 底部间距
               Column()
@@ -336,8 +344,8 @@ struct TarotCardDetailPage {
           // 加载中
           Column() {
             Text('加载中...')
-              .fontSize(Theme.FONT_BODY)
-              .fontColor(Theme.MOON_MUTED)
+              .fontSize(Theme.V2C_FONT_BODY)
+              .fontColor(Theme.V2C_TEXT_SECONDARY)
           }
           .width('100%')
           .layoutWeight(1)
@@ -359,7 +367,7 @@ struct TarotCardDetailPage {
             // 用 Text + onTouch 代替 Button，确保触摸事件不被手势竞争吞掉
             Text('✕')
               .fontSize(20)
-              .fontColor(Theme.GOLD_LIGHT)
+              .fontColor(Theme.V2C_GOLD_GILT_SOFT)
               .width(40)
               .height(40)
               .borderRadius(20)
@@ -375,7 +383,7 @@ struct TarotCardDetailPage {
 
             Text(`${this.card!.nameZh} · ${this.card!.nameEn}`)
               .fontSize(13)
-              .fontColor(Theme.MOON_MUTED)
+              .fontColor(Theme.V2C_TEXT_SECONDARY)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
           }
@@ -457,7 +465,7 @@ struct TarotCardDetailPage {
           .margin({ right: 6 })
 
         Text(title)
-          .fontSize(Theme.FONT_SUBTITLE)
+          .fontSize(Theme.V2C_FONT_SUBTITLE)
           .fontColor(accentColor)
           .fontWeight(FontWeight.Bold)
       }
@@ -466,15 +474,15 @@ struct TarotCardDetailPage {
 
       // 内容
       Text(content)
-        .fontSize(Theme.FONT_BODY)
-        .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+        .fontSize(Theme.V2C_FONT_BODY)
+        .fontColor(Theme.V2C_TEXT_PRIMARY)
         .lineHeight(26)
         .width('100%')
     }
     .width('92%')
-    .backgroundColor(Theme.STARKEY_CARD_BG)
-    .borderRadius(Theme.STARKEY_CARD_RADIUS)
-    .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
+    .backgroundColor(Theme.V2C_BG_CARD)
+    .borderRadius(Theme.V2C_RADIUS_CARD)
+    .border({ width: 1, color: Theme.V2C_SPINE_LINE })
     .padding({ left: Theme.STARKEY_CARD_PADDING_H, right: Theme.STARKEY_CARD_PADDING_H, top: Theme.STARKEY_CARD_PADDING_V, bottom: Theme.STARKEY_CARD_PADDING_V })
     .margin({ bottom: Theme.SPACE_SM })
   }

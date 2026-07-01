@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<!--
+  星钥塔罗 · 问心 / 输入心事
+  设计系统：C 方案「星钥之书」（纯卡牌层，无月光）
+  基准尺寸：390×844 (iPhone 14 / HarmonyOS 主流机型)
+  原型构建师：筑原型（Zhu）
+
+  ▸ 设计意图：陪伴式自我整理——让用户先"看见此刻"再抽牌，而非直接算命
+  ▸ 展示状态：NORMAL_SINGLE 模式 + "今天我想被接住"选中（isPositiveMode=false）
+  ▸ 铁律执行：
+    1. 去 emoji：源码 emoji 替换为 SVG 烫金细线几何图标（◇△◎ 等）
+    2. 去算命感：标题"你现在，最想被哪件事接住？"——陪伴而非预测
+    3. 去博彩感：烫金仅用于图标+选中边框+确认按钮，覆盖率 < 4%
+    4. 陪伴式：确认按钮"让星澜为我抽一张"，不用"立即""马上"
+    5. 合规免责：底部 footer
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>问心 · 星钥塔罗</title>
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       C 方案设计令牌（与 04-card-result.html 完全一致）
+       ═══════════════════════════════════════════════════════════════ */
+    :root {
+      --bg-base-C: #0A0D1A;
+      --bg-card-C: #121836;
+      --bg-floating-C: #181F40;
+      --bg-hover-C: #1C2450;
+      --text-primary-C: #EBE3CD;
+      --text-secondary-C: #8B869B;
+      --text-tertiary-C: #5C5870;
+      --gold-gilt-C: #C5A050;
+      --gold-gilt-soft-C: #E0CD95;
+      --spine-line-C: #1D2342;
+      --crisis-C: #C8826A;
+
+      --moonlight-glow-page: radial-gradient(ellipse 300px 200px at 50% 8%, rgba(212,172,77,0.04) 0%, transparent 70%);
+      --gilt-line-top: rgba(197,160,80,0.4);
+      --spine-center-C: rgba(197,160,80,0.15);
+
+      --font-sans: "HarmonyOS Sans", "Source Sans 3", "Inter", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      --font-serif: "HarmonyOS Serif", "Source Serif 4", "Noto Serif SC", Georgia, serif;
+      --font-mono: "HarmonyOS Sans Mono", "JetBrains Mono", "Consolas", monospace;
+
+      --text-card-name-C: 32px;
+      --text-title-C: 28px;
+      --text-subtitle-C: 20px;
+      --text-body-C: 15px;
+      --text-lead-C: 20px;
+      --text-caption-C: 13px;
+      --text-disclaimer-C: 11px;
+
+      --space-2xs: 4px;
+      --space-xs: 8px;
+      --space-sm: 12px;
+      --space-md: 16px;
+      --space-md-b: 20px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+
+      --radius-btn-C: 8px;
+      --radius-card-C: 12px;
+      --radius-sm-C: 8px;
+      --radius-full: 9999px;
+
+      --shadow-card-c: 0 2px 16px rgba(0,0,0,0.35);
+
+      --ease-out: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.6, 1);
+      --ease-overshoot: cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+
+    /* ═══ 全局重置 ═══ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 390px; height: 844px; overflow: hidden;
+      font-family: var(--font-sans);
+      background-color: var(--bg-base-C);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ═══ 主容器 ═══ */
+    .page {
+      position: relative;
+      width: 390px; height: 844px;
+      background-color: var(--bg-base-C);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      animation: pageEnter 300ms var(--ease-out) both;
+    }
+    @keyframes pageEnter {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══ 顶部导航栏 ═══ */
+    .nav-bar {
+      position: relative; z-index: 10;
+      height: 56px;
+      display: flex; align-items: center;
+      padding: 8px var(--space-md) 0 var(--space-md);
+      flex-shrink: 0;
+    }
+    .nav-back {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border: none; background: none; padding: 0;
+      flex-shrink: 0;
+    }
+    .nav-back svg { width: 20px; height: 20px; }
+    .nav-spacer { flex: 1; }
+
+    /* ═══ 标题区 ═══ */
+    .title-area {
+      text-align: center;
+      padding: 0 var(--space-lg);
+      margin-bottom: var(--space-xs);
+      animation: fadeIn 500ms var(--ease-out) 100ms both;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .page-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-title-C);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+      color: var(--text-primary-C);
+      margin-bottom: var(--space-sm);
+    }
+    .page-subtitle {
+      font-size: var(--text-body-C);
+      font-weight: 400;
+      line-height: 1.6;
+      color: var(--text-secondary-C);
+    }
+
+    /* ═══ 首次引导微文案 ═══ */
+    .first-guide {
+      text-align: center;
+      padding: 0 var(--space-lg) var(--space-sm);
+      animation: fadeIn 500ms var(--ease-out) 200ms both;
+    }
+    .first-guide p {
+      font-size: var(--text-caption-C);
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--text-secondary-C);
+    }
+
+    /* ═══ 模式切换 Tab ═══ */
+    .mode-tabs {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-lg) var(--space-md);
+      animation: fadeIn 500ms var(--ease-out) 250ms both;
+    }
+    .mode-tab {
+      height: 36px;
+      padding: 0 var(--space-md);
+      border-radius: var(--radius-btn-C);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 200ms var(--ease-out);
+      border: 1px solid var(--spine-line-C);
+      background-color: transparent;
+      color: var(--text-secondary-C);
+      font-weight: 400;
+    }
+    .mode-tab.active {
+      background-color: var(--gold-gilt-C);
+      border-color: var(--gold-gilt-C);
+      color: var(--text-primary-C);
+      font-weight: 700;
+    }
+    .mode-tab:active { transform: scale(0.97); }
+
+    /* ═══ 可滚动选项区 ═══ */
+    .scroll-area {
+      position: relative; z-index: 5;
+      flex: 1; overflow-y: auto;
+      padding: 0 var(--space-lg) var(--space-sm);
+    }
+    .scroll-area::-webkit-scrollbar { display: none; }
+    .scroll-area { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .option-list {
+      display: flex; flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    /* ═══ 问心选项卡片 ═══ */
+    .option-card {
+      display: flex; align-items: center;
+      width: 100%;
+      padding: 14px var(--space-lg);
+      background-color: var(--bg-card-C);
+      border: 1px solid transparent;
+      border-radius: var(--radius-card-C);
+      cursor: pointer;
+      transition: background-color 200ms var(--ease-out),
+                  border-color 200ms var(--ease-out),
+                  transform 150ms var(--ease-out);
+      animation: cardSlideIn 350ms var(--ease-out) both;
+    }
+    .option-card:nth-child(1) { animation-delay: 300ms; }
+    .option-card:nth-child(2) { animation-delay: 360ms; }
+    .option-card:nth-child(3) { animation-delay: 420ms; }
+    .option-card:nth-child(4) { animation-delay: 480ms; }
+    .option-card:nth-child(5) { animation-delay: 540ms; }
+    .option-card:nth-child(6) { animation-delay: 600ms; }
+
+    @keyframes cardSlideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .option-card.selected {
+      background-color: var(--bg-floating-C);
+      border: 2px solid var(--gold-gilt-C);
+    }
+    .option-card:active { transform: scale(0.98); }
+
+    .option-icon {
+      width: 24px; height: 24px;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      margin-right: var(--space-md);
+    }
+    .option-icon svg {
+      width: 20px; height: 20px;
+    }
+    .option-card.selected .option-icon svg path,
+    .option-card.selected .option-icon svg circle,
+    .option-card.selected .option-icon svg line {
+      stroke: var(--gold-gilt-soft-C);
+    }
+
+    .option-text {
+      flex: 1;
+    }
+    .option-label {
+      font-size: var(--text-body-C);
+      font-weight: 400;
+      line-height: 1.4;
+      color: var(--text-secondary-C);
+    }
+    .option-card.selected .option-label {
+      font-weight: 700;
+      color: var(--text-primary-C);
+    }
+    .option-desc {
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.4;
+      color: var(--text-tertiary-C);
+      margin-top: 4px;
+    }
+    .option-card.selected .option-desc {
+      color: rgba(197,160,80,0.7);
+    }
+
+    /* ═══ 确认按钮 ═══ */
+    .confirm-area {
+      padding: var(--space-sm) var(--space-lg) var(--space-xs);
+      flex-shrink: 0;
+    }
+    .btn-confirm {
+      width: 85%;
+      height: 52px;
+      margin: 0 auto;
+      display: flex; align-items: center; justify-content: center;
+      background-color: var(--gold-gilt-C);
+      border: none;
+      border-radius: var(--radius-btn-C);
+      font-family: var(--font-sans);
+      font-size: var(--text-subtitle-C);
+      font-weight: 500;
+      color: #FFFFFF;
+      cursor: pointer;
+      transition: transform 150ms var(--ease-out);
+      animation: fadeIn 500ms var(--ease-out) 700ms both;
+    }
+    .btn-confirm:active { transform: scale(0.98); }
+
+    /* ═══ 底部合规 footer ═══ */
+    .compliance-footer {
+      text-align: center;
+      padding: var(--space-xs) var(--space-md) var(--space-lg);
+      flex-shrink: 0;
+    }
+    .compliance-footer p {
+      font-size: var(--text-disclaimer-C);
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--text-tertiary-C);
+    }
+
+    /* ═══ 降级 ═══ */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- ═══ 顶部导航栏 ═══ -->
+    <nav class="nav-bar">
+      <button class="nav-back" type="button" aria-label="返回">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 4 L6 10 L12 16" stroke="#EBE3CD" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="nav-spacer"></div>
+    </nav>
+
+    <!-- ═══ 标题区 ═══ -->
+    <div class="title-area">
+      <h1 class="page-title">你现在，最想被哪件事接住？</h1>
+      <p class="page-subtitle">不用想太久，选最像你此刻的那一句。</p>
+    </div>
+
+    <!-- ═══ 首次引导微文案 ═══ -->
+    <div class="first-guide">
+      <p>一张牌，一个此刻的映照。想着你现在最贴近的感受就好。</p>
+    </div>
+
+    <!-- ═══ 模式切换 Tab ═══ -->
+    <div class="mode-tabs">
+      <div class="mode-tab active" role="button" tabindex="0">今天我想被接住</div>
+      <div class="mode-tab" role="button" tabindex="0">今天我想看见光</div>
+    </div>
+
+    <!-- ═══ 可滚动选项区 ═══ -->
+    <main class="scroll-area">
+      <div class="option-list">
+
+        <!-- 选项 1：关系内耗 -->
+        <div class="option-card" role="button" tabindex="0">
+          <div class="option-icon">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="7" cy="10" r="4" stroke="#8B869B" stroke-width="1.2" fill="none"/>
+              <circle cx="13" cy="10" r="4" stroke="#8B869B" stroke-width="1.2" fill="none"/>
+            </svg>
+          </div>
+          <div class="option-text">
+            <div class="option-label">关系内耗</div>
+            <div class="option-desc">"他到底怎么想，我已经想累了"</div>
+          </div>
+        </div>
+
+        <!-- 选项 2：关系评估 -->
+        <div class="option-card" role="button" tabindex="0">
+          <div class="option-icon">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 3 L17 17 L3 17 Z" stroke="#8B869B" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+              <line x1="10" y1="8" x2="10" y2="13" stroke="#8B869B" stroke-width="1.2" stroke-linecap="round"/>
+              <circle cx="10" cy="15" r="0.8" fill="#8B869B"/>
+            </svg>
+          </div>
+          <div class="option-text">
+            <div class="option-label">关系评估</div>
+            <div class="option-desc">"这段关系还值不值得继续"</div>
+          </div>
+        </div>
+
+        <!-- 选项 3：职场疲惫（选中态） -->
+        <div class="option-card selected" role="button" tabindex="0" aria-selected="true">
+          <div class="option-icon">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 7 L10 13 L16 7" stroke="#E0CD95" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <line x1="10" y1="3" x2="10" y2="13" stroke="#E0CD95" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="option-text">
+            <div class="option-label">职场疲惫</div>
+            <div class="option-desc">"上班比上坟还沉"</div>
+          </div>
+        </div>
+
+        <!-- 选项 4：选择纠结 -->
+        <div class="option-card" role="button" tabindex="0">
+          <div class="option-icon">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 17 L10 10 M10 10 L4 5 M10 10 L16 5" stroke="#8B869B" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 7 L4 5 L6 7 M14 7 L16 5 L18 7" stroke="#8B869B" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="option-text">
+            <div class="option-label">选择纠结</div>
+            <div class="option-desc">"两个选项，我怎么都决定不了"</div>
+          </div>
+        </div>
+
+        <!-- 选项 5：能量低落 -->
+        <div class="option-card" role="button" tabindex="0">
+          <div class="option-icon">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="10" r="6" stroke="#8B869B" stroke-width="1.2" fill="none"/>
+              <path d="M10 4 A6 6 0 0 0 10 16 Z" fill="#8B869B" opacity="0.2"/>
+            </svg>
+          </div>
+          <div class="option-text">
+            <div class="option-label">能量低落</div>
+            <div class="option-desc">"今天什么都不想做"</div>
+          </div>
+        </div>
+
+        <!-- 选项 6：寻求安慰 -->
+        <div class="option-card" role="button" tabindex="0">
+          <div class="option-icon">
+            <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="10" cy="10" r="3" stroke="#8B869B" stroke-width="1.2" fill="none"/>
+              <circle cx="10" cy="10" r="6" stroke="#8B869B" stroke-width="1" fill="none" opacity="0.6"/>
+            </svg>
+          </div>
+          <div class="option-text">
+            <div class="option-label">寻求安慰</div>
+            <div class="option-desc">"就想有人听我说说话"</div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- ═══ 确认按钮 ═══ -->
+    <div class="confirm-area">
+      <button class="btn-confirm" type="button">让星澜为我抽一张</button>
+    </div>
+
+    <!-- ═══ 底部合规 footer ═══ -->
+    <div class="compliance-footer">
+      <p>星澜的回应仅供陪伴与自我探索参考，不构成任何专业建议。</p>
+    </div>
+
+  </div>
+</body>
+</html>

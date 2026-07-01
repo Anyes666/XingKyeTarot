@@ -110,6 +110,9 @@ struct ResultGoldenPage {
   @State private totalLightDays: number = 0;
   @State private currentLevelTitle: string = '初见';
 
+  // ── B 方案月光呼吸动画状态 ──
+  @State private moonlightOpacity: number = 0.6;
+
   async aboutToAppear(): Promise<void> {
     const rawParams: Object | undefined = router.getParams();
     if (rawParams) {
@@ -141,6 +144,15 @@ struct ResultGoldenPage {
 
     // 检查今日情绪星点亮状态（仅在每日一占入口时）
     await this.checkTodayLightStatus();
+
+    // B 方案月光呼吸动画（6s 无限循环）
+    animateTo({
+      duration: Theme.V2_ANIM_MOONLIGHT_BREATH,
+      iterations: -1,
+      curve: Curve.EaseInOut
+    }, () => {
+      this.moonlightOpacity = 1.0;
+    });
   }
 
   /**
@@ -263,79 +275,95 @@ struct ResultGoldenPage {
   }
 
   build() {
-    Scroll() {
-      Column() {
-        // ── P0.3 整改：左上角统一返回按钮（安全区修复）──
-        Row() {
-          AppBackButton({ fallbackUrl: Routes.HOME })
+    Stack() {
+      // ── C 方案底色 ──
+      Column()
+        .width('100%')
+        .height('100%')
+        .backgroundColor(Theme.V2C_BG_BASE)
+
+      // ── B 方案月光光晕层（顶部呼吸动画）──
+      Column()
+        .width('100%')
+        .height(220)
+        .radialGradient({
+          center: ['50%', '20%'],
+          radius: '55%',
+          colors: [
+            ['rgba(212,172,77,0.04)', 0.0],
+            ['rgba(212,172,77,0.01)', 0.6],
+            ['rgba(10,13,26,0)', 1.0]
+          ]
+        })
+        .opacity(this.moonlightOpacity)
+        .hitTestBehavior(HitTestMode.None)
+
+      // ── 主内容滚动区 ──
+      Scroll() {
+        Column() {
+          // ── P0.3 整改：左上角统一返回按钮（安全区修复）──
+          Row() {
+            AppBackButton({ fallbackUrl: Routes.HOME })
+          }
+          .width('100%')
+          .padding({ top: Theme.SAFE_TOP, bottom: 0 })
+
+          // ═══════════ 顶部：牌面 + 牌名 + 正位标签 ═══════════
+          this.buildHeader()
+
+          // ═══════════ 金句区域 ═══════════
+          this.buildGoldenSentence()
+
+          // ═══════════ 分割线 ═══════════
+          Divider()
+            .strokeWidth(0.5)
+            .color(Theme.V2C_SPINE_LINE)
+            .margin({ top: Theme.SPACE_LG, bottom: Theme.SPACE_LG })
+
+          // ═══════════ 情绪关键词 + 今日行动 ═══════════
+          this.buildActionSection()
+
+          // ═══════════ "为什么是这张牌" ═══════════
+          this.buildWhyThisCard()
+
+          Divider()
+            .strokeWidth(0.5)
+            .color(Theme.V2C_SPINE_LINE)
+            .margin({ top: Theme.SPACE_LG, bottom: Theme.SPACE_LG })
+
+          // ═══════════ 操作按钮区 ═══════════
+          this.buildActionButtons()
+
+          // ═══════════ 情绪星点入口 ═══════════
+          this.buildBottomEntry()
+
+          Divider()
+            .strokeWidth(0.5)
+            .color(Theme.V2C_SPINE_LINE)
+            .margin({ top: Theme.SPACE_LG, bottom: Theme.SPACE_LG })
+
+          // ═══════════ 深度解读（折叠区） ═══════════
+          this.buildDeepInterpretation()
+
+          // ═══════════ 合规页脚 ═══════════
+          ComplianceFooter({
+            fontSize: Theme.V2C_FONT_CAPTION,
+            textColor: Theme.V2C_TEXT_SECONDARY,
+            showDivider: true,
+          })
+
+          // 底部留白
+          Blank().height(40)
         }
         .width('100%')
-        .padding({ top: Theme.SAFE_TOP, bottom: 0 })
-
-        // ═══════════ 顶部：牌面 + 牌名 + 正位标签 ═══════════
-        this.buildHeader()
-
-        // ═══════════ 金句区域 ═══════════
-        this.buildGoldenSentence()
-
-        // ═══════════ 分割线 ═══════════
-        Divider()
-          .strokeWidth(0.5)
-          .color(Theme.DEEP_STARRY)
-          .margin({ top: Theme.SPACE_LG, bottom: Theme.SPACE_LG })
-
-        // ═══════════ 情绪关键词 + 今日行动 ═══════════
-        this.buildActionSection()
-
-        // ═══════════ "为什么是这张牌" ═══════════
-        this.buildWhyThisCard()
-
-        Divider()
-          .strokeWidth(0.5)
-          .color(Theme.DEEP_STARRY)
-          .margin({ top: Theme.SPACE_LG, bottom: Theme.SPACE_LG })
-
-        // ═══════════ 操作按钮区 ═══════════
-        this.buildActionButtons()
-
-        // ═══════════ 情绪星点入口 ═══════════
-        this.buildBottomEntry()
-
-        Divider()
-          .strokeWidth(0.5)
-          .color(Theme.DEEP_STARRY)
-          .margin({ top: Theme.SPACE_LG, bottom: Theme.SPACE_LG })
-
-        // ═══════════ 深度解读（折叠区） ═══════════
-        this.buildDeepInterpretation()
-
-        // ═══════════ 合规页脚 ═══════════
-        ComplianceFooter({
-          fontSize: Theme.FONT_CAPTION,
-          textColor: Theme.MOON_MUTED,
-          showDivider: true,
-        })
-
-        // 底部留白
-        Blank().height(40)
+        .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: Theme.SAFE_BOTTOM })
       }
       .width('100%')
-      .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: Theme.SAFE_BOTTOM })
+      .height('100%')
+      .scrollBar(BarState.Off)
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(Theme.BG_DEEP_INDIGO)
-    // 沉浸光感：页面上方轻微金色漫反射
-    .radialGradient({
-      center: ['50%', '12%'],
-      radius: '55%',
-      colors: [
-        ['rgba(229, 165, 10, 0.04)', 0.0],
-        ['rgba(229, 165, 10, 0.01)', 0.6],
-        ['rgba(15, 15, 35, 0)', 1.0]
-      ]
-    })
-    .scrollBar(BarState.Off)
   }
 
   // ────── 子构建器 ──────
@@ -343,27 +371,48 @@ struct ResultGoldenPage {
   @Builder
   buildHeader(): void {
     Column() {
-      // 牌面图片（P0.3 整改 v2：使用统一尺寸常量）
-      TarotCardImage({
-        cardId: this.cardId,
-        cardWidth: Theme.CARD_SIZE_SINGLE_RESULT.width,
-        cardHeight: Theme.CARD_SIZE_SINGLE_RESULT.height
-      })
+      // C 方案烫金线框 + 牌面图
+      Stack() {
+        // 牌面图片（P0.3 整改 v2：使用统一尺寸常量）
+        TarotCardImage({
+          cardId: this.cardId,
+          cardWidth: Theme.CARD_SIZE_SINGLE_RESULT.width,
+          cardHeight: Theme.CARD_SIZE_SINGLE_RESULT.height
+        })
 
-      // 牌名
+        // 烫金顶线装饰
+        Row()
+          .width('60%')
+          .height(1)
+          .backgroundColor(Theme.V2C_GOLD_GILT)
+          .opacity(0.4)
+          .position({ x: '20%', y: 8 })
+
+        // 烫金底线装饰
+        Row()
+          .width('60%')
+          .height(1)
+          .backgroundColor(Theme.V2C_GOLD_GILT)
+          .opacity(0.3)
+          .position({ x: '20%', y: '92%' })
+      }
+      .width(Theme.CARD_SIZE_SINGLE_RESULT.width)
+      .height(Theme.CARD_SIZE_SINGLE_RESULT.height)
+
+      // 牌名（衬线字体）
       Text(this.cardName)
-        .fontSize(Theme.FONT_CARD_NAME)
-        .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+        .fontSize(Theme.V2C_FONT_CARD_NAME)
+        .fontColor(Theme.V2C_TEXT_PRIMARY)
         .fontWeight(FontWeight.Bold)
         .margin({ top: Theme.SPACE_MD })
 
       // 正位标签
       Text('正位')
-        .fontSize(Theme.FONT_CAPTION)
-        .fontColor(Theme.GOLD_LIGHT)
+        .fontSize(Theme.V2C_FONT_CAPTION)
+        .fontColor(Theme.V2C_GOLD_GILT)
         .padding({ left: 12, right: 12, top: 2, bottom: 2 })
-        .borderRadius(Theme.RADIUS_SM)
-        .border({ width: 1, color: Theme.GOLD_LIGHT })
+        .borderRadius(Theme.V2C_RADIUS_CHIP)
+        .border({ width: 1, color: Theme.V2C_GOLD_GILT })
         .margin({ top: Theme.SPACE_XS })
     }
     .width('100%')
@@ -377,13 +426,13 @@ struct ResultGoldenPage {
     Stack({ alignContent: Alignment.Center }) {
       Column()
         .width('100%')
-        .borderRadius(Theme.RADIUS_LG)
+        .borderRadius(Theme.V2C_RADIUS_POPUP)
         .radialGradient({
           center: ['50%', '50%'],
           radius: '70%',
           colors: [
-            ['rgba(202, 138, 4, 0.06)', 0.0],
-            ['rgba(202, 138, 4, 0.015)', 0.6],
+            ['rgba(197, 160, 80, 0.06)', 0.0],
+            ['rgba(197, 160, 80, 0.015)', 0.6],
             ['rgba(27, 27, 48, 0)', 1.0]
           ]
         })
@@ -391,16 +440,16 @@ struct ResultGoldenPage {
 
       Column() {
         Text(this.goldenSentence)
-          .fontSize(Theme.FONT_DISPLAY)
-          .fontColor(Theme.GOLD_LIGHT)
+          .fontSize(Theme.V2C_FONT_DISPLAY)
+          .fontColor(Theme.V2C_GOLD_GILT_SOFT)
           .fontWeight(FontWeight.Bold)
           .lineHeight(52)
           .textAlign(TextAlign.Center)
           .width('100%')
 
         Text(`—— ${Constants.MOON_WATERMARK} ——`)
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .margin({ top: Theme.SPACE_MD })
       }
       .width('100%')
@@ -409,32 +458,32 @@ struct ResultGoldenPage {
     }
     .width('100%')
     .margin({ top: Theme.SPACE_RESULT_GAP })
-    .backgroundColor(Theme.BG_CARD_DARK)
-    .borderRadius(Theme.RADIUS_LG)
-    .border({ width: 1, color: 'rgba(202, 138, 4, 0.12)' })
+    .backgroundColor(Theme.V2C_BG_CARD)
+    .borderRadius(Theme.V2C_RADIUS_POPUP)
+    .border({ width: 1, color: 'rgba(197, 160, 80, 0.12)' })
   }
 
   @Builder
   buildWhyThisCard(): void {
     Column() {
       Text('为什么是这张牌？')
-        .fontSize(Theme.FONT_SUBTITLE)
-        .fontColor(Theme.GOLD_AMBER)
+        .fontSize(Theme.V2C_FONT_SUBTITLE)
+        .fontColor(Theme.V2C_GOLD_GILT)
         .fontWeight(FontWeight.Bold)
         .width('100%')
         .margin({ bottom: Theme.SPACE_MD })
 
       Text(this.cardMeaningBrief)
-        .fontSize(Theme.FONT_BODY)
-        .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+        .fontSize(Theme.V2C_FONT_BODY)
+        .fontColor(Theme.V2C_TEXT_PRIMARY)
         .lineHeight(24)
         .width('100%')
     }
     .width('100%')
     .padding(Theme.SPACE_LG)
-    .backgroundColor(Theme.BG_CARD_DARK)
-    .borderRadius(Theme.RADIUS_MD)
-    .border({ width: 1, color: 'rgba(202, 138, 4, 0.15)' })
+    .backgroundColor(Theme.V2C_BG_CARD)
+    .borderRadius(Theme.V2C_RADIUS_CARD)
+    .border({ width: 1, color: 'rgba(197, 160, 80, 0.15)' })
   }
 
   @Builder
@@ -444,12 +493,12 @@ struct ResultGoldenPage {
       Row({ space: Theme.SPACE_SM }) {
         ForEach(this.emotionKeywords, (keyword: string) => {
           Text(keyword)
-            .fontSize(Theme.FONT_CAPTION)
-            .fontColor(Theme.GOLD_AMBER)
+            .fontSize(Theme.V2C_FONT_CAPTION)
+            .fontColor(Theme.V2C_GOLD_GILT)
             .padding({ left: 12, right: 12, top: 4, bottom: 4 })
-            .backgroundColor('rgba(202, 138, 4, 0.1)')
-            .borderRadius(Theme.RADIUS_FULL)
-            .border({ width: 1, color: 'rgba(202, 138, 4, 0.25)' })
+            .backgroundColor('rgba(197, 160, 80, 0.1)')
+            .borderRadius(Theme.V2C_RADIUS_BTN)
+            .border({ width: 1, color: 'rgba(197, 160, 80, 0.25)' })
         }, (keyword: string) => keyword)
       }
       .width('100%')
@@ -457,22 +506,22 @@ struct ResultGoldenPage {
       // 今日行动卡片
       Column() {
         Text('✅ 今日行动')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.GOLD_AMBER)
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_GOLD_GILT)
           .fontWeight(FontWeight.Bold)
           .width('100%')
           .margin({ bottom: Theme.SPACE_SM })
 
         Text(this.todayAction)
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_PRIMARY)
           .lineHeight(24)
           .width('100%')
       }
       .width('100%')
       .padding(Theme.SPACE_LG)
-      .backgroundColor(Theme.BG_CARD_LIGHTER)
-      .borderRadius(Theme.RADIUS_MD)
+      .backgroundColor(Theme.V2C_BG_FLOATING)
+      .borderRadius(Theme.V2C_RADIUS_CARD)
     }
     .width('100%')
     .margin({ top: Theme.SPACE_LG })
@@ -484,13 +533,14 @@ struct ResultGoldenPage {
       // ── FIRST_EXPERIENCE 专属：「进入首页」按钮（最上方，金色实心）──
       if (this.entryMode === 'FIRST_EXPERIENCE') {
         Button('🏠 进入首页')
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Color.White)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_GOLD_GILT)
           .fontWeight(FontWeight.Medium)
           .width('100%')
           .height(48)
-          .backgroundColor(Theme.GOLD_AMBER)
-          .borderRadius(Theme.RADIUS_FULL)
+          .backgroundColor(Theme.V2C_BG_CARD)
+          .borderRadius(Theme.V2C_RADIUS_BTN)
+          .border({ width: 1, color: Theme.V2C_GOLD_GILT })
           .onClick(async () => {
             try {
               await AppStateStore.completeFirstExperience(getContext(this));
@@ -503,13 +553,14 @@ struct ResultGoldenPage {
 
       // 追问道星澜按钮
       Button('💬 追问星澜')
-        .fontSize(Theme.FONT_BODY)
-        .fontColor(Color.White)
+        .fontSize(Theme.V2C_FONT_BODY)
+        .fontColor(Theme.V2C_GOLD_GILT)
         .fontWeight(FontWeight.Medium)
         .width('100%')
         .height(48)
-        .backgroundColor(Theme.GOLD_AMBER)
-        .borderRadius(Theme.RADIUS_FULL)
+        .backgroundColor(Theme.V2C_BG_CARD)
+        .borderRadius(Theme.V2C_RADIUS_BTN)
+        .border({ width: 1, color: Theme.V2C_GOLD_GILT })
         .onClick(() => {
           const followUpParams: FollowUpRouteParams = {
             cardId: this.cardId,
@@ -530,14 +581,14 @@ struct ResultGoldenPage {
 
       // 生成分享卡按钮（P0.2 改为 sourceRecordId + spreadType）
       Button('📤 生成分享卡')
-        .fontSize(Theme.FONT_BODY)
-        .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+        .fontSize(Theme.V2C_FONT_BODY)
+        .fontColor(Theme.V2C_GOLD_GILT)
         .fontWeight(FontWeight.Medium)
         .width('100%')
         .height(48)
         .backgroundColor(Color.Transparent)
-        .borderRadius(Theme.RADIUS_FULL)
-        .border({ width: 1.5, color: Theme.GOLD_AMBER })
+        .borderRadius(Theme.V2C_RADIUS_BTN)
+        .border({ width: 1.5, color: Theme.V2C_GOLD_GILT })
         .onClick(() => {
           const shareCardParams: ShareCardRouteParams = {
             sourceRecordId: this.historyRecordId || this.recordId,
@@ -556,14 +607,14 @@ struct ResultGoldenPage {
       // NORMAL_SINGLE：「回到首页」
       if (this.entryMode !== 'FIRST_EXPERIENCE') {
         Button('🏠 回到首页')
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .fontWeight(FontWeight.Normal)
           .width('100%')
           .height(48)
           .backgroundColor(Color.Transparent)
-          .borderRadius(Theme.RADIUS_FULL)
-          .border({ width: 1, color: Theme.DEEP_STARRY })
+          .borderRadius(Theme.V2C_RADIUS_BTN)
+          .border({ width: 1, color: Theme.V2C_SPINE_LINE })
           .onClick(() => {
             try {
               router.replaceUrl({ url: Routes.MAIN_FRAME });
@@ -577,7 +628,7 @@ struct ResultGoldenPage {
         if (this.companionResultLine.length > 0) {
           Text(this.companionResultLine)
             .fontSize(14)
-            .fontColor(Theme.TEXT_MUTED)
+            .fontColor(Theme.V2C_TEXT_SECONDARY)
             .textAlign(TextAlign.Center)
             .lineHeight(22)
             .padding({ left: 24, right: 24, top: 12, bottom: 12 })
@@ -586,7 +637,7 @@ struct ResultGoldenPage {
         // ── 阶段4A："再听星澜说一句"入口（轻文字风格，弱于主操作）──
         Text('再听星澜说一句')
           .fontSize(14)
-          .fontColor(this.hasHeardCompanionResult ? Theme.TEXT_MUTED : Theme.TEXT_SECONDARY)
+          .fontColor(this.hasHeardCompanionResult ? Theme.V2C_TEXT_SECONDARY : Theme.V2C_TEXT_SECONDARY)
           .opacity(this.hasHeardCompanionResult ? 0.35 : 0.85)
           .textAlign(TextAlign.Center)
           .width('100%')
@@ -604,15 +655,15 @@ struct ResultGoldenPage {
       // 折叠标题栏（可点击）
       Row() {
         Text('📖 深度解读')
-          .fontSize(Theme.FONT_SUBTITLE)
-          .fontColor(Theme.GOLD_AMBER)
+          .fontSize(Theme.V2C_FONT_SUBTITLE)
+          .fontColor(Theme.V2C_GOLD_GILT)
           .fontWeight(FontWeight.Bold)
 
         Blank()
 
         Text(this.isDeepInterpretationExpanded ? '▲ 收起' : '▼ 展开')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
       }
       .width('100%')
       .onClick(() => {
@@ -622,8 +673,8 @@ struct ResultGoldenPage {
       // 展开时显示内容
       if (this.isDeepInterpretationExpanded) {
         Text(this.deepInterpretation)
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_PRIMARY)
           .lineHeight(26)
           .width('100%')
           .margin({ top: Theme.SPACE_MD })
@@ -631,8 +682,8 @@ struct ResultGoldenPage {
     }
     .width('100%')
     .padding(Theme.SPACE_LG)
-    .backgroundColor(Theme.BG_CARD_DARK)
-    .borderRadius(Theme.RADIUS_MD)
+    .backgroundColor(Theme.V2C_BG_CARD)
+    .borderRadius(Theme.V2C_RADIUS_CARD)
   }
 
   @Builder
@@ -644,12 +695,12 @@ struct ResultGoldenPage {
           .type(ButtonType.Normal)
           .width('100%')
           .height(52)
-          .borderRadius(26)
-          .backgroundColor('rgba(217, 154, 0, 0.12)')
-          .fontColor('#D99A00')
+          .borderRadius(Theme.V2C_RADIUS_BTN)
+          .backgroundColor('rgba(197, 160, 80, 0.12)')
+          .fontColor(Theme.V2C_GOLD_GILT)
           .fontSize(19)
           .fontWeight(FontWeight.Bold)
-          .border({ width: 1, color: 'rgba(217, 154, 0, 0.3)' })
+          .border({ width: 1, color: 'rgba(197, 160, 80, 0.3)' })
           .onClick(() => {
             try {
               this.getUIContext().getPromptAction().showToast({
@@ -662,8 +713,8 @@ struct ResultGoldenPage {
           })
 
         Text('今天的星星已经亮着了，明天再来看看自己吧。')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .margin({ top: 8 })
       } else {
@@ -672,19 +723,19 @@ struct ResultGoldenPage {
           .type(ButtonType.Normal)
           .width('100%')
           .height(52)
-          .borderRadius(26)
-          .backgroundColor('#17172F')
-          .fontColor('#D99A00')
+          .borderRadius(Theme.V2C_RADIUS_BTN)
+          .backgroundColor(Theme.V2C_BG_CARD)
+          .fontColor(Theme.V2C_GOLD_GILT)
           .fontSize(19)
           .fontWeight(FontWeight.Bold)
-          .border({ width: 1, color: '#D99A00' })
+          .border({ width: 1, color: Theme.V2C_GOLD_GILT })
           .onClick(() => {
             this.handleLightEmotionStar();
           })
 
         Text('记录今天的心事，让星澜陪你看见最近的自己。')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .margin({ top: 8 })
       }

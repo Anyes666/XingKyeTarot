@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<!--
+  星钥塔罗 · 关系探索结果
+  设计系统：C 方案「星钥之书」（纯卡牌层，无月光）
+  基准尺寸：390×844 (iPhone 14 / HarmonyOS 主流机型)
+  原型构建师：筑原型（Zhu）
+
+  ▸ 设计意图：陪伴式自我整理——帮用户看清自己在关系中的位置，而非替对方算命
+  ▸ 铁律执行：
+    1. 去 emoji：源码 💞📍🔮⚠️✅📤📋🏠 一律替换为 SVG 烫金细线图标或几何符号（‖）
+    2. 去算命感：标题"关系探索"而非"关系探索占卜"
+    3. 去恋爱绑定：边界提醒温柔可见但不恐吓，不判断对方心意
+    4. 去博彩感：烫金仅用于细线、关键词、按钮边框，覆盖率 < 5%
+    5. 陪伴式：按钮"留下这张星钥卡"而非"生成分享卡"
+    6. 合规免责：底部"星澜的回应仅供陪伴与自我探索参考" + 关系专属边界
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>关系探索结果 · 星钥塔罗</title>
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       C 方案设计令牌（与 04-card-result.html 完全一致）
+       ═══════════════════════════════════════════════════════════════ */
+    :root {
+      --bg-base-C: #0A0D1A;
+      --bg-card-C: #121836;
+      --bg-floating-C: #181F40;
+      --bg-hover-C: #1C2450;
+      --text-primary-C: #EBE3CD;
+      --text-secondary-C: #8B869B;
+      --text-tertiary-C: #5C5870;
+      --gold-gilt-C: #C5A050;
+      --gold-gilt-soft-C: #E0CD95;
+      --spine-line-C: #1D2342;
+      --crisis-C: #C8826A;
+
+      --moonlight-glow-page: radial-gradient(ellipse 300px 200px at 50% 8%, rgba(212,172,77,0.04) 0%, transparent 70%);
+      --gilt-line-top: rgba(197,160,80,0.4);
+      --spine-center-C: rgba(197,160,80,0.15);
+
+      --font-sans: "HarmonyOS Sans", "Source Sans 3", "Inter", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      --font-serif: "HarmonyOS Serif", "Source Serif 4", "Noto Serif SC", Georgia, serif;
+      --font-mono: "HarmonyOS Sans Mono", "JetBrains Mono", "Consolas", monospace;
+
+      --text-card-name-C: 32px;
+      --text-title-C: 28px;
+      --text-subtitle-C: 20px;
+      --text-body-C: 15px;
+      --text-lead-C: 20px;
+      --text-caption-C: 13px;
+      --text-disclaimer-C: 11px;
+
+      --space-2xs: 4px;
+      --space-xs: 8px;
+      --space-sm: 12px;
+      --space-md: 16px;
+      --space-md-b: 20px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+
+      --radius-btn-C: 8px;
+      --radius-card-C: 12px;
+      --radius-sm-C: 8px;
+      --radius-full: 9999px;
+
+      --shadow-card-c: 0 2px 16px rgba(0,0,0,0.35);
+
+      --ease-out: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.6, 1);
+      --ease-overshoot: cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+
+    /* ═══ 全局重置 ═══ */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 390px; height: 844px; overflow: hidden;
+      font-family: var(--font-sans);
+      background-color: var(--bg-base-C);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ═══ 主容器 ═══ */
+    .page {
+      position: relative;
+      width: 390px; height: 844px;
+      background-color: var(--bg-base-C);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      animation: pageEnter 300ms var(--ease-out) both;
+    }
+    @keyframes pageEnter {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══ 顶部导航栏 ═══ */
+    .nav-bar {
+      position: relative; z-index: 10;
+      height: 56px;
+      display: flex; align-items: center;
+      padding: 8px var(--space-md) 0 var(--space-md);
+      flex-shrink: 0;
+    }
+    .nav-back {
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; border: none; background: none; padding: 0;
+      flex-shrink: 0;
+    }
+    .nav-back svg { width: 20px; height: 20px; }
+    .nav-spacer { flex: 1; }
+
+    /* ═══ 可滚动内容区 ═══ */
+    .scroll-area {
+      position: relative; z-index: 5;
+      flex: 1; overflow-y: auto;
+      padding: var(--space-xs) var(--space-lg) var(--space-lg) var(--space-lg);
+    }
+    .scroll-area::-webkit-scrollbar { display: none; }
+    .scroll-area { -ms-overflow-style: none; scrollbar-width: none; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes cardStaggerIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══ 标题区 ═══ */
+    .title-area {
+      text-align: center;
+      margin-bottom: var(--space-md-b);
+      animation: fadeIn 500ms var(--ease-out) 100ms both;
+    }
+    .page-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-title-C);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: 0.01em;
+      color: var(--text-primary-C);
+      margin-bottom: var(--space-sm);
+    }
+    .page-subtitle {
+      font-size: var(--text-body-C);
+      font-weight: 400;
+      line-height: 1.6;
+      color: var(--text-secondary-C);
+    }
+
+    /* ═══ 问题展示 ═══ */
+    .question-display {
+      text-align: center;
+      margin-bottom: var(--space-lg);
+      animation: fadeIn 500ms var(--ease-out) 200ms both;
+    }
+    .question-text {
+      font-family: var(--font-serif);
+      font-size: var(--text-subtitle-C);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.5;
+      letter-spacing: 0.02em;
+      color: var(--gold-gilt-C);
+    }
+
+    /* ═══ 牌位卡片 ═══ */
+    .card-slot {
+      width: 100%;
+      padding: var(--space-lg);
+      background-color: var(--bg-card-C);
+      border: 1px solid rgba(197,160,80,0.15);
+      border-radius: var(--radius-card-C);
+      margin-bottom: var(--space-md);
+      animation: cardStaggerIn 400ms var(--ease-out) both;
+    }
+    .card-slot:nth-of-type(1) { animation-delay: 300ms; }
+    .card-slot:nth-of-type(2) { animation-delay: 400ms; }
+    .card-slot:nth-of-type(3) { animation-delay: 500ms; }
+
+    .slot-position-row {
+      display: flex; align-items: center; gap: var(--space-sm);
+      margin-bottom: var(--space-md);
+    }
+    .slot-position-icon {
+      width: 16px; height: 16px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .slot-position-icon svg { width: 14px; height: 14px; }
+    .slot-position-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-subtitle-C);
+      font-weight: 700;
+      color: var(--gold-gilt-C);
+      letter-spacing: 0.02em;
+    }
+
+    .slot-content-row {
+      display: flex; align-items: flex-start;
+      gap: var(--space-md);
+    }
+
+    .slot-card-image {
+      width: 80px; height: 126px;
+      background-color: var(--bg-floating-C);
+      border: 1px solid var(--spine-line-C);
+      border-radius: var(--radius-sm-C);
+      box-shadow: var(--shadow-card-c);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .slot-card-image::before {
+      content: '';
+      position: absolute; top: 6px; left: 20%;
+      width: 60%; height: 1px;
+      background-color: var(--gilt-line-top);
+    }
+    .slot-card-image::after {
+      content: '';
+      position: absolute; bottom: 6px; left: 20%;
+      width: 60%; height: 1px;
+      background-color: rgba(197,160,80,0.3);
+    }
+    .slot-card-art {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .slot-text-col {
+      flex: 1;
+      min-width: 0;
+    }
+    .slot-card-name {
+      font-size: var(--text-body-C);
+      font-weight: 700;
+      color: var(--text-primary-C);
+      margin-bottom: var(--space-xs);
+      line-height: 1.3;
+    }
+    .slot-keyword {
+      font-size: var(--text-caption-C);
+      font-weight: 400;
+      color: var(--gold-gilt-C);
+      letter-spacing: 0.03em;
+    }
+    .slot-golden-sentence {
+      font-size: var(--text-body-C);
+      font-weight: 400;
+      line-height: 1.7;
+      color: var(--text-primary-C);
+      margin-top: var(--space-sm);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ═══ 综合解读卡片 ═══ */
+    .summary-card {
+      width: 100%;
+      padding: var(--space-lg);
+      background-color: var(--bg-card-C);
+      border: 1px solid rgba(197,160,80,0.15);
+      border-radius: var(--radius-card-C);
+      margin-bottom: var(--space-md);
+      animation: cardStaggerIn 400ms var(--ease-out) 600ms both;
+    }
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-subtitle-C);
+      font-weight: 700;
+      color: var(--gold-gilt-C);
+      letter-spacing: 0.02em;
+      margin-bottom: var(--space-md);
+      display: flex; align-items: center; gap: var(--space-sm);
+    }
+    .section-title-icon {
+      width: 16px; height: 16px;
+      flex-shrink: 0;
+    }
+    .section-title-icon svg { width: 14px; height: 14px; }
+
+    .summary-body {
+      font-size: var(--text-body-C);
+      font-weight: 400;
+      line-height: 1.8;
+      color: var(--text-primary-C);
+    }
+    .summary-body p { margin-bottom: var(--space-sm); }
+    .summary-body p:last-child { margin-bottom: 0; }
+
+    /* ═══ 边界提醒卡片（温柔但醒目） ═══ */
+    .boundary-card {
+      width: 100%;
+      padding: var(--space-lg);
+      background-color: var(--bg-floating-C);
+      border: 1px solid rgba(197,160,80,0.2);
+      border-radius: var(--radius-card-C);
+      margin-bottom: var(--space-md);
+      animation: cardStaggerIn 400ms var(--ease-out) 700ms both;
+      position: relative;
+    }
+    /* 左侧烫金竖线标记（替代 ⚠️） */
+    .boundary-card::before {
+      content: '';
+      position: absolute;
+      top: var(--space-lg);
+      bottom: var(--space-lg);
+      left: 0;
+      width: 3px;
+      background-color: var(--gold-gilt-C);
+      border-radius: 0 2px 2px 0;
+      opacity: 0.5;
+    }
+    .boundary-body {
+      font-size: var(--text-body-C);
+      font-weight: 400;
+      line-height: 1.8;
+      color: var(--text-primary-C);
+    }
+
+    /* ═══ 行动建议卡片 ═══ */
+    .advice-card {
+      width: 100%;
+      padding: var(--space-lg);
+      background-color: var(--bg-card-C);
+      border: 1px solid rgba(197,160,80,0.12);
+      border-radius: var(--radius-card-C);
+      margin-bottom: var(--space-lg);
+      animation: cardStaggerIn 400ms var(--ease-out) 800ms both;
+    }
+    .advice-body {
+      font-size: var(--text-body-C);
+      font-weight: 400;
+      line-height: 1.8;
+      color: var(--text-primary-C);
+    }
+
+    /* ═══ 分隔线 ═══ */
+    .divider {
+      height: 1px;
+      background-color: var(--spine-line-C);
+      margin-bottom: var(--space-lg);
+    }
+
+    /* ═══ 操作按钮区 ═══ */
+    .action-buttons {
+      display: flex; flex-direction: column;
+      gap: var(--space-md);
+      margin-bottom: var(--space-lg);
+      animation: fadeIn 500ms var(--ease-out) 900ms both;
+    }
+
+    .btn-primary-C {
+      width: 100%; height: 48px;
+      background-color: var(--bg-card-C);
+      border: 1px solid var(--gold-gilt-C);
+      border-radius: var(--radius-btn-C);
+      color: var(--gold-gilt-C);
+      font-family: var(--font-sans);
+      font-size: var(--text-body-C);
+      font-weight: 500;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      gap: var(--space-2xs);
+      transition: background-color 200ms var(--ease-out), transform 150ms var(--ease-out);
+    }
+    .btn-primary-C:hover { background-color: var(--bg-hover-C); }
+    .btn-primary-C:active { transform: scale(0.98); }
+    .btn-primary-C svg { width: 14px; height: 14px; }
+
+    .btn-secondary-gold {
+      width: 100%; height: 48px;
+      background-color: transparent;
+      border: 1.5px solid var(--gold-gilt-C);
+      border-radius: var(--radius-btn-C);
+      color: var(--text-primary-C);
+      font-family: var(--font-sans);
+      font-size: var(--text-body-C);
+      font-weight: 500;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      gap: var(--space-2xs);
+      transition: background-color 200ms var(--ease-out), transform 150ms var(--ease-out);
+    }
+    .btn-secondary-gold:hover { background-color: rgba(197,160,80,0.05); }
+    .btn-secondary-gold:active { transform: scale(0.98); }
+    .btn-secondary-gold svg { width: 14px; height: 14px; }
+
+    .btn-text-C {
+      width: 100%; height: 48px;
+      background-color: transparent;
+      border: 1px solid var(--spine-line-C);
+      border-radius: var(--radius-btn-C);
+      color: var(--text-secondary-C);
+      font-family: var(--font-sans);
+      font-size: var(--text-body-C);
+      font-weight: 400;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      gap: var(--space-2xs);
+      transition: border-color 200ms var(--ease-out), transform 150ms var(--ease-out);
+    }
+    .btn-text-C:hover { border-color: rgba(197,160,80,0.2); }
+    .btn-text-C:active { transform: scale(0.98); }
+    .btn-text-C svg { width: 14px; height: 14px; }
+
+    .companion-hint {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--text-secondary-C);
+      opacity: 0.85;
+      cursor: pointer;
+      padding: var(--space-sm) 0;
+      min-height: 44px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ═══ 底部免责声明（含关系探索专属边界） ═══ */
+    .disclaimer {
+      padding-top: var(--space-md);
+      border-top: 1px solid var(--spine-line-C);
+      text-align: center;
+    }
+    .disclaimer p {
+      font-size: var(--text-disclaimer-C);
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--text-tertiary-C);
+    }
+    .disclaimer .disclaimer-boundary {
+      color: var(--text-secondary-C);
+      margin-top: var(--space-xs);
+      font-style: italic;
+    }
+
+    /* ═══ 降级 ═══ */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- ═══ 顶部导航栏 ═══ -->
+    <nav class="nav-bar">
+      <button class="nav-back" type="button" aria-label="返回">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 4 L6 10 L12 16" stroke="#EBE3CD" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <div class="nav-spacer"></div>
+    </nav>
+
+    <!-- ═══ 可滚动内容区 ═══ -->
+    <main class="scroll-area">
+
+      <!-- 标题区 -->
+      <div class="title-area">
+        <h1 class="page-title">关系探索</h1>
+        <p class="page-subtitle">星澜帮你看见这段关系里的三个位置</p>
+      </div>
+
+      <!-- 问题展示 -->
+      <div class="question-display">
+        <p class="question-text">「这段关系，我还要继续等吗？」</p>
+      </div>
+
+      <!-- ═══ 牌位 1：你的位置 ═══ -->
+      <div class="card-slot">
+        <div class="slot-position-row">
+          <div class="slot-position-icon">
+            <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="7" cy="7" r="2.5" fill="#C5A050" opacity="0.7"/>
+              <circle cx="7" cy="7" r="5.5" stroke="#C5A050" stroke-width="1" fill="none" opacity="0.3"/>
+            </svg>
+          </div>
+          <span class="slot-position-title">你的位置</span>
+        </div>
+        <div class="slot-content-row">
+          <div class="slot-card-image">
+            <div class="slot-card-art">
+              <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6 L21 15 L30 18 L21 21 L18 30 L15 21 L6 18 L15 15 Z" fill="#C5A050" opacity="0.15"/>
+              </svg>
+            </div>
+          </div>
+          <div class="slot-text-col">
+            <div class="slot-card-name">圣杯四 · 正位</div>
+            <div class="slot-keyword">停顿 · 审视</div>
+            <p class="slot-golden-sentence">"你在等一个信号，但那个信号也许早就到了。"</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ 牌位 2：对方的位置 ═══ -->
+      <div class="card-slot">
+        <div class="slot-position-row">
+          <div class="slot-position-icon">
+            <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="7" cy="7" r="2.5" fill="#C5A050" opacity="0.4" stroke="#C5A050" stroke-width="1" stroke-dasharray="2 2"/>
+            </svg>
+          </div>
+          <span class="slot-position-title">对方的位置</span>
+        </div>
+        <div class="slot-content-row">
+          <div class="slot-card-image">
+            <div class="slot-card-art">
+              <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6 L21 15 L30 18 L21 21 L18 30 L15 21 L6 18 L15 15 Z" fill="#C5A050" opacity="0.12"/>
+              </svg>
+            </div>
+          </div>
+          <div class="slot-text-col">
+            <div class="slot-card-name">宝剑侍从 · 逆位</div>
+            <div class="slot-keyword">犹豫 · 回避</div>
+            <p class="slot-golden-sentence">"对方也许还没准备好，这未必和你有关。"</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ 牌位 3：关系此刻 ═══ -->
+      <div class="card-slot">
+        <div class="slot-position-row">
+          <div class="slot-position-icon">
+            <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 2 L8.5 5.5 L12 6 L9.5 8.5 L10 12 L7 10 L4 12 L4.5 8.5 L2 6 L5.5 5.5 Z" fill="#C5A050" opacity="0.6"/>
+            </svg>
+          </div>
+          <span class="slot-position-title">关系此刻</span>
+        </div>
+        <div class="slot-content-row">
+          <div class="slot-card-image">
+            <div class="slot-card-art">
+              <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6 L21 15 L30 18 L21 21 L18 30 L15 21 L6 18 L15 15 Z" fill="#C5A050" opacity="0.15"/>
+              </svg>
+            </div>
+          </div>
+          <div class="slot-text-col">
+            <div class="slot-card-name">恋人 · 正位</div>
+            <div class="slot-keyword">选择 · 真诚</div>
+            <p class="slot-golden-sentence">"关系的走向，取决于谁先愿意先说真话。"</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ 综合解读 ═══ -->
+      <div class="summary-card">
+        <div class="section-title">
+          <span class="section-title-icon">
+            <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 2 L8.5 5.5 L12 6 L9.5 8.5 L10 12 L7 10 L4 12 L4.5 8.5 L2 6 L5.5 5.5 Z" stroke="#C5A050" stroke-width="1" fill="none"/>
+            </svg>
+          </span>
+          综合解读
+        </div>
+        <div class="summary-body">
+          <p>星澜帮你看见了这段关系中的三个位置：</p>
+          <p>你的位置：圣杯四——你在等一个信号，但那个信号也许早就到了。</p>
+          <p>对方的位置：宝剑侍从逆位——对方也许还没准备好，这未必和你有关。</p>
+          <p>关系此刻：恋人——关系的走向，取决于谁先愿意先说真话。</p>
+        </div>
+      </div>
+
+      <!-- ═══ 边界提醒（温柔但醒目，去恐吓感） ═══ -->
+      <div class="boundary-card">
+        <div class="section-title">
+          <span class="section-title-icon">
+            <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <line x1="5" y1="3" x2="5" y2="11" stroke="#C5A050" stroke-width="1.5" stroke-linecap="round"/>
+              <line x1="9" y1="3" x2="9" y2="11" stroke="#C5A050" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </span>
+          边界提醒
+        </div>
+        <p class="boundary-body">关系牌阵是一面镜子，帮你看清自己在这段关系中的感受。它不能预测对方的行为，也不能替代真实的沟通。如果某张牌让你不安——它反映的是此刻的能量，而非注定的结果。你始终有主动权。</p>
+      </div>
+
+      <!-- ═══ 今日行动 ═══ -->
+      <div class="advice-card">
+        <div class="section-title">
+          <span class="section-title-icon">
+            <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 7 L6 10 L11 4" stroke="#C5A050" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          今日可以试试
+        </div>
+        <p class="advice-body">今天，试着用笔写下你对这段关系最真实的感受，不需要给任何人看。</p>
+      </div>
+
+      <!-- 分隔线 -->
+      <div class="divider"></div>
+
+      <!-- ═══ 操作按钮区 ═══ -->
+      <div class="action-buttons">
+        <button class="btn-primary-C" type="button">
+          <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 1 L8.2 5 L12.5 6 L8.2 7 L7 13 L5.8 7 L1.5 6 L5.8 5 Z" fill="#C5A050"/>
+          </svg>
+          留下这张星钥卡
+        </button>
+        <button class="btn-secondary-gold" type="button">
+          <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="2.5" width="10" height="9" rx="1" stroke="#EBE3CD" stroke-width="1.2" fill="none"/>
+            <line x1="2" y1="5.5" x2="12" y2="5.5" stroke="#EBE3CD" stroke-width="1"/>
+            <line x1="5" y1="1.5" x2="5" y2="3.5" stroke="#EBE3CD" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="9" y1="1.5" x2="9" y2="3.5" stroke="#EBE3CD" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          已记入历史
+        </button>
+        <button class="btn-text-C" type="button">
+          <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 7 L7 2 L12 7 M3.5 6 L3.5 12 L10.5 12 L10.5 6" stroke="#8B869B" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          回到首页
+        </button>
+        <div class="companion-hint">再听星澜说一句</div>
+      </div>
+
+      <!-- ═══ 底部免责声明（含关系探索专属边界） ═══ -->
+      <div class="disclaimer">
+        <p>星澜的回应仅供陪伴与自我探索参考，不构成任何专业建议。</p>
+        <p class="disclaimer-boundary">不判断对方心意。只陪你看清自己的感受、期待与边界。</p>
+      </div>
+
+    </main>
+
+  </div>
+</body>
+</html>

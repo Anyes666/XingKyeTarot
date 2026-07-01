@@ -1,0 +1,152 @@
+classDiagram
+    direction TB
+
+    %% ════════ 现有数据模型 ════════
+    class TarotCard {
+        +id: string
+        +index: number
+        +nameZh: string
+        +nameEn: string
+        +arcana: ArcanaType
+        +suit: TarotSuit
+        +image: string
+        +keywords: string[]
+    }
+
+    class HeartOption {
+        +index: number
+        +emoji: string
+        +label: string
+        +emotionTag: EmotionTag
+    }
+
+    class DrawnCardRecord {
+        +positionKey: string
+        +positionTitle: string
+        +cardId: string
+        +cardName: string
+        +isReversed: boolean
+        +keyword: string
+        +goldenSentence: string
+        +brief: string
+        +action: string
+    }
+
+    class DivinationHistoryRecord {
+        +id: string
+        +timestamp: number
+        +spreadType: SpreadType
+        +modeTitle: string
+        +questionText: string
+        +scenarioTag: string
+        +cards: DrawnCardRecord[]
+        +summaryTitle: string
+        +summaryText: string
+        +adviceText: string
+        +shareText: string
+    }
+
+    class StarKeyLevel {
+        +title: string
+        +threshold: number
+        +description: string
+    }
+
+    class EmotionStarRecord {
+        +date: string
+        +starName: string
+        +sourceType: string
+        +cardName: string
+        +createdAt: number
+    }
+
+    %% ════════ 现有组件 ════════
+    class ComplianceFooter {
+        +fontSize: number
+        +textColor: string
+        +showDivider: boolean
+    }
+
+    class TarotCardImage {
+        +cardId: string
+        +cardWidth: number
+        +cardHeight: number
+        -getCardImageResource(cardId: string): Resource
+    }
+
+    class AppBackButton {
+        +fallbackUrl: string
+    }
+
+    %% ════════ 新增公共组件 Props ════════
+    class MoonlightLayer {
+        +strong: boolean
+    }
+
+    class CardFrame {
+        +cardWidth: number
+        +cardHeight: number
+        +showDecorStar: boolean
+    }
+
+    class DivinationEntryCard {
+        +icon: string
+        +title: string
+        +subtitle: string
+        +pressedIndex: number
+        +index: number
+        +onClick: () => void
+    }
+
+    class HeartOptionCard {
+        +emoji: string
+        +label: string
+        +isSelected: boolean
+        +pressedIndex: number
+        +index: number
+        +onClick: () => void
+    }
+
+    class ResultCardSlot {
+        +positionTitle: string
+        +cardId: string
+        +cardName: string
+        +keywords: string
+        +goldenLine: string
+        +cardWidth: number
+        +cardHeight: number
+    }
+
+    class BoundaryReminder {
+        +text: string
+    }
+
+    class LevelUpPopup {
+        +show: boolean
+        +levelTitle: string
+        +levelDays: number
+        +levelDescription: string
+        +onDismiss: () => void
+    }
+
+    %% ════════ 新增页面 ════════
+    class XinglanChatEntrancePage {
+        @@Entry @Component
+    }
+
+    class StarCalendarPage {
+        @@Entry @Component
+    }
+
+    %% ════════ 关系 ════════
+    TarotCard "1" --> "78" TarotCardImage : cardId 映射
+    HeartOption "1" --> HeartOptionCard : 数据绑定
+    DrawnCardRecord "1" --> ResultCardSlot : 数据绑定
+    DivinationHistoryRecord "1" --> "*" DrawnCardRecord : cards 数组
+    StarKeyLevel "1" --> LevelUpPopup : 称号数据
+    EmotionStarRecord "*" --> StarCalendarPage : 日历标记数据源
+    ComplianceFooter "1" --> ResultCardSlot : 结果页复用
+    MoonlightLayer "1" --> XinglanChatEntrancePage : 强光态
+    MoonlightLayer "1" --> XinglanChatPage : 普通态
+    BoundaryReminder "1" --> RelationResultPage : 嵌入
+    LevelUpPopup "1" --> EmotionStarPage : 嵌入触发

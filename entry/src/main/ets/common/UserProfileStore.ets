@@ -65,6 +65,22 @@ export class UserProfileStore {
     }
   }
 
+  static async clearNickname(context: Context): Promise<void> {
+    await UserProfileStore.setNickname('', context);
+  }
+
+  /**
+   * 返回展示用的昵称，保证永远不返回空字符串。
+   * 已设置则返回昵称，否则返回默认昵称。
+   */
+  static async getDisplayNickname(context: Context): Promise<string> {
+    const nickname: string = await UserProfileStore.getNickname(context);
+    if (nickname.trim().length === 0) {
+      return UserProfileStore.DEFAULT_NICKNAME;
+    }
+    return nickname.trim();
+  }
+
   // ── 等级 ──
 
   static async getLevel(context: Context): Promise<string> {

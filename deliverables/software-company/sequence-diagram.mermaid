@@ -1,0 +1,97 @@
+%% ════════ 4.1 占卜流程链路 ════════
+sequenceDiagram
+    participant User as 用户
+    participant DC as DivinationCenterPage
+    participant AH as AskHeartPage
+    participant CD as CardDrawPage
+    participant RG as ResultGoldenPage
+    participant TR as TriangleResultPage
+    participant RR as RelationResultPage
+    participant HS as HistoryStore
+
+    User->>DC: 点击"每日一占"
+    DC->>AH: router.pushUrl(ASK_HEART, {entryMode:'NORMAL_SINGLE'})
+    User->>AH: 选择情绪选项卡
+    AH->>AH: selectedIndex 更新, 选项卡高亮
+    User->>AH: 确认选择
+    AH->>AH: isTransitioning = true (防重复)
+    AH->>CD: router.pushUrl(CARD_DRAW, {spreadType:'SINGLE', heartOptionIndex, emotionTag})
+
+    CD->>CD: animPhase = 'loading' (LoadingProgress)
+    CD->>CD: animPhase = 'fadeIn' (牌背淡入 300ms)
+    CD->>CD: animPhase = 'flipping' (翻牌 600ms, flipAngle 0→180)
+    CD->>CD: animPhase = 'revealed' (停留 500ms)
+    CD->>CD: animPhase = 'particles' (粒子 400ms)
+    CD->>CD: animPhase = 'done' → return 防重复
+    CD->>RG: router.replaceUrl(RESULT_GOLDEN, {cardId, cardName, isReversed, ...})
+
+    RG->>RG: aboutToAppear 解析参数
+    RG->>HS: 自动保存历史记录
+    HS-->>RG: historyRecordId
+    RG->>User: 展示牌面+关键词+金句+深度解读+免责声明
+
+    Note over User,RR: 圣三角/关系探索流程类似，结果页不同
+
+    User->>DC: 点击"圣三角牌阵"
+    DC->>AH: router.pushUrl(ASK_HEART, {entryMode, spreadType:'TRIANGLE'})
+    AH->>CD: 省略...抽牌后
+    CD->>TR: router.replaceUrl(TRIANGLE_RESULT, {cards, questionText})
+    TR->>HS: 自动保存历史
+    TR->>User: 展示3牌位+综合解读+"再听星澜说一句"+免责声明
+
+    User->>DC: 点击"关系探索"
+    DC->>RR: router.pushUrl(RELATION_RESULT 或先经关系探索抽牌)
+    RR->>HS: 自动保存历史
+    RR->>User: 展示多牌交叉解读+边界提醒+"再听星澜说一句"+免责声明
+
+%% ════════ 4.2 等级升级流程 ════════
+sequenceDiagram
+    participant User as 用户
+    participant ES as EmotionStarPage
+    participant ESS as EmotionStarStorage
+    participant LUP as LevelUpPopup
+    participant Home as HomePage/MainFramePage
+
+    User->>ES: 从结果页跳转至情绪星点亮页
+    ES->>ES: aboutToAppear 解析参数 (totalLightDays, currentLevelTitle)
+    ES->>ESS: getNextLevelInfo(totalLightDays)
+    ESS-->>ES: {nextLevelTitle, daysLeft, isMaxLevel}
+    
+    User->>ES: 点击"点亮今日情绪星"
+    ES->>ES: 点亮动画 650ms (V2_ANIM_STAR_LIT)
+    ES->>ES: 星澜反馈文案展示
+    
+    alt 达到新等级阈值
+        ES->>ES: showLevelUp = true
+        ES->>LUP: 弹窗显示 (底部滑入 220ms)
+        LUP->>LUP: 烫金横线 + 衬线称号大字 + 勋章 + 寄语
+        User->>LUP: 点击"继续旅程"
+        LUP->>ES: onDismiss()
+        ES->>ES: showLevelUp = false
+    end
+
+    User->>ES: 点击返回
+    ES->>Home: router.back() / router.replaceUrl(HOME)
+
+%% ════════ 4.3 新建页面入口 ════════
+sequenceDiagram
+    participant User as 用户
+    participant Nav as CompanionBottomNav
+    participant XCE as XinglanChatEntrancePage
+    participant XC as XinglanChatPage
+    participant SC as StarCalendarPage
+
+    Note over User,SC: P2 新增路由入口
+
+    User->>Nav: 点击底部导航"星澜"
+    Nav->>XCE: router.pushUrl(XINGLAN_CHAT_ENTRANCE)
+    XCE->>XCE: aboutToAppear, MoonlightLayer(strong=true) 强光态月光
+    XCE->>User: 展示月光门廊 + 引导文案"慢慢说，星澜会先听你说完"
+    User->>XCE: 点击"进入对话"
+    XCE->>XC: router.replaceUrl(XINGLAN_CHAT)
+    XC->>User: 展示聊天页 (B方案气泡 + 月光层)
+
+    User->>Nav: 点击底部导航"星历"
+    Nav->>SC: router.pushUrl(STAR_CALENDAR)
+    SC->>SC: aboutToAppear, 读取 EmotionStarStorage.getRecords()
+    SC->>User: 展示日历网格 + 占卜记录标记 + 等级进度

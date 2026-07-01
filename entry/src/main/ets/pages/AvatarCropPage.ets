@@ -332,14 +332,14 @@ struct AvatarCropPage {
 
       Row() {
         Text('\u53D6\u6D88')
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2A_FONT_BODY)
+          .fontColor(Theme.V2A_TEXT_SECONDARY)
           .width('44%')
           .height(44)
           .textAlign(TextAlign.Center)
-          .backgroundColor('rgba(27, 27, 48, 0.8)')
-          .borderRadius(Theme.RADIUS_MD)
-          .border({ width: 1, color: 'rgba(148, 163, 184, 0.25)' })
+          .backgroundColor(Theme.V2A_BG_CARD)
+          .borderRadius(Theme.V2A_RADIUS_CARD)
+          .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
           .onClick(() => { this.handleCancel(); })
 
         Blank().width(16)

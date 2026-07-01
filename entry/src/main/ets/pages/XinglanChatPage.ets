@@ -6,6 +6,7 @@ import { router } from '@kit.ArkUI';
 import { Theme } from '../common/Theme';
 import { Routes } from '../common/Routes';
 import { AppBackButton } from '../components/AppBackButton';
+import { MoonlightLayer } from '../components/MoonlightLayer';
 import { UserProfileStore } from '../common/UserProfileStore';
 import {
   XinglanChatRole, XinglanChatMessage, XinglanSpecialIntent,
@@ -20,6 +21,7 @@ import {
   XINGLAN_EMPTY_GUIDE, XINGLAN_LISTENING_TEXT,
   XINGLAN_RESPONSE_DELAY_MIN, XINGLAN_RESPONSE_DELAY_MAX
 } from '../xinglan/data/XinglanTemplates';
+import { selectChatGreeting } from '../data/XinglanNicknameGreetings';
 import { XINGLAN_MINI_INTERACTIONS, XinglanMiniInteractionDef } from '../xinglan/data/XinglanMiniInteractions';
 import { getRandomPaperNote } from '../xinglan/data/XinglanPaperNotes';
 import { resolveSpecialIntent } from '../xinglan/engine/XinglanSpecialIntentResolver';
@@ -96,6 +98,8 @@ struct XinglanChatPage {
   @State savedMemories: XinglanLightMemory[] = [];
   @State memoryInputText: string = '';
   @State userAvatarUri: string = '';
+  @State welcomeText: string = XINGLAN_WELCOME_TEXT;
+  @State chatNickname: string = '未命名旅者';
   private echoTurnCounter: number = 0;
   private lastUserEmotionText: string = '';
 
@@ -103,6 +107,7 @@ struct XinglanChatPage {
     this.showWelcome = true;
     setTimeout(() => { this.showWelcome = false; }, 2500);
     this.loadUserAvatar();
+    this.loadNicknameAndWelcome();
   }
 
   private async loadUserAvatar(): Promise<void> {
@@ -110,6 +115,18 @@ struct XinglanChatPage {
       this.userAvatarUri = await UserProfileStore.getAvatarUri(getContext(this));
     } catch (_err) {
       // keep default (empty = default avatar)
+    }
+  }
+
+  private async loadNicknameAndWelcome(): Promise<void> {
+    try {
+      const context: Context = getContext(this);
+      const name: string = await UserProfileStore.getNickname(context);
+      this.chatNickname = name;
+      const greeting = await selectChatGreeting(name, context);
+      this.welcomeText = greeting.text;
+    } catch (_err) {
+      // 降级：使用 XINGLAN_WELCOME_TEXT 默认文案
     }
   }
 
@@ -742,7 +759,11 @@ struct XinglanChatPage {
 
   build() {
     Stack() {
-      Column().width('100%').height('100%').backgroundColor(Theme.BG_DEEP_INDIGO)
+      // v2: B方案月湖映心 — 最深湖底背景
+      Column().width('100%').height('100%').backgroundColor(Theme.V2B_BG_BASE)
+
+      // B方案月光呼吸层（引入公共组件，6s 无限循环呼吸动画）
+      MoonlightLayer({ strong: false })
 
       Column() {
         // ═══ 顶部栏 ═══
@@ -755,14 +776,15 @@ struct XinglanChatPage {
         .padding({ top: Theme.SAFE_TOP, left: 24, right: 24 })
         .alignItems(VerticalAlign.Center)
 
-        // 星钥圆形图标 — 独立于顶部栏，置于 Stack 最顶层，避免状态栏遮挡
-        Image($r('app.media.app_icon3'))
+        // 星澜头像 — v2 暖金细边 + 月光环
+        Image($r('app.media.app_icon5'))
           .width(42)
           .height(42)
           .borderRadius(21)
-          .border({ width: 1.5, color: 'rgba(232, 184, 61, 0.45)' })
+          .border({ width: 1.5, color: 'rgba(212, 172, 77, 0.55)' })
           .objectFit(ImageFit.Cover)
           .clip(true)
+          .shadow(Theme.V2_HALO_AVATAR_STANDARD)
           .position({ x: '100%', y: Theme.SAFE_TOP + 18 })
           .translate({ x: -66, y: 0 })
           .zIndex(10)
@@ -861,7 +883,7 @@ struct XinglanChatPage {
             .height(36)
             .linearGradient({
               direction: GradientDirection.Bottom,
-              colors: [['#0A0E1C', 0], ['rgba(15,15,35,0)', 1]]
+              colors: [[Theme.V2B_BG_BASE, 0], ['rgba(15,15,35,0)', 1]]
             })
             .hitTestBehavior(HitTestMode.Transparent)
             .position({ x: 0, y: 0 })
@@ -872,7 +894,7 @@ struct XinglanChatPage {
             .height(44)
             .linearGradient({
               direction: GradientDirection.Top,
-              colors: [['rgba(15,15,35,0)', 0], ['#0A0E1C', 1]]
+              colors: [['rgba(6,11,26,0)', 0], [Theme.V2B_BG_BASE, 1]]
             })
             .hitTestBehavior(HitTestMode.Transparent)
             .position({ x: 0, y: '100%' })
@@ -882,8 +904,8 @@ struct XinglanChatPage {
 
         // ═══ 免责声明 ═══
         Text(XINGLAN_DISCLAIMER)
-          .fontSize(11).fontColor(Theme.MOON_MUTED).textAlign(TextAlign.Center)
-          .lineHeight(16).width('100%')
+          .fontSize(Theme.V2B_FONT_DISCLAIMER).fontColor(Theme.V2B_TEXT_SECONDARY).textAlign(TextAlign.Center)
+          .lineHeight(17).width('100%')
           .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, bottom: 4 })
 
         // ═══ 输入区 ═══
@@ -899,12 +921,12 @@ struct XinglanChatPage {
       Row({ space: 10 }) {
         ForEach(chips, (chip: ChipItem) => {
           Text(chip.title)
-            .fontSize(13)
-            .fontColor(Theme.GOLD_AMBER)
-            .padding({ left: 14, right: 14, top: 8, bottom: 8 })
-            .backgroundColor('rgba(202, 138, 4, 0.08)')
-            .borderRadius(18)
-            .border({ width: 1, color: 'rgba(202, 138, 4, 0.2)' })
+            .fontSize(Theme.V2B_FONT_CAPTION)
+            .fontColor(Theme.V2B_GOLD_CORE)
+            .padding({ left: 16, right: 16, top: 8, bottom: 8 })
+            .backgroundColor('rgba(212, 172, 77, 0.06)')
+            .borderRadius(Theme.V2B_RADIUS_CHIP)
+            .border({ width: 1, color: 'rgba(212, 172, 77, 0.15)' })
             .flexShrink(0)
             .onClick(() => { this.onChipClick(chip); })
         }, (chip: ChipItem) => chip.title)
@@ -1232,7 +1254,7 @@ struct XinglanChatPage {
   @Builder buildWelcomeCard(): void {
     Column() {
       Text('🌙').fontSize(36).margin({ bottom: 12 })
-      Text(XINGLAN_WELCOME_TEXT)
+      Text(this.welcomeText)
         .fontSize(Theme.FONT_BODY).fontColor(Theme.TEXT_PRIMARY_LIGHT)
         .lineHeight(24).textAlign(TextAlign.Center).maxLines(6)
     }
@@ -1252,25 +1274,25 @@ struct XinglanChatPage {
   @Builder buildUserBubble(msg: XinglanChatMessage): void {
     Row() {
       Blank()
-      // 用户气泡
+      // 用户气泡 — v2: 半透明白底 + 右上小圆角
       Column() {
         Text(msg.text)
-          .fontSize(Theme.FONT_BODY).fontColor(Theme.TEXT_PRIMARY_LIGHT).lineHeight(24)
-          .padding(14).backgroundColor(Theme.BG_CARD_DARK)
-          .border({ width: 1, color: 'rgba(202, 138, 4, 0.12)' })
-          .borderRadius({ topLeft: Theme.RADIUS_MD, topRight: Theme.RADIUS_MD, bottomLeft: Theme.RADIUS_MD, bottomRight: 4 })
+          .fontSize(Theme.V2B_FONT_BODY).fontColor(Theme.V2B_TEXT_PRIMARY).lineHeight(26)
+          .padding({ left: 16, right: 16, top: 12, bottom: 12 })
+          .backgroundColor('rgba(255, 255, 255, 0.04)')
+          .borderRadius({ topLeft: Theme.V2B_RADIUS_BUBBLE_LARGE, topRight: Theme.V2B_RADIUS_BUBBLE_SMALL, bottomLeft: Theme.V2B_RADIUS_BUBBLE_LARGE, bottomRight: Theme.V2B_RADIUS_BUBBLE_LARGE })
           .constraintSize({ maxWidth: '64%' })
       }
       .alignItems(HorizontalAlign.End)
 
-      // 用户头像（圆形，右侧）
+      // 用户头像（圆形，右侧）— v2 暖金细边 + 月光环
       if (this.userAvatarUri.length > 0) {
         Image(this.userAvatarUri)
           .width(Theme.AVATAR_CHAT_DIAMETER)
           .height(Theme.AVATAR_CHAT_DIAMETER)
           .borderRadius(Theme.AVATAR_CHAT_DIAMETER / 2)
-          .border({ width: Theme.AVATAR_BORDER_WIDTH, color: Theme.AVATAR_BORDER })
-          .shadow(Theme.SHADOW_AVATAR_GLOW)
+          .border({ width: Theme.AVATAR_BORDER_WIDTH, color: 'rgba(212, 172, 77, 0.55)' })
+          .shadow(Theme.V2_HALO_AVATAR_STANDARD)
           .objectFit(ImageFit.Cover)
           .clip(true)
           .margin({ left: 10 })
@@ -1279,8 +1301,8 @@ struct XinglanChatPage {
           .width(Theme.AVATAR_CHAT_DIAMETER)
           .height(Theme.AVATAR_CHAT_DIAMETER)
           .borderRadius(Theme.AVATAR_CHAT_DIAMETER / 2)
-          .border({ width: Theme.AVATAR_BORDER_WIDTH, color: Theme.AVATAR_BORDER })
-          .shadow(Theme.SHADOW_AVATAR_GLOW)
+          .border({ width: Theme.AVATAR_BORDER_WIDTH, color: 'rgba(212, 172, 77, 0.55)' })
+          .shadow(Theme.V2_HALO_AVATAR_STANDARD)
           .objectFit(ImageFit.Cover)
           .clip(true)
           .opacity(0.8)
@@ -1292,22 +1314,23 @@ struct XinglanChatPage {
 
   @Builder buildXinglanBubble(msg: XinglanChatMessage): void {
     Row() {
-      // 星澜头像（圆形，左侧，38vp）
+      // 星澜头像（圆形，左侧）— v2 暖金细边 + 月光环
       Image($r('app.media.app_icon5'))
         .width(Theme.AVATAR_CHAT_DIAMETER)
         .height(Theme.AVATAR_CHAT_DIAMETER)
         .borderRadius(Theme.AVATAR_CHAT_DIAMETER / 2)
-        .border({ width: Theme.AVATAR_BORDER_WIDTH, color: Theme.AVATAR_BORDER })
-        .shadow(Theme.SHADOW_AVATAR_GLOW)
+        .border({ width: Theme.AVATAR_BORDER_WIDTH, color: 'rgba(212, 172, 77, 0.55)' })
+        .shadow(Theme.V2_HALO_AVATAR_STANDARD)
         .objectFit(ImageFit.Cover)
         .margin({ right: 10 })
 
       Column() {
+        // 星澜气泡 — v2: 深蓝底 + 月光白文字 + 左上小圆角
         Text(msg.text)
-          .fontSize(Theme.FONT_BODY).fontColor('#F6E6B8').lineHeight(24)
-          .padding(14).backgroundColor('#17172F')
-          .border({ width: 1, color: 'rgba(202, 138, 4, 0.15)' })
-          .borderRadius({ topLeft: 4, topRight: Theme.RADIUS_MD, bottomLeft: Theme.RADIUS_MD, bottomRight: Theme.RADIUS_MD })
+          .fontSize(Theme.V2B_FONT_BODY).fontColor(Theme.V2B_TEXT_PRIMARY).lineHeight(26)
+          .padding({ left: 16, right: 16, top: 12, bottom: 12 })
+          .backgroundColor(Theme.V2B_BG_CARD)
+          .borderRadius({ topLeft: Theme.V2B_RADIUS_BUBBLE_SMALL, topRight: Theme.V2B_RADIUS_BUBBLE_LARGE, bottomLeft: Theme.V2B_RADIUS_BUBBLE_LARGE, bottomRight: Theme.V2B_RADIUS_BUBBLE_LARGE })
           .constraintSize({ maxWidth: '64%' })
       }
       .alignItems(HorizontalAlign.Start)
@@ -1318,20 +1341,21 @@ struct XinglanChatPage {
 
   @Builder buildListeningHint(): void {
     Row() {
-      // 星澜头像 — typing 状态也显示头像
+      // 星澜头像 — typing 状态也显示头像 — v2 月光环
       Image($r('app.media.app_icon5'))
         .width(Theme.AVATAR_CHAT_DIAMETER)
         .height(Theme.AVATAR_CHAT_DIAMETER)
         .borderRadius(Theme.AVATAR_CHAT_DIAMETER / 2)
-        .border({ width: Theme.AVATAR_BORDER_WIDTH, color: Theme.AVATAR_BORDER })
-        .shadow(Theme.SHADOW_AVATAR_GLOW)
+        .border({ width: Theme.AVATAR_BORDER_WIDTH, color: 'rgba(212, 172, 77, 0.55)' })
+        .shadow(Theme.V2_HALO_AVATAR_STANDARD)
         .objectFit(ImageFit.Cover)
         .margin({ right: 10 })
       Column() {
         Text(XINGLAN_LISTENING_TEXT)
-          .fontSize(14).fontColor(Theme.MOON_MUTED).fontStyle(FontStyle.Italic)
-          .padding(12).backgroundColor('rgba(23, 23, 47, 0.6)')
-          .borderRadius({ topLeft: 4, topRight: Theme.RADIUS_MD, bottomLeft: Theme.RADIUS_MD, bottomRight: Theme.RADIUS_MD })
+          .fontSize(Theme.V2B_FONT_CAPTION).fontColor(Theme.V2B_TEXT_SECONDARY).fontStyle(FontStyle.Italic)
+          .padding({ left: 16, right: 16, top: 12, bottom: 12 })
+          .backgroundColor(Theme.V2B_BG_CARD)
+          .borderRadius({ topLeft: Theme.V2B_RADIUS_BUBBLE_SMALL, topRight: Theme.V2B_RADIUS_BUBBLE_LARGE, bottomLeft: Theme.V2B_RADIUS_BUBBLE_LARGE, bottomRight: Theme.V2B_RADIUS_BUBBLE_LARGE })
       }
       .alignItems(HorizontalAlign.Start)
       Blank()
@@ -1594,22 +1618,23 @@ struct XinglanChatPage {
   @Builder buildInputArea(): void {
     Row() {
       TextInput({ placeholder: XINGLAN_INPUT_PLACEHOLDER, text: this.inputText })
-        .placeholderColor(Theme.MOON_MUTED).fontSize(Theme.FONT_BODY).fontColor(Theme.TEXT_PRIMARY_LIGHT)
-        .backgroundColor(Theme.BG_CARD_DARK).borderRadius(Theme.RADIUS_FULL)
-        .height(46).layoutWeight(1).padding({ left: 18, right: 18 })
-        .border({ width: 1, color: 'rgba(202, 138, 4, 0.2)' })
+        .placeholderColor('rgba(149, 144, 168, 0.5)')
+        .fontSize(Theme.V2B_FONT_BODY).fontColor(Theme.V2B_TEXT_PRIMARY)
+        .backgroundColor(Theme.V2B_BG_CARD).borderRadius(Theme.V2B_RADIUS_BTN)
+        .height(48).layoutWeight(1).padding({ left: 16, right: 16 })
+        .border({ width: 1, color: Theme.V2B_BORDER })
         .onChange((value: string) => { this.onInputChange(value); })
         .onSubmit(() => { this.sendMessage(); })
 
       Text('↑')
-        .fontSize(20).fontColor('#111426').width(46).height(46)
-        .borderRadius(23).backgroundColor(Theme.GOLD_AMBER).textAlign(TextAlign.Center)
-        .shadow({ radius: 10, color: 'rgba(202, 138, 4, 0.4)', offsetX: 0, offsetY: 2 })
-        .margin({ left: 10 })
+        .fontSize(20).fontColor(Theme.V2B_GOLD_CORE).width(48).height(48)
+        .borderRadius(Theme.V2B_RADIUS_BTN).backgroundColor(Theme.V2B_BG_CARD).textAlign(TextAlign.Center)
+        .shadow(Theme.V2B_SHADOW_BTN_GLOW)
+        .margin({ left: 12 })
         .onClick(() => { this.sendMessage(); })
     }
     .width('100%')
-    .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, top: 10, bottom: Theme.SAFE_BOTTOM })
-    .backgroundColor(Theme.BG_DEEP_INDIGO)
+    .padding({ left: Theme.SPACE_LG, right: Theme.SPACE_LG, top: 10, bottom: Theme.SAFE_BOTTOM })
+    .backgroundColor(Theme.V2B_BG_BASE)
   }
 }

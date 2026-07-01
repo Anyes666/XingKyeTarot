@@ -61,6 +61,8 @@ struct CardDrawPage {
   @State private animPhase: string = 'loading';
   @State private flipAngle: number = 0;
   @State private cardOpacity: number = 0;
+  // ── B 方案月光呼吸动画状态 ──
+  @State private moonlightOpacity: number = 0.6;
 
   async aboutToAppear(): Promise<void> {
     // 接收路由参数
@@ -82,6 +84,15 @@ struct CardDrawPage {
       this.questionText = '';
       this.isPositiveMode = false;
     }
+
+    // B 方案月光呼吸动画（6s 无限循环）
+    animateTo({
+      duration: Theme.V2_ANIM_MOONLIGHT_BREATH,
+      iterations: -1,
+      curve: Curve.EaseInOut
+    }, () => {
+      this.moonlightOpacity = 1.0;
+    });
   }
 
   onPageShow(): void {
@@ -192,7 +203,23 @@ struct CardDrawPage {
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.BG_DEEP_INDIGO)
+        .backgroundColor(Theme.V2C_BG_BASE)
+
+      // ── B 方案月光呼吸光晕层（顶部 6s 循环）──
+      Column()
+        .width('100%')
+        .height(220)
+        .radialGradient({
+          center: ['50%', '20%'],
+          radius: '55%',
+          colors: [
+            ['rgba(212,172,77,0.04)', 0.0],
+            ['rgba(212,172,77,0.01)', 0.6],
+            ['rgba(10,13,26,0)', 1.0]
+          ]
+        })
+        .opacity(this.moonlightOpacity)
+        .hitTestBehavior(HitTestMode.None)
 
       // ── 星星背景粒子（简化为静态暗色背景 + loading 指示）──
       if (this.animPhase === 'loading' || this.animPhase === 'fadeIn') {
@@ -200,7 +227,7 @@ struct CardDrawPage {
           LoadingProgress()
             .width(48)
             .height(48)
-            .color(Theme.GOLD_LIGHT)
+            .color(Theme.V2C_GOLD_GILT_SOFT)
         }
         .width('100%')
         .height('100%')
@@ -219,8 +246,8 @@ struct CardDrawPage {
         // ── TopBar 标题区（layoutWeight 14）──
         Column() {
           Text('星澜正在为你抽一张牌')
-            .fontSize(Theme.FONT_SUBTITLE)
-            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+            .fontSize(Theme.V2C_FONT_SUBTITLE)
+            .fontColor(Theme.V2C_TEXT_PRIMARY)
             .fontWeight(FontWeight.Bold)
             .textAlign(TextAlign.Center)
         }
@@ -262,8 +289,8 @@ struct CardDrawPage {
         Column() {
           if (this.animPhase !== 'particles' && this.animPhase !== 'done' && this.cardId) {
             Text('星澜正在解读你的心事...')
-              .fontSize(Theme.FONT_BODY)
-              .fontColor(Theme.MOON_MUTED)
+              .fontSize(Theme.V2C_FONT_BODY)
+              .fontColor(Theme.V2C_TEXT_SECONDARY)
               .margin({ top: Theme.SPACE_MD })
               .opacity(this.cardOpacity)
           }
@@ -271,7 +298,7 @@ struct CardDrawPage {
           LoadingProgress()
             .width(40)
             .height(40)
-            .color(Theme.GOLD_LIGHT)
+            .color(Theme.V2C_GOLD_GILT_SOFT)
             .margin({ top: Theme.SPACE_MD })
         }
         .width('100%')

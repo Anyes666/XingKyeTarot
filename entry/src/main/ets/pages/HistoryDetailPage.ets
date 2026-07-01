@@ -125,7 +125,7 @@ struct HistoryDetailPage {
           LoadingProgress()
             .width(36)
             .height(36)
-            .color(Theme.GOLD_AMBER)
+            .color(Theme.V2A_GOLD_ACCENT)
             .margin({ top: 80 })
         }
         .width('100%')
@@ -134,16 +134,16 @@ struct HistoryDetailPage {
       } else if (!this.record) {
         Column() {
           Text('记录不存在')
-            .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.MOON_MUTED)
+            .fontSize(Theme.V2A_FONT_BODY)
+            .fontColor(Theme.V2A_TEXT_SECONDARY)
             .margin({ top: 80 })
 
           Button('返回历史记录')
             .type(ButtonType.Normal)
-            .fontSize(Theme.FONT_BODY)
+            .fontSize(Theme.V2A_FONT_BODY)
             .fontColor(Color.White)
-            .backgroundColor(Theme.GOLD_AMBER)
-            .borderRadius(Theme.RADIUS_FULL)
+            .backgroundColor(Theme.V2A_GOLD_ACCENT)
+            .borderRadius(Theme.V2_RADIUS_FULL)
             .margin({ top: Theme.SPACE_MD })
             .onClick(() => {
               try {
@@ -166,8 +166,8 @@ struct HistoryDetailPage {
               Blank()
 
               Text('历史详情')
-                .fontSize(Theme.FONT_SUBTITLE)
-                .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                .fontSize(Theme.V2A_FONT_TITLE)
+                .fontColor(Theme.V2A_TEXT_PRIMARY)
                 .fontWeight(FontWeight.Bold)
 
               Blank()
@@ -182,21 +182,21 @@ struct HistoryDetailPage {
             // ── 基本信息区 ──
             Column() {
               Text(this.record!.modeTitle)
-                .fontSize(Theme.FONT_HEADLINE)
-                .fontColor(Theme.GOLD_AMBER)
+                .fontSize(Theme.V2A_FONT_DISPLAY)
+                .fontColor(Theme.V2A_GOLD_ACCENT)
                 .fontWeight(FontWeight.Bold)
                 .margin({ bottom: Theme.SPACE_XS })
 
               Text(this.formatDate(this.record!.timestamp))
-                .fontSize(Theme.FONT_CAPTION)
-                .fontColor(Theme.MOON_MUTED)
+                .fontSize(Theme.V2A_FONT_CAPTION)
+                .fontColor(Theme.V2A_TEXT_SECONDARY)
                 .margin({ bottom: 4 })
 
               // 展示用户选择的情绪方向
               if (this.record!.questionText && this.record!.questionText.length > 0) {
                 Text(this.record!.questionText)
-                  .fontSize(Theme.FONT_CAPTION)
-                  .fontColor(Theme.TEXT_SECONDARY)
+                  .fontSize(Theme.V2A_FONT_CAPTION)
+                  .fontColor(Theme.V2A_TEXT_SECONDARY)
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
                   .margin({ bottom: Theme.SPACE_SM })
@@ -204,9 +204,9 @@ struct HistoryDetailPage {
             }
             .width('90%')
             .padding(Theme.SPACE_LG)
-            .backgroundColor(Theme.BG_CARD_DARK)
-            .borderRadius(Theme.RADIUS_MD)
-            .border({ width: 1, color: 'rgba(202, 138, 4, 0.12)' })
+            .backgroundColor(Theme.V2A_BG_CARD)
+            .borderRadius(Theme.V2A_RADIUS_CARD)
+            .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
             .margin({ bottom: Theme.SPACE_MD })
 
             // ── 卡牌区（P0.3 整改：使用 TarotCardImage）──
@@ -218,14 +218,14 @@ struct HistoryDetailPage {
             if (this.record!.summaryText) {
               Column() {
                 Text('综合解读')
-                  .fontSize(Theme.FONT_SUBTITLE)
-                  .fontColor(Theme.GOLD_LIGHT)
+                  .fontSize(Theme.V2A_FONT_SUBTITLE)
+                  .fontColor(Theme.V2A_GOLD_GLOW)
                   .fontWeight(FontWeight.Bold)
                   .margin({ bottom: Theme.SPACE_SM })
 
                 Text(this.record!.summaryText)
-                  .fontSize(Theme.FONT_BODY)
-                  .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                  .fontSize(Theme.V2A_FONT_BODY)
+                  .fontColor(Theme.V2A_TEXT_PRIMARY)
                   .lineHeight(Theme.FONT_BODY * 1.6)
               }
               .width('90%')
@@ -240,8 +240,8 @@ struct HistoryDetailPage {
             if (this.record!.adviceText) {
               Column() {
                 Text('行动建议')
-                  .fontSize(Theme.FONT_SUBTITLE)
-                  .fontColor(Theme.GOLD_LIGHT)
+                  .fontSize(Theme.V2A_FONT_SUBTITLE)
+                  .fontColor(Theme.V2A_GOLD_GLOW)
                   .fontWeight(FontWeight.Bold)
                   .margin({ bottom: Theme.SPACE_SM })
 
@@ -275,8 +275,8 @@ struct HistoryDetailPage {
 
             // ── 合规页脚 ──
             ComplianceFooter({
-              fontSize: Theme.FONT_CAPTION,
-              textColor: Theme.MOON_MUTED,
+              fontSize: Theme.V2A_FONT_CAPTION,
+              textColor: Theme.V2A_TEXT_SECONDARY,
               showDivider: true,
             })
           }
@@ -291,7 +291,7 @@ struct HistoryDetailPage {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(Theme.BG_DEEP_INDIGO)
+    .backgroundColor(Theme.V2A_BG_BASE)
   }
 
   /**
@@ -303,8 +303,8 @@ struct HistoryDetailPage {
       ForEach(cards, (cardRecord: DrawnCardRecord) => {
         Column() {
           Text(cardRecord.positionTitle)
-            .fontSize(Theme.FONT_CAPTION)
-            .fontColor(Theme.GOLD_AMBER)
+            .fontSize(Theme.V2A_FONT_CAPTION)
+            .fontColor(Theme.V2A_GOLD_ACCENT)
             .fontWeight(FontWeight.Bold)
             .margin({ bottom: Theme.SPACE_XS })
 
@@ -315,15 +315,15 @@ struct HistoryDetailPage {
           })
 
           Text(cardRecord.cardName)
-            .fontSize(Theme.FONT_CAPTION)
-            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+            .fontSize(Theme.V2A_FONT_CAPTION)
+            .fontColor(Theme.V2A_TEXT_PRIMARY)
             .margin({ top: Theme.SPACE_XS })
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
 
           Text(cardRecord.keyword)
             .fontSize(10)
-            .fontColor(Theme.MOON_MUTED)
+            .fontColor(Theme.V2A_TEXT_SECONDARY)
             .margin({ top: 2 })
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -334,9 +334,9 @@ struct HistoryDetailPage {
     .width('100%')
     .justifyContent(FlexAlign.SpaceEvenly)
     .padding({ top: Theme.SPACE_MD, bottom: Theme.SPACE_MD })
-    .backgroundColor(Theme.BG_CARD_DARK)
-    .borderRadius(Theme.RADIUS_MD)
-    .border({ width: 1, color: 'rgba(202, 138, 4, 0.12)' })
+    .backgroundColor(Theme.V2A_BG_CARD)
+    .borderRadius(Theme.V2A_RADIUS_CARD)
+    .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
     .margin({ bottom: Theme.SPACE_MD })
   }
 }
