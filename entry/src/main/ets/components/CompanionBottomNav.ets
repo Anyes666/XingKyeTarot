@@ -8,6 +8,8 @@ interface NavTabConfig {
   icon: string;
   label: string;
   onClick: () => void;
+  /** 图标垂直微调偏移（vp），用于补偿 Unicode 字符基线差异 */
+  iconOffsetY?: number;
 }
 
 /**
@@ -39,15 +41,17 @@ export struct CompanionBottomNav {
 
   private readonly tabs: NavTabConfig[] = [
     {
-      icon: '◇',
+      icon: '⬡',
       label: '塔罗',
+      iconOffsetY: 1,
       onClick: (): void => {
         this.onTabChange(0);
       }
     },
     {
-      icon: '◉',
+      icon: '☾',
       label: '星澜聊天',
+      iconOffsetY: 1,
       onClick: (): void => {
         this.onTabChange(1);
       }
@@ -55,20 +59,23 @@ export struct CompanionBottomNav {
     {
       icon: '✦',
       label: '星澜语录',
+      iconOffsetY: 0,
       onClick: (): void => {
         this.onTabChange(2);
       }
     },
     {
-      icon: '▦',
+      icon: '▤',
       label: '卡牌总览',
+      iconOffsetY: 0,
       onClick: (): void => {
         this.onTabChange(3);
       }
     },
     {
-      icon: '☺',
+      icon: '◎',
       label: '我的',
+      iconOffsetY: 0,
       onClick: (): void => {
         this.onTabChange(4);
       }
@@ -91,14 +98,25 @@ export struct CompanionBottomNav {
         Row() {
           ForEach(this.tabs, (tab: NavTabConfig, index: number) => {
             Column() {
-              Text(tab.icon)
-                .fontSize(22)
-                .fontColor(this.currentTab === index ? '#E8B83D' : '#8F96B2')
+              // 图标固定高度容器 + 垂直微调
+              Column() {
+                Text(tab.icon)
+                  .fontSize(21)
+                  .lineHeight(24)
+                  .fontColor(this.currentTab === index ? '#E8B83D' : '#8F96B2')
+                  .textAlign(TextAlign.Center)
+              }
+              .width('100%')
+              .height(24)
+              .justifyContent(FlexAlign.Center)
+              .translate({ y: tab.iconOffsetY ?? 0 })
+
               Text(tab.label)
                 .fontSize(12)
+                .lineHeight(16)
                 .fontColor(this.currentTab === index ? '#E8B83D' : '#9AA2BD')
                 .fontWeight(this.currentTab === index ? FontWeight.Bold : FontWeight.Normal)
-                .margin({ top: 2 })
+                .margin({ top: 3 })
             }
             .layoutWeight(1)
             .height('100%')

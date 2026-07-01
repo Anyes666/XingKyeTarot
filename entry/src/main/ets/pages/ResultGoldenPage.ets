@@ -108,6 +108,8 @@ struct ResultGoldenPage {
 
   // ── 情绪星点亮状态 ──
   @State private isTodayLit: boolean = false;
+  @State private followUpPressed: boolean = false;
+  @State private sharePressed: boolean = false;
   @State private totalLightDays: number = 0;
   @State private currentLevelTitle: string = '初见';
 
@@ -613,6 +615,21 @@ struct ResultGoldenPage {
         .backgroundColor(Theme.V2C_BG_CARD)
         .borderRadius(Theme.V2C_RADIUS_BTN)
         .border({ width: 1, color: Theme.V2C_GOLD_GILT })
+        .scale({
+          x: this.followUpPressed ? Theme.PRESS_SCALE : 1.0,
+          y: this.followUpPressed ? Theme.PRESS_SCALE : 1.0
+        })
+        .animation({
+          duration: Theme.ANIM_PRESS_DURATION,
+          curve: Theme.V2_EASE_OUT
+        })
+        .onTouch((event: TouchEvent) => {
+          if (event.type === TouchType.Down) {
+            this.followUpPressed = true;
+          } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+            this.followUpPressed = false;
+          }
+        })
         .onClick(() => {
           const followUpParams: FollowUpRouteParams = {
             cardId: this.cardId,
@@ -641,6 +658,21 @@ struct ResultGoldenPage {
         .backgroundColor(Color.Transparent)
         .borderRadius(Theme.V2C_RADIUS_BTN)
         .border({ width: 1.5, color: Theme.V2C_GOLD_GILT })
+        .scale({
+          x: this.sharePressed ? Theme.PRESS_SCALE : 1.0,
+          y: this.sharePressed ? Theme.PRESS_SCALE : 1.0
+        })
+        .animation({
+          duration: Theme.ANIM_PRESS_DURATION,
+          curve: Theme.V2_EASE_OUT
+        })
+        .onTouch((event: TouchEvent) => {
+          if (event.type === TouchType.Down) {
+            this.sharePressed = true;
+          } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+            this.sharePressed = false;
+          }
+        })
         .onClick(() => {
           const shareCardParams: ShareCardRouteParams = {
             sourceRecordId: this.historyRecordId || this.recordId,

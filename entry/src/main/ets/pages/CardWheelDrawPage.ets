@@ -161,6 +161,7 @@ struct CardWheelDrawPage {
   @State private isSnapping: boolean = false;
   /** 确认按钮是否可点击（显式 @State，确保 UI 刷新） */
   @State private confirmBtnEnabled: boolean = true;
+  @State private confirmPressed: boolean = false;
   /** 中心光晕透明度（0-1，吸附后渐显） */
   @State private centerGlowAlpha: number = 0;
   /** 惯性速度（vp/frame，仅在惯性阶段有效） */
@@ -802,6 +803,22 @@ struct CardWheelDrawPage {
             .backgroundColor(Theme.V2C_GOLD_GILT)
             .borderRadius(Theme.V2_RADIUS_FULL)
             .opacity(this.confirmBtnEnabled ? 1.0 : 0.5)
+            .scale({
+              x: this.confirmPressed ? Theme.PRESS_SCALE : 1.0,
+              y: this.confirmPressed ? Theme.PRESS_SCALE : 1.0
+            })
+            .animation({
+              duration: Theme.ANIM_PRESS_DURATION,
+              curve: Theme.V2_EASE_OUT
+            })
+            .onTouch((event: TouchEvent) => {
+              if (!this.confirmBtnEnabled) { return; }
+              if (event.type === TouchType.Down) {
+                this.confirmPressed = true;
+              } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+                this.confirmPressed = false;
+              }
+            })
             .onClick(() => {
               this.confirmSelection();
             })

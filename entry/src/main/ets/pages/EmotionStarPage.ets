@@ -36,6 +36,8 @@ struct EmotionStarPage {
   @State nextLevelTitle: string = '星火初亮';
   @State daysToNextLevel: number = 1;
   @State isMaxLevel: boolean = false;
+  @State private homeBtnPressed: boolean = false;
+  @State private calendarBtnPressed: boolean = false;
 
   // ── P1 预留：LevelUpPopup 触发逻辑（P2 阶段替换为真实弹窗组件）──
   @State showLevelUp: boolean = false;
@@ -240,6 +242,21 @@ struct EmotionStarPage {
                 .fontWeight(FontWeight.Bold)
                 .backgroundColor(Theme.V2B_GOLD_CORE)
                 .borderRadius(Theme.V2B_RADIUS_BTN)
+                .scale({
+                  x: this.homeBtnPressed ? Theme.PRESS_SCALE : 1.0,
+                  y: this.homeBtnPressed ? Theme.PRESS_SCALE : 1.0
+                })
+                .animation({
+                  duration: Theme.ANIM_PRESS_DURATION,
+                  curve: Theme.V2_EASE_OUT
+                })
+                .onTouch((event: TouchEvent) => {
+                  if (event.type === TouchType.Down) {
+                    this.homeBtnPressed = true;
+                  } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+                    this.homeBtnPressed = false;
+                  }
+                })
                 .onClick(() => {
                   try {
                     router.replaceUrl({ url: Routes.MAIN_FRAME });
@@ -258,6 +275,21 @@ struct EmotionStarPage {
                 .backgroundColor(Theme.V2B_BG_CARD)
                 .border({ width: 1, color: Theme.V2B_GOLD_CORE })
                 .borderRadius(Theme.V2B_RADIUS_BTN)
+                .scale({
+                  x: this.calendarBtnPressed ? Theme.PRESS_SCALE : 1.0,
+                  y: this.calendarBtnPressed ? Theme.PRESS_SCALE : 1.0
+                })
+                .animation({
+                  duration: Theme.ANIM_PRESS_DURATION,
+                  curve: Theme.V2_EASE_OUT
+                })
+                .onTouch((event: TouchEvent) => {
+                  if (event.type === TouchType.Down) {
+                    this.calendarBtnPressed = true;
+                  } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+                    this.calendarBtnPressed = false;
+                  }
+                })
                 .onClick(() => {
                   try {
                     const params: StarCalendarParams = { tab: 4 };
