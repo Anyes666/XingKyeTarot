@@ -406,10 +406,11 @@ struct DivinationCenterTabContent {
 struct XinglanChatTabContent {
   @State private buttonPressed: boolean = false;
 
-  private static readonly GOLD_CAPSULE_BG: string = '#E5A50A';
-  private static readonly GOLD_CAPSULE_PRESSED: string = '#CA8A04';
-  private static readonly ENTRY_CARD_BG: string = 'rgba(26, 26, 48, 0.72)';
-  private static readonly ENTRY_CARD_BORDER: string = 'rgba(216, 180, 90, 0.14)';
+  // v2 Token（B 方案·月湖映心）— 逐步迁移，旧常量保留兼容
+  private static readonly GOLD_CAPSULE_BG: string = Theme.V2B_GOLD_CORE;
+  private static readonly GOLD_CAPSULE_PRESSED: string = '#B8943D';
+  private static readonly ENTRY_CARD_BG: string = 'rgba(15, 24, 53, 0.72)';
+  private static readonly ENTRY_CARD_BORDER: string = 'rgba(212, 172, 77, 0.14)';
 
   build() {
     Stack() {
@@ -422,8 +423,8 @@ struct XinglanChatTabContent {
         .linearGradient({
           direction: GradientDirection.Bottom,
           colors: [
-            [Theme.BG_DEEP_SPACE, 0.0],
-            [Theme.BG_DEEP_INDIGO, 0.45],
+            [Theme.V2B_BG_BASE, 0.0],
+            [Theme.V2B_BG_BASE, 0.45],
             ['#0A0D20', 1.0]
           ]
         })
@@ -440,7 +441,7 @@ struct XinglanChatTabContent {
         .hitTestBehavior(HitTestMode.Transparent)
 
       // ═══════════════════════════════════════════
-      // Layer 3: 渐变遮罩（上下消隐）
+      // Layer 3: 渐变遮罩（上下消隐）— v2 月湖底色
       // ═══════════════════════════════════════════
       Column()
         .width('100%')
@@ -448,11 +449,11 @@ struct XinglanChatTabContent {
         .linearGradient({
           direction: GradientDirection.Bottom,
           colors: [
-            ['rgba(5, 7, 20, 0.92)', 0.0],
-            ['rgba(15, 15, 35, 0.55)', 0.12],
-            ['rgba(15, 15, 35, 0.08)', 0.30],
-            ['rgba(15, 15, 35, 0.04)', 0.50],
-            ['rgba(10, 13, 32, 0.35)', 0.72],
+            ['rgba(6, 11, 26, 0.92)', 0.0],
+            ['rgba(6, 11, 26, 0.55)', 0.12],
+            ['rgba(6, 11, 26, 0.08)', 0.30],
+            ['rgba(6, 11, 26, 0.04)', 0.50],
+            ['rgba(6, 11, 26, 0.35)', 0.72],
             ['#0A0D20', 1.0]
           ]
         })
@@ -470,17 +471,17 @@ struct XinglanChatTabContent {
 
           // 标题
           Text('星澜聊天')
-            .fontSize(Theme.FONT_HEADLINE)
-            .fontColor(Theme.GOLD_LIGHT)
-            .fontWeight(FontWeight.Bold)
+            .fontSize(Theme.V2B_FONT_TITLE)
+            .fontColor(Theme.V2B_TEXT_PRIMARY)
+            .fontWeight(FontWeight.Normal)
             .textAlign(TextAlign.Center)
             .width('100%')
             .margin({ top: Theme.SPACE_LG })
 
           // 副标题
           Text('慢慢说，星澜会先听你说完。')
-            .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.MOON_MUTED)
+            .fontSize(Theme.V2B_FONT_BODY)
+            .fontColor(Theme.V2B_TEXT_SECONDARY)
             .textAlign(TextAlign.Center)
             .width('100%')
             .margin({ top: Theme.SPACE_SM, bottom: Theme.SPACE_XXL })
@@ -494,27 +495,22 @@ struct XinglanChatTabContent {
               .borderRadius(44)
               .objectFit(ImageFit.Cover)
               .clip(true)
-              .border({ width: 2.5, color: 'rgba(232, 184, 61, 0.55)' })
-              .shadow({
-                radius: 22,
-                color: 'rgba(230, 168, 0, 0.22)',
-                offsetX: 0,
-                offsetY: 0
-              })
+              .border({ width: 2, color: 'rgba(212, 172, 77, 0.55)' })
+              .shadow(Theme.V2_HALO_AVATAR_ACTIVE)
               .margin({ bottom: 20 })
 
             // 星澜名字
             Text('星澜在这里')
               .fontSize(20)
-              .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+              .fontColor(Theme.V2B_TEXT_PRIMARY)
               .fontWeight(FontWeight.Medium)
               .margin({ bottom: 16 })
 
             // 引导文案
             Text('你可以慢慢说。\n星澜不会替你判断，也不会催你变好。\n这里，只陪你把心里的话放下来一点。')
-              .fontSize(Theme.FONT_BODY)
-              .fontColor(Theme.GOLD_PALE)
-              .lineHeight(26)
+              .fontSize(Theme.V2B_FONT_BODY)
+              .fontColor(Theme.V2B_GOLD_RIPPLE)
+              .lineHeight(28)
               .textAlign(TextAlign.Center)
               .maxLines(5)
               .width('86%')
@@ -526,24 +522,17 @@ struct XinglanChatTabContent {
           // ═══ 进入聊天按钮 ═══
           Column() {
             Text('进入星澜聊天')
-              .fontSize(17)
-              .fontColor('#0A0D20')
-              .fontWeight(FontWeight.Bold)
+              .fontSize(Theme.V2B_FONT_BODY)
+              .fontColor(Theme.V2B_GOLD_CORE)
+              .fontWeight(FontWeight.Medium)
               .width('100%')
-              .height(56)
+              .height(52)
               .textAlign(TextAlign.Center)
-              .backgroundColor(this.buttonPressed ?
-                XinglanChatTabContent.GOLD_CAPSULE_PRESSED :
-                XinglanChatTabContent.GOLD_CAPSULE_BG)
-              .borderRadius(Theme.RADIUS_FULL)
-              .shadow({
-                radius: this.buttonPressed ? 8 : 16,
-                color: this.buttonPressed ?
-                  'rgba(202, 138, 4, 0.35)' :
-                  'rgba(202, 138, 4, 0.45)',
-                offsetX: 0,
-                offsetY: this.buttonPressed ? 1 : 3
-              })
+              .backgroundColor(Theme.V2B_BG_CARD)
+              .borderRadius(Theme.V2B_RADIUS_BTN)
+              .shadow(this.buttonPressed ?
+                { radius: 8, color: 'rgba(212,172,77,0.08)', offsetX: 0, offsetY: 0 } :
+                Theme.V2B_SHADOW_BTN_GLOW)
               .scale({ x: this.buttonPressed ? 0.98 : 1, y: this.buttonPressed ? 0.98 : 1 })
               .animation({ duration: 140, curve: Curve.EaseOut })
               .onTouch((event: TouchEvent) => {
@@ -568,8 +557,8 @@ struct XinglanChatTabContent {
 
           // 按钮副文案
           Text('开始一段安静的对话')
-            .fontSize(Theme.FONT_CAPTION)
-            .fontColor(Theme.MOON_MUTED)
+            .fontSize(Theme.V2B_FONT_CAPTION)
+            .fontColor(Theme.V2B_TEXT_SECONDARY)
             .opacity(0.65)
             .textAlign(TextAlign.Center)
             .margin({ bottom: Theme.SPACE_XXL })
@@ -578,11 +567,11 @@ struct XinglanChatTabContent {
 
           // ═══ 免责声明 ═══
           Text('星澜的回应仅供陪伴与自我探索参考，不构成任何专业建议。')
-            .fontSize(11)
-            .fontColor(Theme.MOON_MUTED)
+            .fontSize(Theme.V2B_FONT_DISCLAIMER)
+            .fontColor(Theme.V2B_TEXT_SECONDARY)
             .opacity(0.55)
             .textAlign(TextAlign.Center)
-            .lineHeight(16)
+            .lineHeight(17)
             .width('100%')
             .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, bottom: 16 })
         }

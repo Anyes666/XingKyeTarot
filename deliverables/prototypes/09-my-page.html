@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<!--
+  星钥塔罗 · 我的页面
+  设计系统：A 方案「星图档案」为主 + B「月湖映心」月光底色
+  基准尺寸：390×844 (iPhone 14 / HarmonyOS 主流机型)
+  设计系统专家：彩格调（Cai）
+  原型构建师：筑原型（Zhu）
+
+  ▸ 铁律 1 执行：星澜形象可用星钥符号，禁止全屏立绘
+  ▸ 铁律 3 执行：星钥等级阈值 0/1/7/21/30/90/180/365 天
+  ▸ 铁律 4 执行：月光呼吸 + 区块入场（标准版），降级方案已标注
+  ▸ 设计意图：把"我的"设计成用户的私人星钥档案
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>我的 · 星钥塔罗</title>
+  <style>
+    :root {
+      /* ── A 方案色彩 ── */
+      --bg-base-A: #080B18;
+      --bg-card-A: #10142A;
+      --bg-floating-A: #161C38;
+      --bg-hover-A: #1A2042;
+      --text-primary-A: #EDE8D8;
+      --text-secondary-A: #8A8498;
+      --text-tertiary-A: #5C5870;
+      --gold-accent-A: #C9A44B;
+      --gold-glow-A: #E8D5A3;
+      --orbit-line-A: #1E2545;
+
+      /* ── B 方案月光光晕色（借用氛围）── */
+      /* 标准版 */
+      --moonlight-glow-page: radial-gradient(ellipse 340px 240px at 50% 12%, rgba(212,172,77,0.06) 0%, transparent 65%);
+      /* 降级版：background-color: rgba(212,172,77,0.02); 静态光斑底色 */
+
+      /* ── 字体栈 ── */
+      --font-sans: "HarmonyOS Sans", "Source Sans 3", "Inter", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      --font-serif: "HarmonyOS Serif", "Source Serif 4", "Noto Serif SC", Georgia, serif;
+      --font-mono: "HarmonyOS Sans Mono", "JetBrains Mono", "Consolas", monospace;
+
+      /* ── 排版 ── */
+      --text-title-A: 24px;
+      --text-subtitle-A: 18px;
+      --text-body-A: 15px;
+      --text-lead-A: 17px;
+      --text-caption-A: 13px;
+      --text-nickname-A: 20px;
+      --text-rank-title-A: 20px;
+      --text-rank-days-A: 28px;
+      --text-version-A: 12px;
+
+      /* ── 间距 ── */
+      --space-2xs: 4px;
+      --space-xs: 8px;
+      --space-sm: 12px;
+      --space-md: 16px;
+      --space-md-b: 20px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+
+      /* ── 圆角 ── */
+      --radius-card-A: 16px;
+      --radius-btn-A: 12px;
+      --radius-full: 9999px;
+
+      /* ── 阴影 ── */
+      --shadow-card: 0 2px 12px rgba(0,0,0,0.25);
+
+      /* ── 头像光环 ── */
+      /* 标准版 */
+      --halo-avatar: 0 0 12px rgba(201,164,75,0.12), 0 0 24px rgba(201,164,75,0.05);
+      /* 降级版：box-shadow: none; border: 2px solid rgba(201,164,75,0.4) */
+
+      /* ── 缓动函数 ── */
+      --ease-out: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.6, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 390px; height: 844px; overflow: hidden;
+      font-family: var(--font-sans);
+      background-color: var(--bg-base-A);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      position: relative; width: 390px; height: 844px;
+      background-color: var(--bg-base-A); overflow: hidden;
+      display: flex; flex-direction: column;
+      /* 页面进入 — 标准版：opacity + translateY 300ms ease-out */
+      /* 降级版：opacity only, 150ms linear */
+      animation: pageEnter 300ms var(--ease-out) both;
+    }
+    @keyframes pageEnter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    /* 降级版：@keyframes pageEnterD { from { opacity: 0; } to { opacity: 1; } } */
+
+    /* ═══════════════════════════════════════════════════════════════
+       顶部月光光晕（B 方案元素）
+       标准版：呼吸动画 6s
+       降级版：静态光斑
+       ═══════════════════════════════════════════════════════════════ */
+    .moonlight-top {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 280px;
+      background: var(--moonlight-glow-page);
+      animation: moonlightBreath 6s var(--ease-in-out) infinite;
+      pointer-events: none; z-index: 0;
+    }
+    @keyframes moonlightBreath { 0%, 100% { opacity: 0.6; } 50% { opacity: 1.0; } }
+    /* 降级版：移除 animation，固定 opacity: 0.8 */
+
+    /* ═══════════════════════════════════════════════════════════════
+       可滚动内容区
+       ═══════════════════════════════════════════════════════════════ */
+    .scroll-area {
+      position: relative; z-index: 5;
+      flex: 1; overflow-y: auto;
+      padding: var(--space-xl) var(--space-lg) 96px var(--space-lg); /* 底部留 96px 给悬浮胶囊导航 */
+    }
+    .scroll-area::-webkit-scrollbar { display: none; }
+    .scroll-area { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       头像 + 昵称区
+       ═══════════════════════════════════════════════════════════════ */
+    .profile-area {
+      display: flex; flex-direction: column;
+      align-items: center;
+      margin-bottom: var(--space-xl);
+      animation: fadeIn 500ms var(--ease-out) 200ms both;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    /* 降级版：opacity only, 150ms linear */
+
+    .avatar {
+      width: 72px; height: 72px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(180deg, rgba(201,164,75,0.08) 0%, rgba(16,20,42,0.9) 100%);
+      border: 2px solid rgba(201,164,75,0.4); /* 金色细边 */
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: var(--space-sm);
+      /* 标准版光环 */
+      box-shadow: var(--halo-avatar);
+      /* 降级版：box-shadow: none; border: 2px solid rgba(201,164,75,0.4) */
+    }
+
+    .avatar svg { width: 36px; height: 36px; opacity: 0.4; }
+
+    .nickname {
+      font-size: var(--text-nickname-A);
+      font-weight: 400;
+      color: var(--text-primary-A);
+      letter-spacing: 0.03em;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       星钥等级卡片
+       ═══════════════════════════════════════════════════════════════ */
+    .rank-card {
+      width: 100%;
+      background-color: var(--bg-card-A);
+      border: 1px solid var(--orbit-line-A);
+      border-radius: var(--radius-card-A);
+      padding: var(--space-lg) var(--space-md-b);
+      box-shadow: var(--shadow-card);
+      margin-bottom: var(--space-md);
+      animation: fadeIn 500ms var(--ease-out) 350ms both;
+    }
+
+    .rank-card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: var(--space-md);
+    }
+
+    .rank-label {
+      font-size: var(--text-caption-A);
+      font-weight: 400;
+      color: var(--text-secondary-A);
+      letter-spacing: 0.04em;
+    }
+
+    .rank-current {
+      font-size: var(--text-rank-title-A);
+      font-weight: 500;
+      color: var(--gold-accent-A);
+      letter-spacing: 0.06em;
+    }
+
+    .rank-days-row {
+      display: flex; align-items: baseline; gap: var(--space-xs);
+      margin-bottom: var(--space-md);
+    }
+
+    .rank-days-num {
+      font-family: var(--font-mono);
+      font-size: var(--text-rank-days-A);
+      font-weight: 300;
+      color: var(--gold-accent-A);
+    }
+
+    .rank-days-label {
+      font-size: var(--text-caption-A);
+      font-weight: 400;
+      color: var(--text-secondary-A);
+    }
+
+    /* 进度区 */
+    .rank-progress-area {
+      padding-top: var(--space-sm);
+      border-top: 1px solid rgba(30,37,69,0.5);
+    }
+
+    .rank-next-row {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: var(--space-sm);
+    }
+
+    .rank-next-label {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--text-secondary-A);
+    }
+
+    .rank-next-label .next-name { color: var(--text-primary-A); }
+    .rank-next-label .days-left { color: var(--gold-accent-A); }
+
+    .rank-progress-bar {
+      width: 100%; height: 3px;
+      background-color: rgba(138,132,152,0.15);
+      border-radius: 2px; overflow: hidden;
+    }
+
+    .rank-progress-fill {
+      height: 100%; width: 14%;
+      background-color: var(--gold-accent-A);
+      border-radius: 2px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       星澜星历入口卡片
+       ═══════════════════════════════════════════════════════════════ */
+    .calendar-entry-card {
+      width: 100%;
+      background-color: var(--bg-card-A);
+      border: 1px solid var(--orbit-line-A);
+      border-radius: var(--radius-card-A);
+      padding: var(--space-lg) var(--space-md-b);
+      box-shadow: var(--shadow-card);
+      margin-bottom: var(--space-lg);
+      cursor: pointer;
+      display: flex; align-items: center; gap: var(--space-md);
+      transition: border-color 200ms var(--ease-out);
+      animation: fadeIn 500ms var(--ease-out) 500ms both;
+    }
+
+    .calendar-entry-card:hover { border-color: rgba(201,164,75,0.2); }
+    .calendar-entry-card:active { transform: scale(0.99); }
+
+    .calendar-entry-icon {
+      width: 48px; height: 48px;
+      background-color: rgba(201,164,75,0.06);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .calendar-entry-icon svg { width: 24px; height: 24px; }
+
+    .calendar-entry-info { flex: 1; }
+
+    .calendar-entry-title {
+      font-size: var(--text-body-A);
+      font-weight: 500;
+      color: var(--text-primary-A);
+      letter-spacing: 0.02em;
+      margin-bottom: 2px;
+    }
+
+    .calendar-entry-desc {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-secondary-A);
+      line-height: 1.5;
+    }
+
+    .calendar-entry-arrow {
+      width: 16px; height: 16px;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       设置项列表
+       ═══════════════════════════════════════════════════════════════ */
+    .settings-section {
+      animation: fadeIn 500ms var(--ease-out) 650ms both;
+    }
+
+    .settings-section-title {
+      font-size: var(--text-caption-A);
+      font-weight: 400;
+      color: var(--text-secondary-A);
+      letter-spacing: 0.06em;
+      margin-bottom: var(--space-sm);
+      padding-left: var(--space-xs);
+    }
+
+    .settings-list {
+      background-color: var(--bg-card-A);
+      border: 1px solid var(--orbit-line-A);
+      border-radius: var(--radius-card-A);
+      overflow: hidden;
+    }
+
+    .setting-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: var(--space-md) var(--space-md-b);
+      border-bottom: 1px solid rgba(30,37,69,0.5);
+      cursor: pointer;
+      transition: background-color 150ms var(--ease-out);
+    }
+
+    .setting-item:last-child { border-bottom: none; }
+    .setting-item:hover { background-color: rgba(201,164,75,0.03); }
+
+    .setting-label {
+      font-size: var(--text-body-A);
+      font-weight: 400;
+      color: var(--text-primary-A);
+    }
+
+    .setting-right {
+      display: flex; align-items: center; gap: var(--space-xs);
+    }
+
+    .setting-arrow {
+      width: 14px; height: 14px;
+    }
+
+    .setting-arrow svg { width: 100%; height: 100%; }
+
+    /* BGM Toggle 开关 */
+    .toggle-switch {
+      position: relative;
+      width: 40px; height: 22px;
+      background-color: rgba(138,132,152,0.2);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: background-color 200ms var(--ease-out);
+    }
+
+    .toggle-switch.on {
+      background-color: rgba(201,164,75,0.3);
+    }
+
+    .toggle-knob {
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 18px; height: 18px;
+      background-color: var(--text-secondary-A);
+      border-radius: var(--radius-full);
+      transition: transform 200ms var(--ease-out),
+                  background-color 200ms var(--ease-out);
+    }
+
+    .toggle-switch.on .toggle-knob {
+      transform: translateX(18px);
+      background-color: var(--gold-accent-A);
+    }
+    /* Toggle 切换动画 — 标准版 200ms ease */
+    /* 降级版：无 transition，直接切换 */
+
+    /* ═══════════════════════════════════════════════════════════════
+       底部版本号
+       ═══════════════════════════════════════════════════════════════ */
+    .version {
+      text-align: center;
+      padding: var(--space-xl) 0 var(--space-md);
+      font-family: var(--font-mono);
+      font-size: var(--text-version-A);
+      font-weight: 400;
+      color: var(--text-tertiary-A);
+      letter-spacing: 0.08em;
+      animation: fadeIn 500ms var(--ease-out) 800ms both;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       底部导航
+       ═══════════════════════════════════════════════════════════════ */
+    /* ═══════════════════════════════════════════════════════════════
+       底部导航：悬浮毛玻璃胶囊（CompanionBottomNav 原样）
+       ═══════════════════════════════════════════════════════════════ */
+    .bottom-nav {
+      position: absolute; bottom: 0; left: 0;
+      width: 100%; height: 88px; padding-bottom: 8px;
+      display: flex; justify-content: center; align-items: center;
+      z-index: 20; pointer-events: none; flex-shrink: 0;
+    }
+    .nav-capsule {
+      pointer-events: auto;
+      width: 90%; height: 62px;
+      border-radius: 30px;
+      background-color: rgba(8, 16, 32, 0.5); /* #80081020 毛玻璃半透明深蓝 */
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1); /* #1AFFFFFF 微弱白边 */
+      box-shadow: 0 5px 18px rgba(0, 0, 0, 0.28); /* 悬浮阴影 */
+      display: flex; align-items: center; justify-content: space-evenly;
+      transition: transform 280ms cubic-bezier(0.25, 0.1, 0.25, 1);
+      /* 降级版：移除 backdrop-filter，background-color: rgba(8,16,32,0.85) */
+    }
+    .nav-capsule:active { transform: scale(1.012, 0.988) translateY(1px); }
+    .nav-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 2px;
+      cursor: pointer; border: none; background: none; padding: 0; height: 100%;
+    }
+    .nav-icon { font-size: 22px; line-height: 1; color: #8F96B2; }
+    .nav-label { font-size: 12px; line-height: 1; color: #9AA2BD; font-weight: 400; margin-top: 2px; }
+    .nav-item.active .nav-icon, .nav-item.active .nav-label { color: #E8B83D; font-weight: 700; }
+    /* 导航切换动画 — 标准版 200ms ease 渐变 */
+    /* 降级版：直接切换无过渡 */
+
+    /* ═══════════════════════════════════════════════════════════════
+       降级：prefers-reduced-motion
+       ═══════════════════════════════════════════════════════════════ */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+      .moonlight-top { opacity: 0.8; }
+      .avatar { box-shadow: none; border: 2px solid rgba(201,164,75,0.4); }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- 顶部月光光晕（B 方案元素） -->
+    <div class="moonlight-top"></div>
+
+    <!-- ═══ 可滚动内容区 ═══ -->
+    <main class="scroll-area">
+
+      <!-- 头像 + 昵称 -->
+      <div class="profile-area">
+        <div class="avatar">
+          <!-- 星钥符号（铁律 1：非立绘） -->
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 4 L20 14 L30 18 L20 22 L18 32 L16 22 L6 18 L16 14 Z" fill="#C9A44B" opacity="0.5"/>
+            <circle cx="18" cy="18" r="2" fill="#E8D5A3" opacity="0.3"/>
+          </svg>
+        </div>
+        <span class="nickname">未命名旅者</span>
+      </div>
+
+      <!-- 星钥等级卡片 -->
+      <div class="rank-card">
+        <div class="rank-card-header">
+          <span class="rank-label">当前星钥等级</span>
+          <span class="rank-current">星火初亮</span>
+        </div>
+        <div class="rank-days-row">
+          <span class="rank-days-num">1</span>
+          <span class="rank-days-label">累计点亮天数</span>
+        </div>
+        <div class="rank-progress-area">
+          <div class="rank-next-row">
+            <span class="rank-next-label">下一称号 <span class="next-name">七日星轨</span></span>
+            <span class="rank-next-label">还差 <span class="days-left">6</span> 天</span>
+          </div>
+          <div class="rank-progress-bar">
+            <div class="rank-progress-fill"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 星澜星历入口卡片 -->
+      <div class="calendar-entry-card">
+        <div class="calendar-entry-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="6" width="16" height="14" rx="1" stroke="#C9A44B" stroke-width="1.5" fill="none"/>
+            <path d="M4 10 H20" stroke="#C9A44B" stroke-width="1.5"/>
+            <path d="M12 13 L13 15 L15 15.5 L13 16 L12 18 L11 16 L9 15.5 L11 15 Z" fill="#C9A44B" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="calendar-entry-info">
+          <div class="calendar-entry-title">星澜星历</div>
+          <div class="calendar-entry-desc">查看你的情绪星旅程</div>
+        </div>
+        <div class="calendar-entry-arrow">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M6 4 L10 8 L6 12" stroke="#8A8498" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+
+      <!-- 设置项列表 -->
+      <div class="settings-section">
+        <p class="settings-section-title">设置</p>
+        <div class="settings-list">
+
+          <!-- 背景音乐开关 -->
+          <div class="setting-item">
+            <span class="setting-label">背景音乐</span>
+            <div class="setting-right">
+              <div class="toggle-switch on">
+                <div class="toggle-knob"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 重新听星澜的介绍 -->
+          <div class="setting-item">
+            <span class="setting-label">重新听星澜的介绍</span>
+            <div class="setting-right">
+              <div class="setting-arrow">
+                <svg viewBox="0 0 14 14" fill="none"><path d="M5 3 L9 7 L5 11" stroke="#8A8498" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- 使用说明 -->
+          <div class="setting-item">
+            <span class="setting-label">使用说明</span>
+            <div class="setting-right">
+              <div class="setting-arrow">
+                <svg viewBox="0 0 14 14" fill="none"><path d="M5 3 L9 7 L5 11" stroke="#8A8498" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- 关于星钥塔罗 -->
+          <div class="setting-item">
+            <span class="setting-label">关于星钥塔罗</span>
+            <div class="setting-right">
+              <div class="setting-arrow">
+                <svg viewBox="0 0 14 14" fill="none"><path d="M5 3 L9 7 L5 11" stroke="#8A8498" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- 底部版本号 -->
+      <div class="version">v2.0.0</div>
+
+    </main>
+
+    <!-- ═══ 底部导航：悬浮毛玻璃胶囊（5 Tab，我的高亮） ═══ -->
+    <nav class="bottom-nav">
+      <div class="nav-capsule">
+        <button class="nav-item" type="button">
+          <span class="nav-icon">◇</span>
+          <span class="nav-label">塔罗</span>
+        </button>
+        <button class="nav-item" type="button">
+          <span class="nav-icon">◉</span>
+          <span class="nav-label">星澜</span>
+        </button>
+        <button class="nav-item" type="button">
+          <span class="nav-icon">✦</span>
+          <span class="nav-label">语录</span>
+        </button>
+        <button class="nav-item" type="button">
+          <span class="nav-icon">▦</span>
+          <span class="nav-label">卡牌</span>
+        </button>
+        <button class="nav-item active" type="button">
+          <span class="nav-icon">☺</span>
+          <span class="nav-label">我的</span>
+        </button>
+      </div>
+    </nav>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<!--
+  星钥塔罗 · 每日一占 / 卡牌结果页
+  设计系统：C 方案「星钥之书」为主 + B「月湖映心」月光氛围
+  基准尺寸：390×844 (iPhone 14 / HarmonyOS 主流机型)
+  设计系统专家：彩格调（Cai）
+  原型构建师：筑原型（Zhu）
+
+  ▸ 铁律 4 执行：翻页展开 + 月光呼吸（标准版），降级方案已标注
+  ▸ 设计意图：陪伴式自我整理——让抽牌结果像一次"被看见"
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>卡牌结果 · 星钥塔罗</title>
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       C 方案 + B 月光氛围 设计令牌
+       ═══════════════════════════════════════════════════════════════ */
+    :root {
+      /* ── C 方案色彩 ── */
+      --bg-base-C: #0A0D1A;            /* 深蓝黑——旧书封壳底色 */
+      --bg-card-C: #121836;           /* 书页底色 */
+      --bg-floating-C: #181F40;       /* 扉页/弹窗 */
+      --bg-hover-C: #1C2450;          /* hover/pressed 微亮态 */
+      --text-primary-C: #EBE3CD;      /* 书页白 */
+      --text-secondary-C: #8B869B;    /* 注释灰 */
+      --text-tertiary-C: #5C5870;     /* 暗灰三级文字 */
+      --gold-gilt-C: #C5A050;         /* 烫金 */
+      --gold-gilt-soft-C: #E0CD95;    /* 柔和金 */
+      --spine-line-C: #1D2342;        /* 书脊线 */
+      --crisis-C: #C8826A;            /* 铜棕 */
+
+      /* ── B 方案月光光晕色（借用氛围）── */
+      /* 标准版 */
+      --moonlight-glow-page: radial-gradient(ellipse 300px 200px at 50% 8%, rgba(212,172,77,0.04) 0%, transparent 70%);
+      /* 降级版：background-color: rgba(212,172,77,0.015); 静态微光底色 */
+
+      /* ── C 方案烫金线色 ── */
+      --gilt-line-top: rgba(197,160,80,0.4);
+      --spine-center-C: rgba(197,160,80,0.15);
+
+      /* ── 字体栈 ── */
+      --font-sans: "HarmonyOS Sans", "Source Sans 3", "Inter", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      --font-serif: "HarmonyOS Serif", "Source Serif 4", "Noto Serif SC", Georgia, serif;
+      --font-mono: "HarmonyOS Sans Mono", "JetBrains Mono", "Consolas", monospace;
+
+      /* ── 排版 ── */
+      --text-card-name-C: 32px;   /* Bold, serif, 1.05, 0.03em */
+      --text-title-C: 28px;       /* Semibold, serif, 1.2, 0.01em */
+      --text-subtitle-C: 20px;    /* Medium, sans, 1.3 */
+      --text-body-C: 15px;        /* Regular, sans, 1.8 */
+      --text-lead-C: 20px;        /* Light, serif, 1.9, 0.02em */
+      --text-caption-C: 13px;     /* Regular, sans, 1.5 */
+      --text-disclaimer-C: 11px;  /* Regular, sans, 1.5 */
+
+      /* ── 间距 ── */
+      --space-2xs: 4px;
+      --space-xs: 8px;
+      --space-sm: 12px;
+      --space-md: 16px;
+      --space-md-b: 20px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+
+      /* ── 圆角 ── */
+      --radius-btn-C: 8px;
+      --radius-card-C: 12px;
+      --radius-sm-C: 8px;
+      --radius-full: 9999px;
+
+      /* ── 阴影 ── */
+      --shadow-card-c: 0 2px 16px rgba(0,0,0,0.35);
+
+      /* ── 缓动函数 ── */
+      --ease-out: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.6, 1);
+      --ease-overshoot: cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       全局重置
+       ═══════════════════════════════════════════════════════════════ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 390px;
+      height: 844px;
+      overflow: hidden;
+      font-family: var(--font-sans);
+      background-color: var(--bg-base-C);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       主容器 · 深蓝黑书封
+       ═══════════════════════════════════════════════════════════════ */
+    .page {
+      position: relative;
+      width: 390px;
+      height: 844px;
+      background-color: var(--bg-base-C);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      /* 页面进入 — 标准版：opacity + translateY 300ms ease-out */
+      /* 降级版：opacity only, 150ms linear */
+      animation: pageEnter 300ms var(--ease-out) both;
+    }
+
+    @keyframes pageEnter {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* 降级版 keyframes：
+       @keyframes pageEnterD { from { opacity: 0; } to { opacity: 1; } }
+       animation: pageEnterD 150ms linear both;
+    */
+
+    /* ═══════════════════════════════════════════════════════════════
+       B 方案月光光晕 — 顶部微弱月光（B 方案元素）
+       标准版：呼吸动画 6s
+       降级版：静态光斑
+       ═══════════════════════════════════════════════════════════════ */
+    .moonlight-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 200px;
+      background: var(--moonlight-glow-page);
+      animation: moonlightBreath 6s var(--ease-in-out) infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes moonlightBreath {
+      0%, 100% { opacity: 0.6; }
+      50%      { opacity: 1.0; }
+    }
+    /* 降级版：移除 animation，固定 opacity: 0.8 */
+
+    /* ═══════════════════════════════════════════════════════════════
+       顶部导航栏
+       ═══════════════════════════════════════════════════════════════ */
+    .nav-bar {
+      position: relative;
+      z-index: 10;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-md);
+      padding-top: 8px;
+      flex-shrink: 0;
+    }
+
+    .nav-back {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .nav-back svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .nav-title {
+      flex: 1;
+      text-align: center;
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary-C);
+      letter-spacing: 0.04em;
+    }
+
+    .nav-spacer {
+      width: 32px;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       可滚动内容区
+       ═══════════════════════════════════════════════════════════════ */
+    .scroll-area {
+      position: relative;
+      z-index: 5;
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-sm) var(--space-lg) var(--space-lg) var(--space-lg);
+    }
+
+    .scroll-area::-webkit-scrollbar { display: none; }
+    .scroll-area { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       牌面图区域 — CSS 绘制牌面框
+       标准版：翻页展开 3D rotateY 400ms
+       降级版：opacity + scale 200ms
+       ═══════════════════════════════════════════════════════════════ */
+    .card-image-area {
+      display: flex;
+      justify-content: center;
+      margin-bottom: var(--space-md-b);
+      perspective: 1000px;
+      /* 翻页入场 — 标准版 3D rotateY */
+      animation: cardFlipIn 400ms var(--ease-out) 200ms both;
+      transform-origin: left center;
+    }
+    /* 降级版：
+       .card-image-area { animation: cardFlipInD 200ms ease-out 200ms both; transform-origin: center; }
+       @keyframes cardFlipInD { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    */
+
+    @keyframes cardFlipIn {
+      from { opacity: 0; transform: rotateY(90deg); }
+      to   { opacity: 1; transform: rotateY(0deg); }
+    }
+
+    .card-frame {
+      width: 140px;
+      height: 220px;
+      background-color: var(--bg-card-C);
+      border: 1px solid var(--spine-line-C);
+      border-radius: var(--radius-sm-C);
+      box-shadow: var(--shadow-card-c);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 牌面图占位标记 */
+    .card-frame::before {
+      content: '牌面图';
+      font-family: var(--font-serif);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary-C);
+      letter-spacing: 0.05em;
+      opacity: 0.5;
+    }
+
+    /* 牌面内部装饰星 */
+    .card-frame::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -60%);
+      width: 32px;
+      height: 32px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 4 L18 13 L28 16 L18 19 L16 28 L14 19 L4 16 L14 13 Z' fill='%23C5A050' opacity='0.15'/%3E%3C/svg%3E") no-repeat center;
+    }
+
+    /* 牌面框顶部烫金线装饰 */
+    .card-frame-top-line {
+      position: absolute;
+      top: 8px;
+      left: 20%;
+      width: 60%;
+      height: 1px;
+      background-color: var(--gilt-line-top);
+    }
+
+    .card-frame-bottom-line {
+      position: absolute;
+      bottom: 8px;
+      left: 20%;
+      width: 60%;
+      height: 1px;
+      background-color: rgba(197,160,80,0.3);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       牌名 + 正逆位标签
+       ═══════════════════════════════════════════════════════════════ */
+    .card-name-area {
+      text-align: center;
+      margin-bottom: var(--space-md-b);
+      animation: fadeIn 500ms var(--ease-out) 500ms both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* 降级版：opacity only, 150ms linear */
+
+    .card-name {
+      font-family: var(--font-serif);
+      font-size: var(--text-card-name-C);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: 0.03em;
+      color: var(--text-primary-C);
+      margin-bottom: var(--space-xs);
+    }
+
+    .card-num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-secondary-C);
+      letter-spacing: 0.1em;
+      margin-bottom: var(--space-sm);
+    }
+
+    .position-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      background-color: rgba(197,160,80,0.08);
+      border: 1px solid rgba(197,160,80,0.2);
+      border-radius: var(--radius-sm-C);
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--gold-gilt-C);
+      letter-spacing: 0.03em;
+    }
+
+    .position-tag svg {
+      width: 10px;
+      height: 10px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       金句卡片 — 一句话核心
+       ═══════════════════════════════════════════════════════════════ */
+    .quote-card {
+      background-color: var(--bg-card-C);
+      border: 1px solid var(--spine-line-C);
+      border-radius: var(--radius-card-C);
+      padding: var(--space-lg) var(--space-md-b);
+      margin-bottom: var(--space-md-b);
+      position: relative;
+      animation: fadeIn 500ms var(--ease-out) 700ms both;
+    }
+
+    /* 金句卡顶部烫金线 */
+    .quote-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 20%;
+      width: 60%;
+      height: 1px;
+      background-color: var(--gilt-line-top);
+    }
+
+    .quote-text {
+      font-family: var(--font-serif);
+      font-size: var(--text-lead-C);
+      font-weight: 300;
+      line-height: 1.9;
+      letter-spacing: 0.02em;
+      color: var(--text-primary-C);
+      text-align: center;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       今日行动区块
+       ═══════════════════════════════════════════════════════════════ */
+    .action-block {
+      margin-bottom: var(--space-md-b);
+      animation: fadeIn 500ms var(--ease-out) 900ms both;
+    }
+
+    .block-title {
+      font-family: var(--font-sans);
+      font-size: var(--text-subtitle-C);
+      font-weight: 500;
+      color: var(--gold-gilt-C);
+      margin-bottom: var(--space-sm);
+      letter-spacing: 0.02em;
+    }
+
+    .action-text {
+      font-size: var(--text-body-C);
+      font-weight: 400;
+      line-height: 1.8;
+      color: var(--text-primary-C);
+    }
+
+    .action-text p { margin-bottom: 0; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       深度解读 — 可折叠区域
+       ═══════════════════════════════════════════════════════════════ */
+    .deep-read-block {
+      margin-bottom: var(--space-lg);
+      animation: fadeIn 500ms var(--ease-out) 1100ms both;
+    }
+
+    /* 使用 <details>/<summary> 实现纯 CSS 可折叠 */
+    details.deep-read {
+      position: relative;
+    }
+
+    details.deep-read summary {
+      list-style: none;
+      outline: none;
+    }
+    details.deep-read summary::-webkit-details-marker { display: none; }
+
+    .deep-read-content {
+      font-size: var(--text-body-C);
+      font-weight: 400;
+      line-height: 1.8;
+      color: var(--text-primary-C);
+      position: relative;
+      max-height: 81px; /* 默认展开前 3 行（15px × 1.8 × 3 ≈ 81px） */
+      overflow: hidden;
+      transition: max-height 300ms var(--ease-out);
+    }
+
+    details.deep-read[open] .deep-read-content {
+      max-height: 500px;
+    }
+
+    /* 渐变遮罩（折叠时） */
+    .deep-read-content::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 24px;
+      background: linear-gradient(180deg, transparent 0%, var(--bg-base-C) 100%);
+      pointer-events: none;
+    }
+
+    details.deep-read[open] .deep-read-content::after {
+      display: none;
+    }
+
+    .deep-read-content p {
+      margin-bottom: var(--space-sm);
+    }
+
+    .expand-hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      margin-top: var(--space-sm);
+      cursor: pointer;
+      font-size: var(--text-caption-C);
+      color: var(--gold-gilt-C);
+      font-family: var(--font-serif);
+      letter-spacing: 0.02em;
+    }
+
+    .expand-hint svg {
+      width: 12px;
+      height: 12px;
+      transition: transform 200ms var(--ease-out);
+    }
+
+    details.deep-read[open] .expand-hint svg {
+      transform: rotate(180deg);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       底部按钮组
+       ═══════════════════════════════════════════════════════════════ */
+    .button-group {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+      animation: fadeIn 500ms var(--ease-out) 1300ms both;
+    }
+
+    /* ── C 方案次按钮 ── */
+    .btn-secondary-C {
+      flex: 1;
+      height: 50px;
+      background-color: transparent;
+      border: 1px solid var(--spine-line-C);
+      border-radius: var(--radius-btn-C);
+      color: var(--text-secondary-C);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 400;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2xs);
+      transition: border-color 200ms var(--ease-out),
+                  transform 150ms var(--ease-out);
+    }
+
+    .btn-secondary-C:hover {
+      border-color: rgba(197,160,80,0.3);
+    }
+
+    .btn-secondary-C:active {
+      transform: scale(0.98);
+    }
+
+    .btn-secondary-C svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ── 点亮情绪星按钮 — 突出但不强迫 ── */
+    .btn-star-lit {
+      flex: 1;
+      height: 50px;
+      background-color: var(--bg-card-C);
+      border: 1px solid var(--gold-gilt-C);
+      border-radius: var(--radius-btn-C);
+      color: var(--gold-gilt-C);
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 400;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2xs);
+      transition: background-color 200ms var(--ease-out),
+                  transform 150ms var(--ease-out);
+    }
+
+    .btn-star-lit:hover {
+      background-color: var(--bg-hover-C);
+    }
+
+    .btn-star-lit:active {
+      transform: scale(0.98);
+    }
+
+    .btn-star-lit svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       底部免责声明
+       ═══════════════════════════════════════════════════════════════ */
+    .disclaimer {
+      padding-top: var(--space-md);
+      border-top: 1px solid var(--spine-line-C);
+      text-align: center;
+    }
+
+    .disclaimer p {
+      font-size: var(--text-disclaimer-C);
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--text-tertiary-C);
+      margin-bottom: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       降级：prefers-reduced-motion
+       铁律 4 执行：系统级降级，移除所有循环动画
+       ═══════════════════════════════════════════════════════════════ */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+      .moonlight-top { opacity: 0.8; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- B 方案月光光晕（顶部微弱月光） -->
+    <div class="moonlight-top"></div>
+
+    <!-- ═══ 顶部导航栏 ═══ -->
+    <nav class="nav-bar">
+      <button class="nav-back" type="button" aria-label="返回">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 4 L6 10 L12 16" stroke="#8B869B" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <span class="nav-title">每日一占</span>
+      <div class="nav-spacer"></div>
+    </nav>
+
+    <!-- ═══ 可滚动内容区 ═══ -->
+    <main class="scroll-area">
+
+      <!-- 牌面图区域 -->
+      <div class="card-image-area">
+        <div class="card-frame">
+          <div class="card-frame-top-line"></div>
+          <div class="card-frame-bottom-line"></div>
+        </div>
+      </div>
+
+      <!-- 牌名 + 正逆位标签 -->
+      <div class="card-name-area">
+        <h1 class="card-name">星星 · The Star</h1>
+        <div class="card-num">XVII / 22</div>
+        <span class="position-tag">
+          <svg viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 1 L6 4 L9 5 L6 6 L5 9 L4 6 L1 5 L4 4 Z" fill="#C5A050"/>
+          </svg>
+          正位
+        </span>
+      </div>
+
+      <!-- 金句卡片 -->
+      <div class="quote-card">
+        <p class="quote-text">"在你以为一切都已经干涸的地方，<br>其实还有水在流。"</p>
+      </div>
+
+      <!-- 今日行动 -->
+      <div class="action-block">
+        <h2 class="block-title">今日行动</h2>
+        <div class="action-text">
+          <p>今天，允许自己慢一点。如果有一件被搁置的事让你感到不安，不必急着完成它。先坐下来，给自己倒一杯水。</p>
+        </div>
+      </div>
+
+      <!-- 深度解读（可折叠，纯 CSS details/summary） -->
+      <details class="deep-read deep-read-block">
+        <summary>
+          <h2 class="block-title">深度解读</h2>
+          <div class="deep-read-content">
+            <p>星星牌的出现，往往不是在最好的时候。它出现在风暴过后，在你以为一切都已经结束的时候——然后，你看见了天上那颗星。</p>
+            <p>这张牌说的不是"一切都会好起来"，而是更安静的一句话："你还活着，你还有感受，你还有可以倒水的杯子。"</p>
+            <p>正位的星星邀请你回到自己。不是回到一个更好的自己，而是回到此刻真实的自己。那些你以为已经失去的东西——希望、信心、对自己的温柔——也许并没有消失，只是被灰烬盖住了。</p>
+            <p>星澜想告诉你的是：你不必现在就相信。只是留一扇窗，让星光进来就好。</p>
+          </div>
+          <div class="expand-hint">
+            <span class="expand-text-closed">展开全部</span>
+            <span class="expand-text-open" style="display:none;">收起</span>
+            <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 4.5 L6 7.5 L9 4.5" stroke="#C5A050" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </summary>
+      </details>
+      <style>
+        details.deep-read[open] .expand-text-closed { display: none; }
+        details.deep-read[open] .expand-text-open { display: inline !important; }
+      </style>
+
+      <!-- 按钮组 -->
+      <div class="button-group">
+        <button class="btn-secondary-C" type="button" aria-label="追问星澜">
+          <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 3 H12 V9 H8 L5 12 V9 H2 Z" stroke="#8B869B" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+          </svg>
+          追问星澜
+        </button>
+        <button class="btn-secondary-C" type="button" aria-label="分享">
+          <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="4" cy="7" r="1.5" stroke="#8B869B" stroke-width="1.2" fill="none"/>
+            <circle cx="10" cy="3.5" r="1.5" stroke="#8B869B" stroke-width="1.2" fill="none"/>
+            <circle cx="10" cy="10.5" r="1.5" stroke="#8B869B" stroke-width="1.2" fill="none"/>
+            <path d="M5.3 6.3 L8.7 4.2 M5.3 7.7 L8.7 9.8" stroke="#8B869B" stroke-width="1.2"/>
+          </svg>
+          分享
+        </button>
+        <button class="btn-star-lit" type="button" aria-label="点亮情绪星">
+          <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 1 L8.2 5 L12.5 6 L8.2 7 L7 13 L5.8 7 L1.5 6 L5.8 5 Z" fill="#C5A050"/>
+          </svg>
+          点亮情绪星
+        </button>
+      </div>
+
+      <!-- 底部免责声明 -->
+      <div class="disclaimer">
+        <p>这张牌不是答案。是陪伴。</p>
+        <p>结果仅供娱乐与自我探索参考，不构成任何专业建议。</p>
+      </div>
+
+    </main>
+
+  </div>
+</body>
+</html>

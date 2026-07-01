@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<!--
+  星钥塔罗 · 星钥等级升级弹窗
+  设计系统：A 方案「星图档案」为主 + C「星钥之书」烫金标题
+  基准尺寸：390×844 (iPhone 14 / HarmonyOS 主流机型)
+  设计系统专家：彩格调（Cai）
+  原型构建师：筑原型（Zhu）
+
+  ▸ 铁律 3 执行：7天 = 七日星轨（阈值 0/1/7/21/30/90/180/365）
+  ▸ 铁律 4 执行：弹窗滑入 + 轻微 overshoot（标准版），降级方案已标注
+  ▸ 设计意图：等级升级像"情绪旅程称号"，不是战力成长
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>新的星钥称号 · 星钥塔罗</title>
+  <style>
+    :root {
+      /* ── A 方案色彩 ── */
+      --bg-base-A: #080B18;
+      --bg-card-A: #10142A;
+      --bg-floating-A: #161C38;
+      --bg-hover-A: #1A2042;
+      --text-primary-A: #EDE8D8;
+      --text-secondary-A: #8A8498;
+      --text-tertiary-A: #5C5870;
+      --gold-accent-A: #C9A44B;
+      --gold-glow-A: #E8D5A3;
+      --orbit-line-A: #1E2545;
+
+      /* ── C 方案烫金（借用标题色）── */
+      --gold-gilt-C: #C5A050;
+      --gold-gilt-soft-C: #E0CD95;
+
+      /* ── 弹窗专用色 ── */
+      --overlay-bg: rgba(8,11,26,0.87);
+      --popup-bg: #161C38;
+      --gilt-line-horizontal: rgba(197,160,80,0.45);
+
+      /* ── 字体栈 ── */
+      --font-sans: "HarmonyOS Sans", "Source Sans 3", "Inter", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      --font-serif: "HarmonyOS Serif", "Source Serif 4", "Noto Serif SC", Georgia, serif;
+      --font-mono: "HarmonyOS Sans Mono", "JetBrains Mono", "Consolas", monospace;
+
+      /* ── 排版 ── */
+      --text-rank-title-popup: 32px; /* 衬线 Bold — 称号大字 */
+      --text-lead-popup: 16px;       /* Light, 1.9 — 寄语 */
+      --text-caption-popup: 13px;    /* Regular — 顶部小字 */
+      --text-body-popup: 15px;       /* Regular — 按钮文字 */
+
+      /* ── 间距 ── */
+      --space-2xs: 4px;
+      --space-xs: 8px;
+      --space-sm: 12px;
+      --space-md: 16px;
+      --space-md-b: 20px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+
+      /* ── 圆角 ── */
+      --radius-popup: 20px;
+      --radius-btn-A: 12px;
+      --radius-full: 9999px;
+
+      /* ── 阴影 ── */
+      --shadow-popup: 0 8px 48px rgba(0,0,0,0.5);
+
+      /* ── 星轨发光 ── */
+      /* 标准版 */
+      --glow-orbit: 0 0 12px rgba(201,164,75,0.2), 0 0 24px rgba(201,164,75,0.08);
+      /* 降级版：无 box-shadow，仅 stroke 颜色 */
+
+      /* ── 缓动函数 ── */
+      --ease-out: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.6, 1);
+      --ease-overshoot: cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 390px; height: 844px; overflow: hidden;
+      font-family: var(--font-sans);
+      background-color: var(--bg-base-A);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       全屏半透明遮罩
+       标准版：背景淡入 250ms
+       降级版：100ms linear
+       ═══════════════════════════════════════════════════════════════ */
+    .overlay {
+      position: relative;
+      width: 390px; height: 844px;
+      background-color: var(--overlay-bg);
+      display: flex; align-items: center; justify-content: center;
+      /* 遮罩淡入 — 标准版 250ms */
+      animation: overlayFadeIn 250ms var(--ease-out) both;
+    }
+    /* 降级版：animation: overlayFadeInD 100ms linear both; */
+    @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    /* 降级版：@keyframes overlayFadeInD { from { opacity: 0; } to { opacity: 1; } } */
+
+    /* ═══════════════════════════════════════════════════════════════
+       弹窗卡片
+       标准版：从底部滑入 + 轻微 overshoot, 350ms
+       降级版：150ms ease-out（无 overshoot）
+       ═══════════════════════════════════════════════════════════════ */
+    .popup {
+      width: 318px;
+      background-color: var(--popup-bg);
+      border: 1px solid var(--orbit-line-A);
+      border-radius: var(--radius-popup);
+      box-shadow: var(--shadow-popup);
+      padding: var(--space-xl) var(--space-lg) var(--space-lg) var(--space-lg);
+      display: flex; flex-direction: column; align-items: center;
+      position: relative;
+      /* 弹窗出现 — 标准版：translateY 40px→0, 350ms, overshoot */
+      animation: popupSlideUp 350ms var(--ease-overshoot) 150ms both;
+    }
+    /* 降级版：animation: popupSlideUpD 150ms ease-out 150ms both; */
+    @keyframes popupSlideUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* 降级版：@keyframes popupSlideUpD { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } } */
+
+    /* ═══════════════════════════════════════════════════════════════
+       顶部横向烫金细线（C 方案元素）
+       ═══════════════════════════════════════════════════════════════ */
+    .gilt-top-line {
+      position: absolute;
+      top: 0; left: 20%;
+      width: 60%; height: 1px;
+      background-color: var(--gilt-line-horizontal);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       顶部小字
+       ═══════════════════════════════════════════════════════════════ */
+    .popup-eyebrow {
+      font-size: var(--text-caption-popup);
+      font-weight: 400;
+      color: var(--text-secondary-A);
+      letter-spacing: 0.06em;
+      margin-bottom: var(--space-lg);
+      animation: textFadeIn 500ms var(--ease-out) 500ms both;
+    }
+
+    @keyframes textFadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    /* 降级版：opacity only, 150ms linear */
+
+    /* ═══════════════════════════════════════════════════════════════
+       等级图标 — 7 颗星连成轨道的简约 SVG
+       标准版：星轨描线动画 800ms + 星点依次点亮
+       降级版：直接显示完整星轨
+       ═══════════════════════════════════════════════════════════════ */
+    .orbit-icon {
+      width: 120px; height: 120px;
+      margin-bottom: var(--space-lg);
+      position: relative;
+      animation: textFadeIn 500ms var(--ease-out) 600ms both;
+    }
+
+    .orbit-icon svg {
+      width: 100%; height: 100%;
+    }
+
+    /* 星轨路径 */
+    .orbit-path {
+      fill: none;
+      stroke: var(--orbit-line-A);
+      stroke-width: 1;
+      /* 标准版：描线动画 */
+      stroke-dasharray: 280;
+      stroke-dashoffset: 280;
+      animation: orbitDraw 800ms var(--ease-out) 700ms forwards;
+    }
+    /* 降级版：stroke-dashoffset: 0; 无动画 */
+    @keyframes orbitDraw { to { stroke-dashoffset: 0; } }
+
+    /* 7 颗星点 */
+    .orbit-star {
+      fill: var(--gold-accent-A);
+      /* 标准版：依次点亮 */
+      opacity: 0;
+      animation: starAppear 300ms var(--ease-out) forwards;
+    }
+    /* 降级版：opacity: 0.8; 无动画 */
+
+    .orbit-star:nth-child(2) { animation-delay: 900ms; }
+    .orbit-star:nth-child(3) { animation-delay: 1000ms; }
+    .orbit-star:nth-child(4) { animation-delay: 1100ms; }
+    .orbit-star:nth-child(5) { animation-delay: 1200ms; }
+    .orbit-star:nth-child(6) { animation-delay: 1300ms; }
+    .orbit-star:nth-child(7) { animation-delay: 1400ms; }
+    .orbit-star:nth-child(8) { animation-delay: 1500ms; }
+
+    @keyframes starAppear { to { opacity: 0.8; } }
+
+    /* ═══════════════════════════════════════════════════════════════
+       称号大字 — C 方案烫金标题
+       ═══════════════════════════════════════════════════════════════ */
+    .rank-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-rank-title-popup);
+      font-weight: 700;
+      color: var(--gold-gilt-soft-C); /* C 方案柔和金 */
+      letter-spacing: 0.08em;
+      text-align: center;
+      margin-bottom: var(--space-lg);
+      animation: textFadeIn 500ms var(--ease-out) 800ms both;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       星澜寄语
+       ═══════════════════════════════════════════════════════════════ */
+    .xinglan-msg {
+      font-size: var(--text-lead-popup);
+      font-weight: 300;
+      line-height: 1.9;
+      letter-spacing: 0.02em;
+      color: var(--text-primary-A);
+      text-align: center;
+      margin-bottom: var(--space-xl);
+      animation: textFadeIn 500ms var(--ease-out) 1000ms both;
+    }
+
+    .xinglan-msg .xinglan-sign {
+      display: block;
+      margin-top: var(--space-sm);
+      font-size: 13px;
+      color: var(--text-secondary-A);
+      letter-spacing: 0.04em;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       底部按钮
+       ═══════════════════════════════════════════════════════════════ */
+    .btn-collect {
+      width: 100%; height: 52px;
+      background-color: rgba(201,164,75,0.08);
+      border: 1px solid var(--gold-accent-A);
+      border-radius: var(--radius-btn-A);
+      color: var(--gold-accent-A);
+      font-family: var(--font-sans);
+      font-size: var(--text-body-popup);
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      gap: var(--space-xs);
+      transition: background-color 200ms var(--ease-out),
+                  transform 150ms var(--ease-out);
+      animation: textFadeIn 500ms var(--ease-out) 1200ms both;
+    }
+
+    .btn-collect:hover { background-color: rgba(201,164,75,0.12); }
+    .btn-collect:active { transform: scale(0.98); }
+
+    .btn-collect svg { width: 16px; height: 16px; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       降级：prefers-reduced-motion
+       ═══════════════════════════════════════════════════════════════ */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+      .orbit-path { stroke-dashoffset: 0; }
+      .orbit-star { opacity: 0.8; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="overlay">
+
+    <!-- ═══ 弹窗卡片 ═══ -->
+    <div class="popup">
+      <!-- 顶部横向烫金细线 -->
+      <div class="gilt-top-line"></div>
+
+      <!-- 顶部小字 -->
+      <p class="popup-eyebrow">新的星钥称号已点亮</p>
+
+      <!-- 等级图标：7 颗星连成轨道 -->
+      <div class="orbit-icon">
+        <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- 星轨椭圆路径 -->
+          <ellipse class="orbit-path" cx="60" cy="60" rx="48" ry="36"/>
+          <!-- 7 颗星点沿轨道分布 -->
+          <circle class="orbit-star" cx="108" cy="60" r="2.5"/>
+          <circle class="orbit-star" cx="96" cy="88" r="2.5"/>
+          <circle class="orbit-star" cx="60" cy="96" r="2.5"/>
+          <circle class="orbit-star" cx="24" cy="88" r="2.5"/>
+          <circle class="orbit-star" cx="12" cy="60" r="2.5"/>
+          <circle class="orbit-star" cx="24" cy="32" r="2.5"/>
+          <circle class="orbit-star" cx="60" cy="24" r="2.5"/>
+        </svg>
+      </div>
+
+      <!-- 称号大字 -->
+      <h1 class="rank-title">七日星轨</h1>
+
+      <!-- 星澜寄语 -->
+      <div class="xinglan-msg">
+        七颗星，连成了一条小小的轨道。<br>
+        不是要求你每天都来。<br>
+        只是这些日子，你认真看见过自己。
+        <span class="xinglan-sign">—— 星澜</span>
+      </div>
+
+      <!-- 按钮 -->
+      <button class="btn-collect" type="button" aria-label="收下这颗星">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M8 2 L9.5 6 L14 7 L9.5 8 L8 14 L6.5 8 L2 7 L6.5 6 Z" fill="#C9A44B"/></svg>
+        收下这颗星
+      </button>
+    </div>
+
+  </div>
+</body>
+</html>

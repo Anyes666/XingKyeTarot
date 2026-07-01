@@ -244,4 +244,245 @@ export class Theme {
   static starkeyCardGlow(): string {
     return `linear-gradient(180deg, ${Theme.GLOW_GOLD_TOP} 0%, ${Theme.GLOW_CARD_BOTTOM} 30%)`;
   }
+
+  // ═══════════════════════════════════════════════════════════════
+  // v2.0 设计系统 Token
+  // 场景分层混合：B 月湖映心（聊天陪伴层）+ C 星钥之书（卡牌内容层）+ A 星图档案（时间记录层）
+  // 基于 deliverables/design-system-tokens.md
+  // 现有页面可继续使用旧 Token，新页面/重构页面使用 v2 Token
+  // ═══════════════════════════════════════════════════════════════
+
+  // ── v2 统一基础色板（三套共享）──
+  static readonly V2_BG_BASE: string = '#080B1A';
+  static readonly V2_TEXT_PRIMARY: string = '#EDE8D8';
+  static readonly V2_TEXT_SECONDARY: string = '#8A8498';
+  static readonly V2_TEXT_TERTIARY: string = '#5C5870';
+  static readonly V2_GOLD_PRIMARY: string = '#C9A44B';
+  static readonly V2_GOLD_SOFT: string = '#E8D5A3';
+  static readonly V2_BORDER_BASE: string = '#1E2545';
+  static readonly V2_OVERLAY_SCRIM: string = 'rgba(8,11,26,0.87)';
+
+  // ── v2 B 方案色板（月湖映心 · 聊天陪伴层）──
+  static readonly V2B_BG_BASE: string = '#060B1A';       // 最深湖底
+  static readonly V2B_BG_CARD: string = '#0F1835';       // 湖中石板
+  static readonly V2B_BG_FLOATING: string = '#162048';   // 浮上水面的光斑
+  static readonly V2B_BG_HOVER: string = '#1A2A55';      // hover/pressed 微亮态
+  static readonly V2B_TEXT_PRIMARY: string = '#F2EDDD';  // 月光白（柔和暖白）
+  static readonly V2B_TEXT_SECONDARY: string = '#9590A8';// 水雾灰
+  static readonly V2B_GOLD_CORE: string = '#D4AC4D';     // 湖面月光（B 方案唯一金色）
+  static readonly V2B_GOLD_RIPPLE: string = '#ECD89D';   // 月光扩散
+  static readonly V2B_BORDER: string = 'rgba(255,255,255,0.06)';
+  static readonly V2B_CRISIS: string = '#C88B7A';        // 暖陶土（危机提示）
+
+  // ── v2 C 方案色板（星钥之书 · 卡牌内容层）──
+  static readonly V2C_BG_BASE: string = '#0A0D1A';       // 深蓝黑（旧书封壳）
+  static readonly V2C_BG_CARD: string = '#121836';       // 书页底色
+  static readonly V2C_BG_FLOATING: string = '#181F40';   // 扉页/弹窗
+  static readonly V2C_BG_HOVER: string = '#1C2450';      // hover/pressed
+  static readonly V2C_TEXT_PRIMARY: string = '#EBE3CD';  // 书页白（微暖）
+  static readonly V2C_TEXT_SECONDARY: string = '#8B869B';// 注释灰
+  static readonly V2C_GOLD_GILT: string = '#C5A050';     // 烫金
+  static readonly V2C_GOLD_GILT_SOFT: string = '#E0CD95';// 柔和金
+  static readonly V2C_SPINE_LINE: string = '#1D2342';    // 书脊线
+  static readonly V2C_CRISIS: string = '#C8826A';        // 铜棕
+
+  // ── v2 A 方案色板（星图档案 · 时间记录层）──
+  static readonly V2A_BG_BASE: string = '#080B18';       // 最深夜空
+  static readonly V2A_BG_CARD: string = '#10142A';       // 星图纸
+  static readonly V2A_BG_FLOATING: string = '#161C38';   // 弹窗/浮层
+  static readonly V2A_BG_HOVER: string = '#1A2042';      // hover/pressed
+  static readonly V2A_TEXT_PRIMARY: string = '#EDE8D8';  // 月光白
+  static readonly V2A_TEXT_SECONDARY: string = '#8A8498';// 星灰
+  static readonly V2A_GOLD_ACCENT: string = '#C9A44B';   // 核心金色
+  static readonly V2A_GOLD_GLOW: string = '#E8D5A3';     // 柔和金
+  static readonly V2A_ORBIT_LINE: string = '#1E2545';    // 星轨线
+  static readonly V2A_CRISIS: string = '#D4856B';        // 暖铜
+
+  // ── v2 特殊状态色（跨方案统一）──
+  static readonly V2_STATE_CRISIS_BG: string = 'rgba(200,139,122,0.08)';
+  static readonly V2_STATE_DISABLED: string = 'rgba(138,132,152,0.3)';
+  static readonly V2_STATE_DISABLED_TEXT: string = 'rgba(138,132,152,0.5)';
+  static readonly V2_STATE_STAR_LIT: string = '#C9A44B';
+  static readonly V2_STATE_STAR_UNLIT: string = 'rgba(138,132,152,0.2)';
+  static readonly V2_STATE_FUTURE_TEXT: string = 'rgba(138,132,152,0.4)';
+  static readonly V2_STATE_VIEWED_DOT: string = 'rgba(197,160,80,0.4)';
+  static readonly V2_STATE_UNVIEWED_DOT: string = 'rgba(139,134,155,0.3)';
+  static readonly V2_STATE_SELECTED: string = '#C9A44B';
+  static readonly V2_STATE_FOCUS_RING: string = 'rgba(201,164,75,0.4)';
+
+  // ── v2 间距系统（4px 基准）──
+  static readonly V2_SPACE_2XS: number = 4;
+  static readonly V2_SPACE_XS: number = 8;
+  static readonly V2_SPACE_SM: number = 12;
+  static readonly V2_SPACE_MD: number = 16;
+  static readonly V2_SPACE_MD_B: number = 20;
+  static readonly V2_SPACE_LG: number = 24;
+  static readonly V2_SPACE_XL: number = 32;
+  static readonly V2_SPACE_2XL: number = 48;
+  static readonly V2_SPACE_3XL: number = 64;
+
+  // ── v2 圆角系统 ──
+  static readonly V2_RADIUS_XS: number = 4;
+  static readonly V2_RADIUS_SM: number = 8;
+  static readonly V2_RADIUS_MD: number = 12;
+  static readonly V2_RADIUS_LG: number = 14;
+  static readonly V2_RADIUS_XL: number = 20;
+  static readonly V2_RADIUS_2XL: number = 24;
+  static readonly V2_RADIUS_FULL: number = 999;
+
+  // ── v2 B 方案圆角倾向（圆润）──
+  static readonly V2B_RADIUS_BTN: number = 14;
+  static readonly V2B_RADIUS_CARD: number = 20;
+  static readonly V2B_RADIUS_CHIP: number = 24;
+  static readonly V2B_RADIUS_BUBBLE_LARGE: number = 20;
+  static readonly V2B_RADIUS_BUBBLE_SMALL: number = 6;
+
+  // ── v2 C 方案圆角倾向（方正）──
+  static readonly V2C_RADIUS_BTN: number = 8;
+  static readonly V2C_RADIUS_CARD: number = 12;
+  static readonly V2C_RADIUS_CHIP: number = 6;
+  static readonly V2C_RADIUS_POPUP: number = 16;
+
+  // ── v2 A 方案圆角倾向（中性）──
+  static readonly V2A_RADIUS_BTN: number = 12;
+  static readonly V2A_RADIUS_CARD: number = 16;
+  static readonly V2A_RADIUS_CHIP: number = 20;
+  static readonly V2A_RADIUS_POPUP: number = 20;
+
+  // ── v2 字号系统 ──
+  // B 方案（人文无衬线）
+  static readonly V2B_FONT_DISPLAY: number = 34;
+  static readonly V2B_FONT_TITLE: number = 26;
+  static readonly V2B_FONT_SUBTITLE: number = 20;
+  static readonly V2B_FONT_BODY: number = 15;
+  static readonly V2B_FONT_LEAD: number = 18;
+  static readonly V2B_FONT_CAPTION: number = 13;
+  static readonly V2B_FONT_DISCLAIMER: number = 11;
+
+  // C 方案（衬线标题 + 无衬线正文）
+  static readonly V2C_FONT_DISPLAY: number = 36;
+  static readonly V2C_FONT_TITLE: number = 28;
+  static readonly V2C_FONT_SUBTITLE: number = 20;
+  static readonly V2C_FONT_BODY: number = 15;
+  static readonly V2C_FONT_LEAD: number = 20;
+  static readonly V2C_FONT_CAPTION: number = 13;
+  static readonly V2C_FONT_DISCLAIMER: number = 11;
+  static readonly V2C_FONT_CARD_NAME: number = 32;
+  static readonly V2C_FONT_CARD_NUM: number = 12;
+  static readonly V2C_FONT_GILT_TITLE: number = 24;
+
+  // A 方案（几何无衬线 + 等宽辅助）
+  static readonly V2A_FONT_DISPLAY: number = 32;
+  static readonly V2A_FONT_TITLE: number = 24;
+  static readonly V2A_FONT_SUBTITLE: number = 18;
+  static readonly V2A_FONT_BODY: number = 15;
+  static readonly V2A_FONT_LEAD: number = 17;
+  static readonly V2A_FONT_CAPTION: number = 12;
+  static readonly V2A_FONT_DISCLAIMER: number = 11;
+  static readonly V2A_FONT_DATE_NUM: number = 14;
+  static readonly V2A_FONT_TIMESTAMP: number = 12;
+  static readonly V2A_FONT_RANK_TITLE: number = 20;
+  static readonly V2A_FONT_RANK_DAYS: number = 28;
+
+  // ── v2 阴影系统 ──
+  /** B 方案按钮柔光阴影 */
+  static readonly V2B_SHADOW_BTN_GLOW: ShadowOptions = {
+    radius: 20,
+    color: 'rgba(212,172,77,0.12)',
+    offsetX: 0,
+    offsetY: 0
+  };
+  /** B 方案按钮 hover 柔光增强 */
+  static readonly V2B_SHADOW_BTN_HOVER: ShadowOptions = {
+    radius: 28,
+    color: 'rgba(212,172,77,0.18)',
+    offsetX: 0,
+    offsetY: 0
+  };
+  /** B 方案卡片悬浮阴影 */
+  static readonly V2B_SHADOW_CARD: ShadowOptions = {
+    radius: 24,
+    color: 'rgba(0,0,0,0.3)',
+    offsetX: 0,
+    offsetY: 4
+  };
+  /** C 方案卡片叠放阴影 */
+  static readonly V2C_SHADOW_CARD: ShadowOptions = {
+    radius: 16,
+    color: 'rgba(0,0,0,0.35)',
+    offsetX: 0,
+    offsetY: 2
+  };
+  /** A 方案卡片轻微阴影 */
+  static readonly V2A_SHADOW_CARD: ShadowOptions = {
+    radius: 12,
+    color: 'rgba(0,0,0,0.25)',
+    offsetX: 0,
+    offsetY: 2
+  };
+  /** v2 头像光环（active 级） */
+  static readonly V2_HALO_AVATAR_ACTIVE: ShadowOptions = {
+    radius: 16,
+    color: 'rgba(212,172,77,0.15)',
+    offsetX: 0,
+    offsetY: 0
+  };
+  /** v2 头像光环（standard 级） */
+  static readonly V2_HALO_AVATAR_STANDARD: ShadowOptions = {
+    radius: 12,
+    color: 'rgba(212,172,77,0.15)',
+    offsetX: 0,
+    offsetY: 0
+  };
+
+  // ── v2 动效时长（ms）──
+  static readonly V2_ANIM_PAGE_ENTER: number = 300;
+  static readonly V2_ANIM_BUBBLE_ENTER: number = 400;
+  static readonly V2_ANIM_BTN_PRESS: number = 100;
+  static readonly V2_ANIM_BTN_RELEASE: number = 150;
+  static readonly V2_ANIM_POPUP: number = 220;
+  static readonly V2_ANIM_MOONLIGHT_BREATH: number = 6000;
+  static readonly V2_ANIM_STAR_BLINK_MIN: number = 4000;
+  static readonly V2_ANIM_STAR_BLINK_MAX: number = 6000;
+  static readonly V2_ANIM_TYPING_DOT: number = 1200;
+  static readonly V2_ANIM_STAR_LIT: number = 650;
+
+  // ── v2 缓动函数（ArkUI Curve 对应）──
+  /** 标准版 ease-out — 对应 ArkUI Curve.EaseOut */
+  static readonly V2_EASE_OUT: Curve = Curve.EaseOut;
+  /** 标准版 ease-in-out — 对应 ArkUI Curve.EaseInOut */
+  static readonly V2_EASE_IN_OUT: Curve = Curve.EaseInOut;
+  /** 按钮回弹 — 对应 ArkUI Curve.EaseIn */
+  static readonly V2_EASE_BOUNCE: Curve = Curve.EaseIn;
+
+  /**
+   * v2: 生成 B 方案月光光晕渐变（页面中上区域）
+   * @param strong 是否使用强光态（入口页/仪式感场景）
+   */
+  static v2bMoonlightGlow(strong: boolean = false): string {
+    const opacity: string = strong ? '0.08' : '0.04';
+    const transparent: string = strong ? '60%' : '70%';
+    return `radial-gradient(ellipse 360px 280px at 50% 20%, rgba(212,172,77,${opacity}) 0%, transparent ${transparent})`;
+  }
+
+  /**
+   * v2: 生成 B 方案降级版月光光晕（静态极弱光斑）
+   */
+  static v2bMoonlightGlowDim(): string {
+    return 'radial-gradient(ellipse, rgba(212,172,77,0.02) 0%, transparent 50%)';
+  }
+
+  /**
+   * v2: 生成 C 方案书脊中轴线渐变
+   */
+  static v2cSpineCenterLine(): string {
+    return 'linear-gradient(180deg, rgba(197,160,80,0.15) 0%, rgba(197,160,80,0.05) 50%, rgba(197,160,80,0.15) 100%)';
+  }
+
+  /**
+   * v2: 生成 B 方案星澜气泡左侧暖金光晕
+   */
+  static v2bBubbleGlow(): string {
+    return 'radial-gradient(ellipse 120px 80px at 0% 50%, rgba(212,172,77,0.06) 0%, transparent 60%)';
+  }
 }

@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<!--
+  星钥塔罗 · 星澜星历 + 星钥等级
+  设计系统：A 方案「星图档案」
+  基准尺寸：390×844 (iPhone 14 / HarmonyOS 主流机型)
+  设计系统专家：彩格调（Cai）
+  原型构建师：筑原型（Zhu）
+
+  ▸ 铁律 3 执行：星钥等级阈值 0/1/7/21/30/90/180/365 天
+  ▸ 铁律 4 执行：日历翻页 + 星星发光（标准版），降级方案已标注
+  ▸ 设计意图：把"点亮情绪星"设计成情绪旅程，而不是打卡
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>星澜星历 · 星钥塔罗</title>
+  <style>
+    :root {
+      --bg-base-A: #080B18;
+      --bg-card-A: #10142A;
+      --bg-floating-A: #161C38;
+      --bg-hover-A: #1A2042;
+      --text-primary-A: #EDE8D8;
+      --text-secondary-A: #8A8498;
+      --text-tertiary-A: #5C5870;
+      --gold-accent-A: #C9A44B;
+      --gold-glow-A: #E8D5A3;
+      --orbit-line-A: #1E2545;
+      --state-star-lit: #C9A44B;
+      --state-today-bg: #161C38;
+      --state-future-text: rgba(138,132,152,0.4);
+      --state-past-text: rgba(138,132,152,0.3);
+      --font-sans: "HarmonyOS Sans", "Source Sans 3", "Inter", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      --font-serif: "HarmonyOS Serif", "Source Serif 4", "Noto Serif SC", Georgia, serif;
+      --font-mono: "HarmonyOS Sans Mono", "JetBrains Mono", "Consolas", monospace;
+      --text-display-A: 32px;
+      --text-title-A: 24px;
+      --text-subtitle-A: 18px;
+      --text-body-A: 15px;
+      --text-lead-A: 17px;
+      --text-caption-A: 12px;
+      --text-date-num-A: 14px;
+      --text-rank-title-A: 20px;
+      --text-rank-days-A: 28px;
+      --text-timestamp-A: 12px;
+      --space-2xs: 4px;
+      --space-xs: 8px;
+      --space-sm: 12px;
+      --space-md: 16px;
+      --space-md-b: 20px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --radius-card-A: 16px;
+      --radius-btn-A: 12px;
+      --radius-full: 9999px;
+      --shadow-card: 0 2px 12px rgba(0,0,0,0.25);
+      --shadow-modal: 0 -8px 32px rgba(0,0,0,0.4);
+      /* 标准版 */
+      --glow-star-lit: 0 0 6px rgba(201,164,75,0.4), 0 0 12px rgba(201,164,75,0.15);
+      --glow-star-today: 0 0 8px rgba(201,164,75,0.25);
+      /* 降级版：无 box-shadow，仅纯色实心点 / 金色细边框 */
+      --ease-out: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.6, 1);
+      --ease-overshoot: cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 390px; height: 844px; overflow: hidden;
+      font-family: var(--font-sans);
+      background-color: var(--bg-base-A);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      position: relative; width: 390px; height: 844px;
+      background-color: var(--bg-base-A); overflow: hidden;
+      display: flex; flex-direction: column;
+      /* 页面进入 — 标准版：opacity + translateY 300ms ease-out */
+      /* 降级版：opacity only, 150ms linear */
+      animation: pageEnter 300ms var(--ease-out) both;
+    }
+    @keyframes pageEnter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    /* 降级版：@keyframes pageEnterD { from { opacity: 0; } to { opacity: 1; } } */
+
+    /* ── 可滚动内容区 ── */
+    .scroll-area {
+      flex: 1; overflow-y: auto;
+      padding: 8px var(--space-lg) 96px var(--space-lg); /* 底部留 96px 给悬浮胶囊导航 */
+    }
+    .scroll-area::-webkit-scrollbar { display: none; }
+    .scroll-area { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* ── 页面标题 ── */
+    .page-title {
+      font-size: var(--text-title-A); font-weight: 400;
+      color: var(--text-primary-A); letter-spacing: 0.03em;
+      text-align: center; margin-bottom: var(--space-xs);
+    }
+    .page-subtitle {
+      font-size: var(--text-lead-A); font-weight: 300;
+      line-height: 1.8; letter-spacing: 0.02em;
+      color: var(--text-secondary-A); text-align: center;
+      margin-bottom: var(--space-lg);
+    }
+
+    /* ── 月份翻页 ── */
+    .month-nav {
+      display: flex; align-items: center; justify-content: center;
+      gap: var(--space-lg); margin-bottom: var(--space-md-b);
+    }
+    .month-arrow {
+      width: 32px; height: 32px; display: flex;
+      align-items: center; justify-content: center;
+      cursor: pointer; border: none; background: none; padding: 0;
+      transition: opacity 150ms var(--ease-out);
+    }
+    .month-arrow:hover { opacity: 0.7; }
+    .month-arrow:active { transform: scale(0.95); }
+    .month-arrow svg { width: 16px; height: 16px; }
+    .month-label {
+      font-size: var(--text-display-A); font-weight: 300;
+      letter-spacing: 0.04em; color: var(--text-primary-A);
+      min-width: 140px; text-align: center;
+      /* 月份切换 — 标准版：opacity + translateX 250ms ease-out */
+      /* 降级版：opacity only 100ms linear */
+    }
+
+    /* ── 日历区域 ── */
+    .calendar-wrap {
+      background-color: var(--bg-card-A);
+      border: 1px solid var(--orbit-line-A);
+      border-radius: var(--radius-card-A);
+      padding: var(--space-md-b) var(--space-md);
+      margin-bottom: var(--space-lg);
+      box-shadow: var(--shadow-card);
+    }
+    .weekday-row {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      gap: 4px; margin-bottom: var(--space-sm); height: 32px;
+    }
+    .weekday {
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-mono); font-size: 12px;
+      font-weight: 400; color: var(--text-secondary-A);
+    }
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .day-cell {
+      width: 100%; aspect-ratio: 1; max-width: 40px; max-height: 40px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: relative; cursor: pointer; margin: 0 auto;
+      border-radius: var(--radius-full);
+      transition: background-color 150ms var(--ease-out);
+    }
+    .day-num { font-size: var(--text-date-num-A); font-weight: 500; line-height: 1.0; }
+    .day-dot {
+      width: 5px; height: 5px; border-radius: var(--radius-full);
+      background-color: var(--state-star-lit); margin-top: 3px;
+      /* 标准版：发光 */
+      box-shadow: var(--glow-star-lit);
+      /* 降级版：无 box-shadow，仅 background-color: #C9A44B */
+    }
+    .day-lit .day-num { color: var(--text-primary-A); }
+    .day-past .day-num { color: var(--text-primary-A); opacity: 0.6; }
+    .day-today {
+      background-color: var(--state-today-bg); border-radius: var(--radius-full);
+      width: 32px; height: 32px; max-width: 32px; max-height: 32px; margin: 4px auto;
+      /* 标准版：金色微光 */
+      box-shadow: var(--glow-star-today);
+      /* 降级版：无 box-shadow，仅 border: 1px solid #C9A44B */
+    }
+    .day-today .day-num { color: var(--gold-accent-A); font-weight: 500; }
+    .day-future .day-num { color: var(--state-future-text); }
+    .day-future { cursor: default; }
+    .day-other-month .day-num { color: var(--state-past-text); }
+    .day-other-month { cursor: default; }
+    .day-lit:hover, .day-past:hover { background-color: rgba(201,164,75,0.06); }
+
+    /* ── 选中日期态 ── */
+    .day-selected {
+      background-color: transparent; border-radius: var(--radius-full);
+      width: 32px; height: 32px; max-width: 32px; max-height: 32px; margin: 4px auto;
+      border: 1px solid var(--gold-accent-A);
+    }
+    .day-selected .day-num { color: var(--text-primary-A); }
+
+    /* ── 星历详情弹窗 ── */
+    .modal-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(8,11,24,0.85); z-index: 100;
+      display: flex; align-items: flex-end;
+      /* 背板淡入 — 标准版 200ms */
+      animation: overlayFadeIn 200ms var(--ease-out) both;
+    }
+    /* 降级版：animation: overlayFadeInD 100ms linear both; */
+    @keyframes overlayFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .modal-sheet {
+      width: 100%; max-height: 72%;
+      background-color: var(--bg-floating-A);
+      border-radius: 20px 20px 0 0;
+      box-shadow: var(--shadow-modal);
+      padding: var(--space-lg) var(--space-lg) 48px var(--space-lg);
+      overflow-y: auto; position: relative;
+      /* 弹窗出现 — 标准版：translateY 100%→0, 220ms, overshoot */
+      animation: sheetSlideUp 220ms var(--ease-overshoot) both;
+    }
+    /* 降级版：animation: sheetSlideUpD 150ms ease-out both; */
+    @keyframes sheetSlideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    /* 降级版：@keyframes sheetSlideUpD { from { transform: translateY(100%); } to { transform: translateY(0); } } */
+
+    .modal-handle {
+      width: 40px; height: 4px; background-color: rgba(138,132,152,0.3);
+      border-radius: 2px; margin: 0 auto var(--space-md);
+    }
+    .modal-close {
+      position: absolute; top: var(--space-lg); right: var(--space-lg);
+      width: 24px; height: 24px; display: flex;
+      align-items: center; justify-content: center;
+      cursor: pointer; border: none; background: none; padding: 0;
+    }
+    .modal-close svg { width: 18px; height: 18px; }
+    .modal-date-title {
+      font-size: var(--text-title-A); font-weight: 400;
+      color: var(--text-primary-A); letter-spacing: 0.03em;
+      margin-bottom: var(--space-xs);
+    }
+    .modal-timestamp {
+      font-family: var(--font-mono); font-size: var(--text-timestamp-A);
+      color: var(--text-secondary-A); letter-spacing: 0.05em;
+      margin-bottom: var(--space-md);
+    }
+    .modal-emotion-tags { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin-bottom: var(--space-md); }
+    .emotion-chip {
+      padding: 4px 10px; background-color: rgba(201,164,75,0.06);
+      border: 1px solid rgba(201,164,75,0.15); border-radius: 20px;
+      color: var(--gold-accent-A); font-size: 12px; font-weight: 400;
+    }
+    .modal-card-thumb {
+      display: flex; align-items: center; gap: var(--space-sm);
+      margin-bottom: var(--space-md); padding: var(--space-sm);
+      background-color: var(--bg-card-A); border: 1px solid var(--orbit-line-A);
+      border-radius: 12px;
+    }
+    .card-thumb-frame {
+      width: 36px; height: 56px; background-color: var(--bg-base-A);
+      border: 1px solid var(--orbit-line-A); border-radius: 4px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .card-thumb-frame svg { width: 16px; height: 16px; opacity: 0.4; }
+    .card-thumb-info { flex: 1; }
+    .card-thumb-name {
+      font-family: var(--font-serif); font-size: 15px; font-weight: 600;
+      color: var(--text-primary-A); letter-spacing: 0.02em;
+    }
+    .card-thumb-num {
+      font-family: var(--font-mono); font-size: 11px;
+      color: var(--text-secondary-A); letter-spacing: 0.1em;
+    }
+    .modal-xinglan-msg {
+      font-size: var(--text-body-A); font-weight: 300; line-height: 1.8;
+      color: var(--text-primary-A); padding: var(--space-md);
+      background-color: rgba(201,164,75,0.03);
+      border-left: 2px solid rgba(201,164,75,0.2);
+      border-radius: 0 8px 8px 0;
+    }
+
+    /* ── 本月星光记录卡片 ── */
+    .stats-card {
+      background-color: var(--bg-card-A); border: 1px solid var(--orbit-line-A);
+      border-radius: var(--radius-card-A); padding: var(--space-lg) var(--space-md-b);
+      box-shadow: var(--shadow-card);
+    }
+    .stats-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: var(--space-sm) 0; border-bottom: 1px solid rgba(30,37,69,0.5);
+    }
+    .stats-row:last-child { border-bottom: none; }
+    .stats-label { font-size: var(--text-body-A); font-weight: 400; color: var(--text-secondary-A); }
+    .stats-value {
+      font-family: var(--font-mono); font-size: var(--text-rank-days-A);
+      font-weight: 300; color: var(--gold-accent-A);
+    }
+    .stats-value .unit { font-size: 13px; color: var(--text-secondary-A); font-weight: 400; margin-left: 2px; }
+    .stats-rank-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: var(--space-sm) 0; border-bottom: 1px solid rgba(30,37,69,0.5);
+    }
+    .rank-current {
+      font-size: var(--text-rank-title-A); font-weight: 500;
+      color: var(--gold-accent-A); letter-spacing: 0.06em;
+    }
+    .rank-next-info {
+      text-align: right; font-family: var(--font-mono);
+      font-size: 12px; color: var(--text-secondary-A); line-height: 1.6;
+    }
+    .rank-next-info .next-name { color: var(--text-primary-A); }
+    .rank-next-info .days-left { color: var(--gold-accent-A); }
+    .rank-progress {
+      margin-top: var(--space-sm); height: 3px;
+      background-color: rgba(138,132,152,0.15); border-radius: 2px; overflow: hidden;
+    }
+    .rank-progress-fill { height: 100%; width: 14%; background-color: var(--gold-accent-A); border-radius: 2px; }
+
+    /* ── 底部导航：悬浮毛玻璃胶囊（CompanionBottomNav 原样） ── */
+    .bottom-nav {
+      position: absolute; bottom: 0; left: 0;
+      width: 100%; height: 88px; padding-bottom: 8px;
+      display: flex; justify-content: center; align-items: center;
+      z-index: 20; pointer-events: none; flex-shrink: 0;
+    }
+    .nav-capsule {
+      pointer-events: auto;
+      width: 90%; height: 62px;
+      border-radius: 30px;
+      background-color: rgba(8, 16, 32, 0.5); /* #80081020 毛玻璃半透明深蓝 */
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1); /* #1AFFFFFF 微弱白边 */
+      box-shadow: 0 5px 18px rgba(0, 0, 0, 0.28); /* 悬浮阴影 */
+      display: flex; align-items: center; justify-content: space-evenly;
+      transition: transform 280ms cubic-bezier(0.25, 0.1, 0.25, 1);
+      /* 降级版：移除 backdrop-filter，background-color: rgba(8,16,32,0.85) */
+    }
+    .nav-capsule:active { transform: scale(1.012, 0.988) translateY(1px); }
+    .nav-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 2px;
+      cursor: pointer; border: none; background: none; padding: 0; height: 100%;
+    }
+    .nav-icon { font-size: 22px; line-height: 1; color: #8F96B2; }
+    .nav-label { font-size: 12px; line-height: 1; color: #9AA2BD; font-weight: 400; margin-top: 2px; }
+    .nav-item.active .nav-icon, .nav-item.active .nav-label { color: #E8B83D; font-weight: 700; }
+    /* 导航切换动画 — 标准版 200ms ease 渐变 */
+    /* 降级版：直接切换无过渡 */
+
+    /* ── 降级 ── */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+      .day-dot { box-shadow: none; }
+      .day-today { box-shadow: none; border: 1px solid var(--gold-accent-A); }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- ═══ 可滚动内容区 ═══ -->
+    <main class="scroll-area">
+      <h1 class="page-title">星澜星历</h1>
+      <p class="page-subtitle">不是打卡，只是把认真感受过的日子轻轻留下。</p>
+
+      <!-- 月份翻页 -->
+      <div class="month-nav">
+        <button class="month-arrow" type="button" aria-label="上一月">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M10 4 L6 8 L10 12" stroke="#8A8498" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <span class="month-label">2026年 7月</span>
+        <button class="month-arrow" type="button" aria-label="下一月">
+          <svg viewBox="0 0 16 16" fill="none"><path d="M6 4 L10 8 L6 12" stroke="#8A8498" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+      <!-- 日历 -->
+      <div class="calendar-wrap">
+        <div class="weekday-row">
+          <span class="weekday">日</span><span class="weekday">一</span><span class="weekday">二</span>
+          <span class="weekday">三</span><span class="weekday">四</span><span class="weekday">五</span><span class="weekday">六</span>
+        </div>
+        <div class="calendar-grid">
+          <div class="day-cell day-other-month"><span class="day-num">28</span></div>
+          <div class="day-cell day-other-month"><span class="day-num">29</span></div>
+          <div class="day-cell day-other-month"><span class="day-num">30</span></div>
+          <div class="day-cell day-lit"><span class="day-num">1</span><span class="day-dot"></span></div>
+          <div class="day-cell day-past"><span class="day-num">2</span></div>
+          <div class="day-cell day-past"><span class="day-num">3</span></div>
+          <div class="day-cell day-past"><span class="day-num">4</span></div>
+          <div class="day-cell day-past"><span class="day-num">5</span></div>
+          <div class="day-cell day-past"><span class="day-num">6</span></div>
+          <div class="day-cell day-past"><span class="day-num">7</span></div>
+          <div class="day-cell day-past"><span class="day-num">8</span></div>
+          <div class="day-cell day-past"><span class="day-num">9</span></div>
+          <div class="day-cell day-past"><span class="day-num">10</span></div>
+          <div class="day-cell day-past"><span class="day-num">11</span></div>
+          <div class="day-cell day-past"><span class="day-num">12</span></div>
+          <div class="day-cell day-past"><span class="day-num">13</span></div>
+          <div class="day-cell day-past"><span class="day-num">14</span></div>
+          <div class="day-cell day-selected day-lit" style="background-color: rgba(201,164,75,0.06);">
+            <span class="day-num">15</span><span class="day-dot" style="margin-top: 1px;"></span>
+          </div>
+          <div class="day-cell day-today"><span class="day-num">16</span></div>
+          <div class="day-cell day-future"><span class="day-num">17</span></div>
+          <div class="day-cell day-future"><span class="day-num">18</span></div>
+          <div class="day-cell day-future"><span class="day-num">19</span></div>
+          <div class="day-cell day-future"><span class="day-num">20</span></div>
+          <div class="day-cell day-future"><span class="day-num">21</span></div>
+          <div class="day-cell day-future"><span class="day-num">22</span></div>
+          <div class="day-cell day-future"><span class="day-num">23</span></div>
+          <div class="day-cell day-future"><span class="day-num">24</span></div>
+          <div class="day-cell day-future"><span class="day-num">25</span></div>
+          <div class="day-cell day-future"><span class="day-num">26</span></div>
+          <div class="day-cell day-future"><span class="day-num">27</span></div>
+          <div class="day-cell day-future"><span class="day-num">28</span></div>
+          <div class="day-cell day-future"><span class="day-num">29</span></div>
+          <div class="day-cell day-future"><span class="day-num">30</span></div>
+          <div class="day-cell day-future"><span class="day-num">31</span></div>
+          <div class="day-cell day-other-month"><span class="day-num">1</span></div>
+        </div>
+      </div>
+
+      <!-- 本月星光记录卡片 -->
+      <div class="stats-card">
+        <div class="stats-row">
+          <span class="stats-label">本月累计点亮</span>
+          <span class="stats-value">2<span class="unit"> 天</span></span>
+        </div>
+        <div class="stats-row">
+          <span class="stats-label">连续记录</span>
+          <span class="stats-value" style="font-size: 14px; color: var(--text-secondary-A);">— 天</span>
+        </div>
+        <div class="stats-rank-row">
+          <span class="rank-current">星火初亮</span>
+          <div class="rank-next-info">
+            下一称号 <span class="next-name">七日星轨</span><br>
+            还差 <span class="days-left">6</span> 天
+          </div>
+        </div>
+        <div class="rank-progress"><div class="rank-progress-fill"></div></div>
+      </div>
+    </main>
+
+    <!-- ═══ 星历详情弹窗（点击15日触发，静态展示） ═══ -->
+    <div class="modal-overlay">
+      <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <button class="modal-close" type="button" aria-label="关闭">
+          <svg viewBox="0 0 18 18" fill="none"><path d="M4 4 L14 14 M14 4 L4 14" stroke="#8A8498" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+        <h2 class="modal-date-title">7月15日 星期三</h2>
+        <p class="modal-timestamp">2026-07-15 23:42</p>
+        <div class="modal-emotion-tags">
+          <span class="emotion-chip">平静</span>
+          <span class="emotion-chip">释然</span>
+          <span class="emotion-chip">微光</span>
+        </div>
+        <div class="modal-card-thumb">
+          <div class="card-thumb-frame">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M8 2 L9 6.5 L14 8 L9 9.5 L8 14 L7 9.5 L2 8 L7 6.5 Z" fill="#C9A44B" opacity="0.3"/></svg>
+          </div>
+          <div class="card-thumb-info">
+            <div class="card-thumb-name">星星 · The Star</div>
+            <div class="card-thumb-num">XVII / 22</div>
+          </div>
+        </div>
+        <div class="modal-xinglan-msg">
+          你说今天感到平静。<br>
+          星澜觉得，平静不是什么都没有，<br>
+          而是你终于放下了那把一直在量自己的尺子。<br><br>
+          今天的星星，记住了。
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ 底部导航：悬浮毛玻璃胶囊（5 Tab，我的高亮） ═══ -->
+    <nav class="bottom-nav">
+      <div class="nav-capsule">
+        <button class="nav-item" type="button">
+          <span class="nav-icon">◇</span>
+          <span class="nav-label">塔罗</span>
+        </button>
+        <button class="nav-item" type="button">
+          <span class="nav-icon">◉</span>
+          <span class="nav-label">星澜</span>
+        </button>
+        <button class="nav-item" type="button">
+          <span class="nav-icon">✦</span>
+          <span class="nav-label">语录</span>
+        </button>
+        <button class="nav-item" type="button">
+          <span class="nav-icon">▦</span>
+          <span class="nav-label">卡牌</span>
+        </button>
+        <button class="nav-item active" type="button">
+          <span class="nav-icon">☺</span>
+          <span class="nav-label">我的</span>
+        </button>
+      </div>
+    </nav>
+
+  </div>
+</body>
+</html>

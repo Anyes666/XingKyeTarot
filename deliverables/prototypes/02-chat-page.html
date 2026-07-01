@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<!--
+  星钥塔罗 · 星澜聊天页
+  设计系统：B 方案「月湖映心」
+  基准尺寸：390×844 (iPhone 14 / HarmonyOS 主流机型)
+  设计系统专家：彩格调（Cai）
+  原型构建师：筑原型（Zhu）
+
+  ▸ 铁律 1 执行：星澜头像为圆形 + 月光环，非全屏立绘
+  ▸ 铁律 4 执行：月光呼吸 + Typing dots（标准版），降级方案已标注
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>星澜聊天 · 月湖映心</title>
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       B 方案设计令牌（月湖映心）
+       ═══════════════════════════════════════════════════════════════ */
+    :root {
+      /* ── 色彩 ── */
+      --bg-base-B: #060B1A;
+      --bg-card-B: #0F1835;
+      --bg-floating-B: #162048;
+      --bg-hover-B: #1A2A55;
+      --text-primary-B: #F2EDDD;
+      --text-secondary-B: #9590A8;
+      --text-tertiary-B: #5C5870;
+      --gold-core-B: #D4AC4D;
+      --gold-ripple-B: #ECD89D;
+      --border-B: rgba(255,255,255,0.06);
+
+      /* ── 月光光晕 ── */
+      /* 标准版 */
+      --moonlight-glow-page: radial-gradient(ellipse 300px 200px at 50% 15%, rgba(212,172,77,0.04) 0%, transparent 70%);
+      /* 降级版：background-color: rgba(212,172,77,0.015); 静态微光底色 */
+
+      /* ── 字体栈 ── */
+      --font-sans: "HarmonyOS Sans", "Source Sans 3", "Inter", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+
+      /* ── 间距 ── */
+      --space-2xs: 4px;
+      --space-xs: 8px;
+      --space-sm: 12px;
+      --space-md: 16px;
+      --space-md-b: 20px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+
+      /* ── 圆角 ── */
+      --radius-bubble-small: 6px;
+      --radius-bubble-large: 20px;
+      --radius-btn-B: 14px;
+      --radius-chip-B: 24px;
+      --radius-full: 9999px;
+
+      /* ── 缓动函数 ── */
+      --ease-out: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.6, 1);
+
+      /* ── 头像光环 ── */
+      /* 标准版 */
+      --halo-avatar-standard: 0 0 12px rgba(212,172,77,0.15), 0 0 24px rgba(212,172,77,0.06);
+      /* 降级版：border: 1px solid rgba(212,172,77,0.3) */
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       全局重置
+       ═══════════════════════════════════════════════════════════════ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 390px;
+      height: 844px;
+      overflow: hidden;
+      font-family: var(--font-sans);
+      background-color: var(--bg-base-B);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       主容器
+       ═══════════════════════════════════════════════════════════════ */
+    .page {
+      position: relative;
+      width: 390px;
+      height: 844px;
+      background-color: var(--bg-base-B);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      /* 页面进入 — 标准版：opacity + translateY 300ms ease-out */
+      /* 降级版：opacity only, 150ms linear */
+      animation: pageEnter 300ms var(--ease-out) both;
+    }
+
+    @keyframes pageEnter {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* 降级版 keyframes：
+       @keyframes pageEnterD { from { opacity: 0; } to { opacity: 1; } }
+       animation: pageEnterD 150ms linear both;
+    */
+
+    /* ═══════════════════════════════════════════════════════════════
+       顶部月光光晕 — 标准版呼吸 6s
+       降级版：静态光斑
+       ═══════════════════════════════════════════════════════════════ */
+    .moonlight-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 240px;
+      background: var(--moonlight-glow-page);
+      animation: moonlightBreath 6s var(--ease-in-out) infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes moonlightBreath {
+      0%, 100% { opacity: 0.6; }
+      50%      { opacity: 1.0; }
+    }
+    /* 降级版：移除 animation，固定 opacity: 0.8 */
+
+    /* ═══════════════════════════════════════════════════════════════
+       顶部导航栏
+       ═══════════════════════════════════════════════════════════════ */
+    .nav-bar {
+      position: relative;
+      z-index: 10;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-md);
+      padding-top: 8px; /* 状态栏安全区 */
+    }
+
+    .nav-back {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .nav-back svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .nav-title-area {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+    }
+
+    /* 星澜头像 — 圆形 + 月光环 */
+    .nav-avatar {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(180deg, rgba(212,172,77,0.1) 0%, rgba(15,24,53,0.8) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      /* 标准版光环 */
+      box-shadow: var(--halo-avatar-standard);
+      /* 降级版：box-shadow: none; border: 1px solid rgba(212,172,77,0.3); */
+    }
+
+    .nav-avatar svg {
+      width: 20px;
+      height: 20px;
+      opacity: 0.3;
+    }
+
+    .nav-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-primary-B);
+      letter-spacing: 0.02em;
+    }
+
+    .nav-spacer {
+      width: 32px;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       聊天区域
+       ═══════════════════════════════════════════════════════════════ */
+    .chat-area {
+      position: relative;
+      z-index: 5;
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-md) var(--space-lg) 0 var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md); /* 气泡间距 16px */
+    }
+
+    /* 隐藏滚动条 */
+    .chat-area::-webkit-scrollbar { display: none; }
+    .chat-area { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* ── 气泡基础 ── */
+    .bubble {
+      max-width: 280px;
+      padding: var(--space-sm) var(--space-md); /* Token §7.5: 纵12px 横16px */
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1.7;
+      color: var(--text-primary-B);
+      /* 气泡出现 — 从上方飘入，opacity + translateY */
+      animation: bubbleEnter 400ms var(--ease-out) both;
+    }
+
+    @keyframes bubbleEnter {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* 降级版：opacity only, 150ms linear */
+
+    /* ── 星澜气泡 ── */
+    .bubble-xinglan {
+      align-self: flex-start;
+      background-color: var(--bg-card-B);
+      border-radius: var(--radius-bubble-small) var(--radius-bubble-large) var(--radius-bubble-large) var(--radius-bubble-large);
+      max-width: 280px;
+      position: relative;
+      /* 左侧微弱暖金光晕 — 标准版径向渐变 */
+      background-image: radial-gradient(ellipse 120px 80px at 0% 50%, rgba(212,172,77,0.06) 0%, transparent 60%);
+      /* 降级版：移除 background-image，改用 border-left: 2px solid rgba(212,172,77,0.3); */
+    }
+
+    /* 星澜气泡底部装饰线 — 2px 暖金细线，居中 60% 宽度 */
+    .bubble-xinglan::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 20%;
+      width: 60%;
+      height: 2px;
+      background-color: rgba(212,172,77,0.2);
+      border-radius: 1px;
+    }
+
+    /* ── 用户气泡 ── */
+    .bubble-user {
+      align-self: flex-end;
+      background-color: rgba(255,255,255,0.04);
+      border-radius: var(--radius-bubble-large) var(--radius-bubble-small) var(--radius-bubble-large) var(--radius-bubble-large);
+      max-width: 240px;
+    }
+
+    /* ── 气泡时间标签（辅助信息） ── */
+    .bubble-time {
+      font-size: 11px;
+      color: var(--text-tertiary-B);
+      margin-top: 4px;
+      font-weight: 400;
+    }
+
+    .bubble-time.xinglan { align-self: flex-start; padding-left: 4px; }
+    .bubble-time.user    { align-self: flex-end; padding-right: 4px; text-align: right; }
+
+    /* ── 不同发送者间距 ── */
+    .chat-area .bubble-xinglan + .bubble-user,
+    .chat-area .bubble-user + .bubble-xinglan {
+      margin-top: var(--space-lg); /* Token §3.7: 不同发送者间距 24px */
+    }
+
+    /* ── 气泡动画错位延迟 ── */
+    .chat-area > *:nth-child(1) { animation-delay: 100ms; }
+    .chat-area > *:nth-child(2) { animation-delay: 150ms; }
+    .chat-area > *:nth-child(3) { animation-delay: 300ms; }
+    .chat-area > *:nth-child(4) { animation-delay: 350ms; }
+    .chat-area > *:nth-child(5) { animation-delay: 500ms; }
+    .chat-area > *:nth-child(6) { animation-delay: 550ms; }
+    .chat-area > *:nth-child(7) { animation-delay: 700ms; }
+    .chat-area > *:nth-child(8) { animation-delay: 750ms; }
+    .chat-area > *:nth-child(9) { animation-delay: 900ms; }
+    .chat-area > *:nth-child(10) { animation-delay: 950ms; }
+    .chat-area > *:nth-child(11) { animation-delay: 1100ms; }
+    .chat-area > *:nth-child(12) { animation-delay: 1150ms; }
+    /* 降级版：移除所有 animation-delay，全部同时出现 */
+
+    /* ═══════════════════════════════════════════════════════════════
+       Typing Dots — 星澜正在输入
+       标准版：三点依次 opacity 变化，周期 1200ms
+       降级版：三个静态圆点，无动画
+       ═══════════════════════════════════════════════════════════════ */
+    .typing-bubble {
+      align-self: flex-start;
+      background-color: var(--bg-card-B);
+      border-radius: var(--radius-bubble-small) var(--radius-bubble-large) var(--radius-bubble-large) var(--radius-bubble-large);
+      background-image: radial-gradient(ellipse 120px 80px at 0% 50%, rgba(212,172,77,0.06) 0%, transparent 60%);
+      padding: var(--space-sm) var(--space-md); /* 与气泡内边距一致 */
+      height: 40px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      animation: bubbleEnter 400ms var(--ease-out) both;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: var(--radius-full);
+      background-color: var(--text-secondary-B);
+    }
+
+    /* 三点依次明暗循环 */
+    .typing-dot:nth-child(1) { animation: typingDot 1200ms var(--ease-in-out) infinite 0ms; }
+    .typing-dot:nth-child(2) { animation: typingDot 1200ms var(--ease-in-out) infinite 200ms; }
+    .typing-dot:nth-child(3) { animation: typingDot 1200ms var(--ease-in-out) infinite 400ms; }
+
+    @keyframes typingDot {
+      0%   { opacity: 0.3; }
+      15%  { opacity: 1; }
+      40%  { opacity: 0.3; }
+      100% { opacity: 0.3; }
+    }
+    /* 降级版：移除 animation，三个圆点统一 opacity: 0.6，静态显示 */
+
+    /* ═══════════════════════════════════════════════════════════════
+       Chips 快捷选项
+       ═══════════════════════════════════════════════════════════════ */
+    .chips-area {
+      align-self: flex-start;
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-xs);
+      margin-top: var(--space-sm);
+      padding-left: 4px;
+      animation: bubbleEnter 400ms var(--ease-out) 1300ms both;
+    }
+
+    .chip {
+      padding: var(--space-2xs) var(--space-xs); /* Token §7.4: Chip 内边距 4px 8px */
+      background-color: rgba(212,172,77,0.06);
+      border: 1px solid rgba(212,172,77,0.15);
+      border-radius: var(--radius-chip-B); /* 24px 全圆 */
+      color: var(--gold-core-B);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      font-weight: 400;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color 200ms var(--ease-out), border-color 200ms var(--ease-out);
+    }
+
+    .chip:hover {
+      background-color: rgba(212,172,77,0.12);
+      border-color: rgba(212,172,77,0.25);
+    }
+
+    .chip:active {
+      transform: scale(0.98);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       底部输入区域
+       ═══════════════════════════════════════════════════════════════ */
+    .input-area {
+      position: relative;
+      z-index: 10;
+      padding: var(--space-md) var(--space-lg) 34px var(--space-lg); /* 底部安全区 34px */
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      background-color: var(--bg-base-B);
+    }
+
+    .input-wrap {
+      flex: 1;
+      position: relative;
+    }
+
+    .chat-input {
+      width: 100%;
+      height: 48px;
+      background-color: var(--bg-card-B);
+      border: 1px solid var(--border-B);
+      border-radius: var(--radius-btn-B); /* 14px */
+      padding: 0 var(--space-md);
+      color: var(--text-primary-B);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 400;
+      outline: none;
+      transition: border-color 200ms var(--ease-out), box-shadow 200ms var(--ease-out);
+    }
+
+    .chat-input::placeholder {
+      color: rgba(149,144,168,0.5);
+    }
+
+    /* 聚焦态 — 金色光环 */
+    .chat-input:focus {
+      border-color: rgba(212,172,77,0.4);
+      box-shadow: 0 0 0 3px rgba(212,172,77,0.08);
+    }
+    /* 降级版：.chat-input:focus { border-color: rgba(212,172,77,0.4); box-shadow: none; } */
+
+    .send-btn {
+      flex-shrink: 0;
+      height: 48px;
+      padding: 0 var(--space-md);
+      background: none;
+      border: none;
+      color: var(--gold-core-B);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 400; /* Token §7.1: 按钮文字 400 Regular */
+      cursor: pointer;
+      transition: opacity 200ms var(--ease-out), transform 150ms var(--ease-out);
+    }
+
+    .send-btn:active {
+      transform: scale(0.98);
+      opacity: 0.7;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       装饰星点（聊天区域上方稀疏星点）
+       标准版：非同步眨眼
+       降级版：静态
+       ═══════════════════════════════════════════════════════════════ */
+    .chat-stars {
+      position: absolute;
+      top: 56px;
+      left: 0;
+      width: 100%;
+      height: 180px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .chat-star {
+      position: absolute;
+      border-radius: var(--radius-full);
+      background-color: #FFFFFF;
+    }
+
+    @keyframes starBlink {
+      0%, 100% { opacity: 0.2; }
+      50%      { opacity: 0.5; }
+    }
+    /* 降级版：移除 animation，固定 opacity: 0.3 */
+
+    .chat-star:nth-child(1) { width: 2px; height: 2px; top: 20%; left: 10%; animation: starBlink 5.2s var(--ease-in-out) infinite; }
+    .chat-star:nth-child(2) { width: 1px; height: 1px; top: 45%; left: 85%; animation: starBlink 4.3s var(--ease-in-out) infinite 0.8s; }
+    .chat-star:nth-child(3) { width: 1px; height: 1px; top: 10%; left: 70%; animation: starBlink 5.8s var(--ease-in-out) infinite 1.5s; }
+    .chat-star:nth-child(4) { width: 2px; height: 2px; top: 60%; left: 22%; animation: starBlink 4.7s var(--ease-in-out) infinite 0.3s; }
+    .chat-star:nth-child(5) { width: 1px; height: 1px; top: 30%; left: 92%; animation: starBlink 5.5s var(--ease-in-out) infinite 2.1s; }
+    .chat-star:nth-child(6) { width: 1px; height: 1px; top: 75%; left: 55%; animation: starBlink 4.1s var(--ease-in-out) infinite 1.2s; }
+    .chat-star:nth-child(7) { width: 2px; height: 2px; top: 15%; left: 40%; animation: starBlink 5.0s var(--ease-in-out) infinite 0.5s; }
+    .chat-star:nth-child(8) { width: 1px; height: 1px; top: 50%; left: 15%; animation: starBlink 4.6s var(--ease-in-out) infinite 1.8s; }
+    .chat-star:nth-child(9) { width: 1px; height: 1px; top: 25%; left: 60%; animation: starBlink 5.3s var(--ease-in-out) infinite 2.4s; }
+    .chat-star:nth-child(10) { width: 2px; height: 2px; top: 65%; left: 80%; animation: starBlink 4.8s var(--ease-in-out) infinite 0.7s; }
+    .chat-star:nth-child(11) { width: 1px; height: 1px; top: 5%; left: 25%; animation: starBlink 5.6s var(--ease-in-out) infinite 1.1s; }
+    .chat-star:nth-child(12) { width: 1px; height: 1px; top: 40%; left: 50%; animation: starBlink 4.4s var(--ease-in-out) infinite 1.9s; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       降级：prefers-reduced-motion
+       铁律 4 执行：系统级降级，移除所有循环动画
+       ═══════════════════════════════════════════════════════════════ */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+      .moonlight-top { opacity: 0.8; }
+      .chat-star { opacity: 0.3; }
+      .typing-dot { opacity: 0.6; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- 顶部月光光晕 -->
+    <div class="moonlight-top"></div>
+
+    <!-- 装饰星点（12颗） -->
+    <div class="chat-stars">
+      <span class="chat-star"></span><span class="chat-star"></span>
+      <span class="chat-star"></span><span class="chat-star"></span>
+      <span class="chat-star"></span><span class="chat-star"></span>
+      <span class="chat-star"></span><span class="chat-star"></span>
+      <span class="chat-star"></span><span class="chat-star"></span>
+      <span class="chat-star"></span><span class="chat-star"></span>
+    </div>
+
+    <!-- ═══ 顶部导航栏 ═══ -->
+    <nav class="nav-bar">
+      <button class="nav-back" type="button" aria-label="返回">
+        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 4 L6 10 L12 16" stroke="#9590A8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div class="nav-title-area">
+        <!-- 星澜头像：圆形 + 月光环（铁律 1：非立绘） -->
+        <div class="nav-avatar">
+          <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- 月牙发饰 -->
+            <path d="M10 3 C8 3, 7 4, 7 5 C8 4.5, 9 4.5, 10 5 C11 4.5, 12 4.5, 13 5 C13 4, 12 3, 10 3 Z" fill="rgba(212,172,77,0.5)"/>
+            <!-- 头部轮廓 -->
+            <circle cx="10" cy="9" r="3.5" stroke="rgba(242,237,221,0.35)" stroke-width="0.8" fill="none"/>
+            <!-- 肩部 -->
+            <path d="M4 17 C4 14, 6.5 12.5, 10 12.5 C13.5 12.5, 16 14, 16 17" stroke="rgba(242,237,221,0.35)" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="nav-title">星澜</span>
+      </div>
+
+      <div class="nav-spacer"></div>
+    </nav>
+
+    <!-- ═══ 聊天区域 ═══ -->
+    <main class="chat-area">
+
+      <!-- 用户消息 1 -->
+      <div class="bubble bubble-user">我最近总觉得自己不够好。</div>
+
+      <!-- 星澜消息 1 -->
+      <div class="bubble bubble-xinglan">
+        星澜听到了。<br>
+        那种"不够好"的感觉很重。<br>
+        不必急着反驳它。<br>
+        我们可以先看看，是哪件事让你这样觉得。
+      </div>
+
+      <!-- 用户消息 2 -->
+      <div class="bubble bubble-user">可能是工作上的事吧，总觉得自己做的不够好</div>
+
+      <!-- 星澜消息 2 -->
+      <div class="bubble bubble-xinglan">
+        工作上的事，有时候会变成一把尺子，<br>
+        我们拿它量自己，越量越觉得短。<br>
+        你愿意说说，最近是哪件事让你有这种感觉吗？
+      </div>
+
+      <!-- Typing Dots（星澜正在输入） -->
+      <div class="typing-bubble">
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+      </div>
+
+      <!-- Chips 快捷选项 -->
+      <div class="chips-area">
+        <button class="chip" type="button">不想说，就想待一会儿</button>
+        <button class="chip" type="button">试试看</button>
+        <button class="chip" type="button">换个别的话题</button>
+      </div>
+
+    </main>
+
+    <!-- ═══ 底部输入区域 ═══ -->
+    <div class="input-area">
+      <div class="input-wrap">
+        <input
+          type="text"
+          class="chat-input"
+          placeholder="写给你的话..."
+          aria-label="输入消息"
+        >
+      </div>
+      <button class="send-btn" type="button">发送</button>
+    </div>
+
+  </div>
+</body>
+</html>

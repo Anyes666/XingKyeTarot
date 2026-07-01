@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<!--
+  星钥塔罗 · 点亮情绪星成功页
+  设计系统：B 方案「月湖映心」为主 + A「星图档案」标记感
+  基准尺寸：390×844 (iPhone 14 / HarmonyOS 主流机型)
+  设计系统专家：彩格调（Cai）
+  原型构建师：筑原型（Zhu）
+
+  ▸ 铁律 3 执行：星钥等级阈值 0/1/7/21/30/90/180/365 天
+  ▸ 铁律 4 执行：星星点亮涟漪 + 月光呼吸（标准版），降级方案已标注
+  ▸ 设计意图：温柔收据——占卜完成后的轻轻确认，不是游戏成就弹窗
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>情绪星已点亮 · 星钥塔罗</title>
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       B 方案 + A 标记感 设计令牌
+       ═══════════════════════════════════════════════════════════════ */
+    :root {
+      /* ── B 方案色彩 ── */
+      --bg-base-B: #060B1A;            /* 最深湖底 */
+      --bg-card-B: #0F1835;           /* 湖中石板 */
+      --bg-floating-B: #162048;       /* 浮上水面的光斑 */
+      --bg-hover-B: #1A2A55;          /* hover/pressed 微亮态 */
+      --text-primary-B: #F2EDDD;      /* 月光白 */
+      --text-secondary-B: #9590A8;    /* 水雾灰 */
+      --text-tertiary-B: #5C5870;     /* 暗灰三级文字 */
+      --gold-core-B: #D4AC4D;         /* 湖面月光 */
+      --gold-ripple-B: #ECD89D;       /* 月光扩散 */
+      --border-B: rgba(255,255,255,0.06);
+
+      /* ── A 方案标记色（借用金色 + 星灰）── */
+      --gold-accent-A: #C9A44B;       /* A 方案核心金色——星星标记 */
+      --gold-glow-A: #E8D5A3;         /* A 方案柔金——高亮文字 */
+      --text-secondary-A: #8A8498;    /* A 方案星灰——天数标签 */
+      --orbit-line-A: #1E2545;        /* A 方案星轨线 */
+
+      /* ── 月光光晕色 ── */
+      /* 标准版 */
+      --moonlight-glow-entry: radial-gradient(ellipse 360px 280px at 50% 15%, rgba(212,172,77,0.08) 0%, transparent 60%);
+      /* 降级版：background-color: rgba(212,172,77,0.03); 静态光斑底色 */
+
+      /* ── 字体栈 ── */
+      --font-sans: "HarmonyOS Sans", "Source Sans 3", "Inter", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      --font-serif: "HarmonyOS Serif", "Source Serif 4", "Noto Serif SC", Georgia, serif;
+      --font-mono: "HarmonyOS Sans Mono", "JetBrains Mono", "Cascadia Code", "Consolas", monospace;
+
+      /* ── 排版 ── */
+      --text-display-B: 34px;   /* Light, 1.15, 0.02em */
+      --text-lead-B: 18px;      /* Light, 1.9, 0.01em */
+      --text-body-B: 15px;      /* Regular, 1.75 */
+      --text-caption-B: 13px;   /* Regular, 1.5 */
+      --text-rank-title-A: 20px;/* Medium, 1.3, 0.06em — 等级称号 */
+      --text-rank-days-A: 28px; /* Light, 1.1, mono — 天数数字 */
+      --text-timestamp-A: 12px; /* Regular, 1.5, mono, 0.05em */
+
+      /* ── 间距 ── */
+      --space-2xs: 4px;
+      --space-xs: 8px;
+      --space-sm: 12px;
+      --space-md: 16px;
+      --space-md-b: 20px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      --space-3xl: 64px;
+
+      /* ── 圆角 ── */
+      --radius-btn-B: 14px;
+      --radius-card-B: 20px;
+      --radius-full: 9999px;
+
+      /* ── 阴影 ── */
+      --shadow-card-b: 0 4px 24px rgba(0,0,0,0.3);
+      /* 标准版降级：0 2px 8px rgba(0,0,0,0.2) */
+
+      /* ── 星星发光 ── */
+      /* 标准版 */
+      --glow-star-lit: 0 0 6px rgba(201,164,75,0.4), 0 0 12px rgba(201,164,75,0.15);
+      /* 降级版：无 box-shadow，仅 background-color: #C9A44B 纯色实心点 */
+
+      /* ── 缓动函数 ── */
+      --ease-out: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.6, 1);
+      --ease-overshoot: cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       全局重置
+       ═══════════════════════════════════════════════════════════════ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 390px;
+      height: 844px;
+      overflow: hidden;
+      font-family: var(--font-sans);
+      background-color: var(--bg-base-B);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       主容器 · 深湖底
+       ═══════════════════════════════════════════════════════════════ */
+    .page {
+      position: relative;
+      width: 390px;
+      height: 844px;
+      background-color: var(--bg-base-B);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      /* 页面进入动画 — 标准版：opacity + translateY 300ms ease-out */
+      /* 降级版：opacity only, 150ms linear */
+      animation: pageEnter 300ms var(--ease-out) both;
+    }
+
+    @keyframes pageEnter {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* 降级版 keyframes：
+       @keyframes pageEnterD { from { opacity: 0; } to { opacity: 1; } }
+       animation: pageEnterD 150ms linear both;
+    */
+
+    /* ═══════════════════════════════════════════════════════════════
+       月光光晕层 — 顶部径向渐变
+       标准版：呼吸动画 6s 周期
+       降级版：静态光斑 rgba(212,172,77,0.03)
+       ═══════════════════════════════════════════════════════════════ */
+    .moonlight-halo {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 45%;
+      background: var(--moonlight-glow-entry);
+      /* 月光呼吸 — 标准版：opacity 0.6↔1.0, 6s, ease-in-out */
+      animation: moonlightBreath 6s var(--ease-in-out) infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes moonlightBreath {
+      0%, 100% { opacity: 0.6; }
+      50%      { opacity: 1.0; }
+    }
+    /* 降级版：移除 animation，固定 opacity: 0.8 */
+
+    /* ═══════════════════════════════════════════════════════════════
+       稀疏星点层
+       标准版：非同步缓慢明暗 4-6s
+       降级版：静态，固定 opacity 30%
+       ═══════════════════════════════════════════════════════════════ */
+    .stars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 40%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .star {
+      position: absolute;
+      border-radius: var(--radius-full);
+      background-color: #FFFFFF;
+    }
+
+    @keyframes starBlink {
+      0%, 100% { opacity: 0.2; }
+      50%      { opacity: 0.5; }
+    }
+    /* 降级版：移除 animation，固定 opacity: 0.3 */
+
+    .star:nth-child(1)  { width: 2px; height: 2px; top: 10%; left: 14%; animation: starBlink 5.2s var(--ease-in-out) infinite; }
+    .star:nth-child(2)  { width: 1px; height: 1px; top: 18%; left: 32%; animation: starBlink 4.3s var(--ease-in-out) infinite 0.8s; }
+    .star:nth-child(3)  { width: 2px; height: 2px; top: 8%;  left: 50%; animation: starBlink 5.8s var(--ease-in-out) infinite 1.5s; }
+    .star:nth-child(4)  { width: 1px; height: 1px; top: 22%; left: 68%; animation: starBlink 4.7s var(--ease-in-out) infinite 0.3s; }
+    .star:nth-child(5)  { width: 2px; height: 2px; top: 14%; left: 82%; animation: starBlink 5.5s var(--ease-in-out) infinite 2.1s; }
+    .star:nth-child(6)  { width: 1px; height: 1px; top: 30%; left: 8%;  animation: starBlink 4.1s var(--ease-in-out) infinite 1.2s; }
+    .star:nth-child(7)  { width: 1px; height: 1px; top: 28%; left: 88%; animation: starBlink 5.9s var(--ease-in-out) infinite 0.6s; }
+    .star:nth-child(8)  { width: 2px; height: 2px; top: 35%; left: 42%; animation: starBlink 4.5s var(--ease-in-out) infinite 1.8s; }
+    .star:nth-child(9)  { width: 1px; height: 1px; top: 24%; left: 58%; animation: starBlink 5.3s var(--ease-in-out) infinite 0.4s; }
+    .star:nth-child(10) { width: 1px; height: 1px; top: 38%; left: 74%; animation: starBlink 4.9s var(--ease-in-out) infinite 2.5s; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       内容区域
+       ═══════════════════════════════════════════════════════════════ */
+    .content {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 var(--space-lg);
+      padding-top: 64px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       金色星星点亮视觉 — 中心位置
+       标准版：scale 弹出 + 光晕扩散 + 涟漪三阶段
+       降级版：opacity only, 200ms linear
+       ═══════════════════════════════════════════════════════════════ */
+    .star-lit-area {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-xl);
+      /* 飘落入场 */
+      animation: areaEnter 600ms var(--ease-out) 200ms both;
+    }
+
+    @keyframes areaEnter {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* 降级版：opacity only, 150ms linear */
+
+    /* 涟漪扩散层 — 三层同心圆涟漪 */
+    .ripple {
+      position: absolute;
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(212,172,77,0.3);
+      /* 标准版：涟漪扩散 scale 0→1, opacity 0.3→0, 3s 循环 */
+      animation: rippleExpand 3s var(--ease-out) infinite;
+    }
+    .ripple:nth-child(1) { width: 80px; height: 80px; animation-delay: 0s; }
+    .ripple:nth-child(2) { width: 80px; height: 80px; animation-delay: 1s; }
+    .ripple:nth-child(3) { width: 80px; height: 80px; animation-delay: 2s; }
+
+    @keyframes rippleExpand {
+      0%   { transform: scale(0.5); opacity: 0.4; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+    /* 降级版：移除 animation，涟漪层 display: none */
+
+    /* 金色星星本体 — 四角星 */
+    .star-core {
+      position: relative;
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      /* 星星点亮 — 标准版：scale 弹出三阶段
+         阶段1: scale 0→1.3, 200ms ease-out
+         阶段2: scale 1.3→1.0, 150ms ease-out
+         阶段3: 光晕扩散 box-shadow, 300ms ease-out */
+      animation: starLightUp 650ms var(--ease-overshoot) 400ms both;
+      box-shadow: var(--glow-star-lit);
+    }
+    /* 降级版：
+       .star-core { animation: starLightUpD 200ms linear 400ms both; box-shadow: none; }
+       @keyframes starLightUpD { from { opacity: 0; } to { opacity: 1; } }
+    */
+
+    @keyframes starLightUp {
+      0%   { transform: scale(0); opacity: 0; }
+      40%  { transform: scale(1.3); opacity: 1; }
+      70%  { transform: scale(1.0); opacity: 1; }
+      100% { transform: scale(1.0); opacity: 1; }
+    }
+
+    .star-core svg {
+      width: 48px;
+      height: 48px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       标题文字区
+       ═══════════════════════════════════════════════════════════════ */
+    .text-block {
+      text-align: center;
+      margin-bottom: var(--space-xl);
+      animation: textEnter 700ms var(--ease-out) 600ms both;
+    }
+
+    @keyframes textEnter {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* 降级版：opacity only, 150ms linear */
+
+    .title {
+      font-size: var(--text-display-B);
+      font-weight: 300;
+      line-height: 1.15;
+      letter-spacing: 0.02em;
+      color: var(--text-primary-B);
+      margin-bottom: var(--space-sm);
+    }
+
+    .subtitle {
+      font-size: var(--text-lead-B);
+      font-weight: 300;
+      line-height: 1.9;
+      letter-spacing: 0.01em;
+      color: var(--text-secondary-B);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       温柔收据卡片 — 今日信息
+       B 方案卡片底 + A 方案标记感
+       ═══════════════════════════════════════════════════════════════ */
+    .receipt-card {
+      width: 100%;
+      background-color: var(--bg-card-B);
+      border: 1px solid var(--border-B);
+      border-radius: var(--radius-card-B);
+      box-shadow: var(--shadow-card-b);
+      padding: var(--space-lg) var(--space-lg) var(--space-md-b) var(--space-lg);
+      margin-bottom: var(--space-xl);
+      animation: cardEnter 700ms var(--ease-out) 800ms both;
+    }
+    /* 降级版 box-shadow: 0 2px 8px rgba(0,0,0,0.2) */
+
+    @keyframes cardEnter {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* 降级版：opacity only, 150ms linear */
+
+    /* 收据标题行 */
+    .receipt-header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-md);
+      border-bottom: 1px solid var(--orbit-line-A); /* A 方案星轨线 */
+    }
+
+    .receipt-header svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .receipt-header span {
+      font-size: var(--text-caption-B);
+      font-weight: 400;
+      color: var(--text-secondary-B);
+      letter-spacing: 0.04em;
+    }
+
+    /* 收据内容行 */
+    .receipt-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      padding: var(--space-sm) 0;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .receipt-row:last-child {
+      border-bottom: none;
+    }
+
+    .receipt-label {
+      font-size: var(--text-caption-B);
+      font-weight: 400;
+      color: var(--text-secondary-B);
+      flex-shrink: 0;
+    }
+
+    .receipt-value {
+      font-size: var(--text-body-B);
+      font-weight: 400;
+      color: var(--text-primary-B);
+      text-align: right;
+    }
+
+    .receipt-value.gold {
+      color: var(--gold-core-B);
+      font-weight: 500;
+    }
+
+    .receipt-value.serif {
+      font-family: var(--font-serif);
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: 0.02em;
+    }
+
+    /* 进度行 — 当前等级 + 下一称号 */
+    .receipt-progress {
+      margin-top: var(--space-md);
+      padding-top: var(--space-md);
+      border-top: 1px dashed var(--orbit-line-A);
+    }
+
+    .progress-label-row {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: var(--space-sm);
+    }
+
+    .progress-current {
+      font-size: var(--text-rank-title-A);
+      font-weight: 500;
+      color: var(--gold-accent-A);
+      letter-spacing: 0.06em;
+    }
+
+    .progress-next-label {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--text-secondary-A);
+      font-family: var(--font-mono);
+    }
+
+    .progress-next-label .next-name {
+      color: var(--text-primary-B);
+    }
+
+    .progress-next-label .days-left {
+      color: var(--gold-accent-A);
+    }
+
+    /* 进度条 */
+    .progress-bar-wrap {
+      position: relative;
+      width: 100%;
+      height: 3px;
+      background-color: rgba(138,132,152,0.15);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 14%; /* 1天/7天 ≈ 14% */
+      background-color: var(--gold-accent-A);
+      border-radius: 2px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       底部按钮区域
+       ═══════════════════════════════════════════════════════════════ */
+    .bottom-area {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 0 var(--space-lg) 48px var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      z-index: 10;
+      animation: bottomEnter 700ms var(--ease-out) 1000ms both;
+    }
+
+    @keyframes bottomEnter {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* 降级版：opacity only, 150ms linear */
+
+    /* ── 主按钮 — B 方案 ── */
+    .btn-primary {
+      width: 100%;
+      height: 52px;
+      background-color: var(--bg-card-B);
+      border: none;
+      border-radius: var(--radius-btn-B);
+      color: var(--gold-core-B);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      box-shadow: 0 0 20px rgba(212,172,77,0.12);
+      transition: box-shadow 200ms var(--ease-out),
+                  transform 150ms var(--ease-out),
+                  background-color 200ms var(--ease-out);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 28px rgba(212,172,77,0.18);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+      box-shadow: 0 0 12px rgba(212,172,77,0.08);
+    }
+    /* 降级版：
+       .btn-primary { box-shadow: none; }
+       .btn-primary:hover { background-color: #1A2A55; box-shadow: none; }
+       .btn-primary:active { transform: scale(0.98); }
+    */
+
+    .btn-primary svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ── 次按钮 — B 方案 ── */
+    .btn-secondary {
+      width: 100%;
+      height: 52px;
+      background-color: transparent;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--radius-btn-B);
+      color: var(--text-secondary-B);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 200ms var(--ease-out),
+                  transform 150ms var(--ease-out);
+    }
+
+    .btn-secondary:hover {
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    .btn-secondary:active {
+      transform: scale(0.98);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       降级：prefers-reduced-motion
+       铁律 4 执行：系统级降级，移除所有循环动画
+       ═══════════════════════════════════════════════════════════════ */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+      .moonlight-halo { opacity: 0.8; }
+      .star { opacity: 0.3; }
+      .ripple { display: none; }
+      .star-core { box-shadow: none; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- 月光光晕层 -->
+    <div class="moonlight-halo"></div>
+
+    <!-- 稀疏星点（10 颗） -->
+    <div class="stars">
+      <span class="star"></span><span class="star"></span>
+      <span class="star"></span><span class="star"></span>
+      <span class="star"></span><span class="star"></span>
+      <span class="star"></span><span class="star"></span>
+      <span class="star"></span><span class="star"></span>
+    </div>
+
+    <!-- 内容区域 -->
+    <div class="content">
+
+      <!-- ═══ 金色星星点亮视觉 ═══ -->
+      <div class="star-lit-area">
+        <!-- 涟漪扩散层（三层同心圆） -->
+        <div class="ripple"></div>
+        <div class="ripple"></div>
+        <div class="ripple"></div>
+        <!-- 金色四角星本体 -->
+        <div class="star-core">
+          <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24 4 L27 20 L44 24 L27 28 L24 44 L21 28 L4 24 L21 20 Z"
+                  fill="#D4AC4D"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- ═══ 标题 + 副文案 ═══ -->
+      <div class="text-block">
+        <h1 class="title">你点亮了今天的情绪星。</h1>
+        <p class="subtitle">星澜会替你记住：<br>今天的你，也认真面对过自己的感受。</p>
+      </div>
+
+      <!-- ═══ 温柔收据卡片 ═══ -->
+      <div class="receipt-card">
+        <!-- 收据标题 -->
+        <div class="receipt-header">
+          <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 1 L8 5.5 L13 7 L8 8.5 L7 13 L6 8.5 L1 7 L6 5.5 Z"
+                  fill="#D4AC4D" opacity="0.6"/>
+          </svg>
+          <span>今日情绪星 · 星澜收存</span>
+        </div>
+
+        <!-- 今日星名 -->
+        <div class="receipt-row">
+          <span class="receipt-label">今日星名</span>
+          <span class="receipt-value gold">平静之星</span>
+        </div>
+
+        <!-- 今日牌名 -->
+        <div class="receipt-row">
+          <span class="receipt-label">今日牌面</span>
+          <span class="receipt-value serif">星星 · The Star</span>
+        </div>
+
+        <!-- 累计点亮天数 -->
+        <div class="receipt-row">
+          <span class="receipt-label">累计点亮</span>
+          <span class="receipt-value">
+            <span style="font-family: var(--font-mono); color: var(--gold-accent-A); font-size: 18px;">1</span>
+            <span style="color: var(--text-secondary-B); font-size: 13px;"> 天</span>
+          </span>
+        </div>
+
+        <!-- 当前等级 + 下一称号进度 -->
+        <div class="receipt-progress">
+          <div class="progress-label-row">
+            <span class="progress-current">星火初亮</span>
+            <span class="progress-next-label">
+              下一称号 <span class="next-name">七日星轨</span> · 还差 <span class="days-left">6</span> 天
+            </span>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar-fill"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ 底部按钮区域 ═══ -->
+    <div class="bottom-area">
+      <button class="btn-primary" type="button" aria-label="查看我的星历">
+        <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="3" width="12" height="11" rx="1.5" stroke="#D4AC4D" stroke-width="1.5" fill="none"/>
+          <path d="M2 6 H14" stroke="#D4AC4D" stroke-width="1.5"/>
+          <circle cx="8" cy="10.5" r="1.5" fill="#D4AC4D" opacity="0.6"/>
+        </svg>
+        查看我的星历
+      </button>
+      <button class="btn-secondary" type="button" aria-label="返回首页">返回首页</button>
+    </div>
+
+  </div>
+</body>
+</html>

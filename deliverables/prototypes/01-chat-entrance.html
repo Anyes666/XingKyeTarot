@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<!--
+  星钥塔罗 · 星澜聊天入口页（月光门廊）
+  设计系统：B 方案「月湖映心」
+  基准尺寸：390×844 (iPhone 14 / HarmonyOS 主流机型)
+  设计系统专家：彩格调（Cai）
+  原型构建师：筑原型（Zhu）
+
+  ▸ 铁律 1 执行：星澜形象为半透明剪影 + 月光环，非全屏立绘
+  ▸ 铁律 4 执行：月光呼吸 + 星点眨眼（标准版），降级方案已标注
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>月光门廊 · 星澜聊天入口</title>
+  <style>
+    /* ═══════════════════════════════════════════════════════════════
+       B 方案设计令牌（月湖映心）
+       ═══════════════════════════════════════════════════════════════ */
+    :root {
+      /* ── 色彩 ── */
+      --bg-base-B: #060B1A;            /* 最深湖底 */
+      --bg-card-B: #0F1835;           /* 湖中石板 */
+      --bg-floating-B: #162048;       /* 浮上水面的光斑 */
+      --bg-hover-B: #1A2A55;          /* hover/pressed 微亮态 */
+      --text-primary-B: #F2EDDD;      /* 月光白 */
+      --text-secondary-B: #9590A8;    /* 水雾灰 */
+      --text-tertiary-B: #5C5870;     /* 暗灰三级文字 */
+      --gold-core-B: #D4AC4D;         /* 湖面月光 */
+      --gold-ripple-B: #ECD89D;       /* 月光扩散 */
+      --border-B: rgba(255,255,255,0.06);
+
+      /* ── 月光光晕色 ── */
+      /* 标准版 */
+      --moonlight-glow-entry: radial-gradient(ellipse 360px 280px at 50% 20%, rgba(212,172,77,0.08) 0%, transparent 60%);
+      /* 降级版：background-color: rgba(212,172,77,0.03); 静态光斑底色 */
+
+      /* ── 字体栈 ── */
+      --font-sans: "HarmonyOS Sans", "Source Sans 3", "Inter", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+
+      /* ── 排版 ── */
+      --text-display-B: 34px;   /* Light, 1.15, 0.02em */
+      --text-lead-B: 18px;      /* Light, 1.9, 0.01em */
+      --text-disclaimer-B: 11px;/* Regular, 1.5 */
+
+      /* ── 间距 ── */
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --space-2xl: 48px;
+      --space-3xl: 64px;
+
+      /* ── 圆角 ── */
+      --radius-btn-B: 14px;
+      --radius-full: 9999px;
+
+      /* ── 阴影 ── */
+      /* 标准版 */
+      --shadow-glow-btn: 0 0 20px rgba(212,172,77,0.12);
+      --shadow-glow-btn-hover: 0 0 28px rgba(212,172,77,0.18);
+      /* 降级版：移除 box-shadow，hover 仅背景微亮至 #1A2A55 */
+
+      /* ── 头像光环 ── */
+      /* 标准版 */
+      --halo-avatar-active: 0 0 16px rgba(212,172,77,0.15), 0 0 32px rgba(212,172,77,0.06);
+      /* 降级版：border: 1px solid rgba(212,172,77,0.3) */
+
+      /* ── 缓动函数 ── */
+      --ease-out: cubic-bezier(0.25, 0.1, 0.25, 1);
+      --ease-in-out: cubic-bezier(0.4, 0, 0.6, 1);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       全局重置
+       ═══════════════════════════════════════════════════════════════ */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 390px;
+      height: 844px;
+      overflow: hidden;
+      font-family: var(--font-sans);
+      background-color: var(--bg-base-B);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       主容器 · 深湖底
+       ═══════════════════════════════════════════════════════════════ */
+    .page {
+      position: relative;
+      width: 390px;
+      height: 844px;
+      background-color: var(--bg-base-B);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      /* 页面进入动画 — 标准版：opacity + translateY 300ms ease-out */
+      /* 降级版：opacity only, 150ms linear */
+      animation: pageEnter 300ms var(--ease-out) both;
+    }
+
+    @keyframes pageEnter {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* 降级版 keyframes：
+       @keyframes pageEnterD { from { opacity: 0; } to { opacity: 1; } }
+       animation: pageEnterD 150ms linear both;
+    */
+
+    /* ═══════════════════════════════════════════════════════════════
+       月光光晕层 — 中上区域径向渐变
+       标准版：呼吸动画 6s 周期
+       降级版：静态光斑 rgba(212,172,77,0.03)
+       ═══════════════════════════════════════════════════════════════ */
+    .moonlight-halo {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      background: var(--moonlight-glow-entry);
+      /* 月光呼吸 — 标准版：opacity 0.6↔1.0, 6s, ease-in-out */
+      animation: moonlightBreath 6s var(--ease-in-out) infinite;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes moonlightBreath {
+      0%, 100% { opacity: 0.6; }
+      50%      { opacity: 1.0; }
+    }
+    /* 降级版：移除 animation，固定 opacity: 0.8，或使用 --moonlight-glow-dim 静态底色 */
+
+    /* ═══════════════════════════════════════════════════════════════
+       星点层 — 12-18 颗白色微星
+       标准版：非同步缓慢明暗 4-6s
+       降级版：6-8 颗静态，固定 opacity 30%
+       ═══════════════════════════════════════════════════════════════ */
+    .stars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 45%;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .star {
+      position: absolute;
+      border-radius: var(--radius-full);
+      background-color: #FFFFFF;
+    }
+
+    /* 每颗星点有独立的眨眼周期，制造非同步自然感 */
+    /* 标准版：opacity 20%↔50%, 4-6s, ease-in-out */
+    @keyframes starBlink {
+      0%, 100% { opacity: 0.2; }
+      50%      { opacity: 0.5; }
+    }
+    /* 降级版：移除 animation，固定 opacity: 0.3，减少至 6-8 颗 */
+
+    /* ── 15 颗星点分布 ── */
+    .star:nth-child(1)  { width: 2px; height: 2px; top: 8%;  left: 12%; animation: starBlink 5.2s var(--ease-in-out) infinite; }
+    .star:nth-child(2)  { width: 1px; height: 1px; top: 15%; left: 28%; animation: starBlink 4.3s var(--ease-in-out) infinite 0.8s; }
+    .star:nth-child(3)  { width: 3px; height: 3px; top: 6%;  left: 45%; animation: starBlink 5.8s var(--ease-in-out) infinite 1.5s; }
+    .star:nth-child(4)  { width: 2px; height: 2px; top: 22%; left: 62%; animation: starBlink 4.7s var(--ease-in-out) infinite 0.3s; }
+    .star:nth-child(5)  { width: 1px; height: 1px; top: 12%; left: 78%; animation: starBlink 5.5s var(--ease-in-out) infinite 2.1s; }
+    .star:nth-child(6)  { width: 2px; height: 2px; top: 30%; left: 8%;  animation: starBlink 4.1s var(--ease-in-out) infinite 1.2s; }
+    .star:nth-child(7)  { width: 1px; height: 1px; top: 18%; left: 88%; animation: starBlink 5.9s var(--ease-in-out) infinite 0.6s; }
+    .star:nth-child(8)  { width: 3px; height: 3px; top: 35%; left: 38%; animation: starBlink 4.5s var(--ease-in-out) infinite 1.8s; }
+    .star:nth-child(9)  { width: 1px; height: 1px; top: 26%; left: 52%; animation: starBlink 5.3s var(--ease-in-out) infinite 0.4s; }
+    .star:nth-child(10) { width: 2px; height: 2px; top: 10%; left: 68%; animation: starBlink 4.9s var(--ease-in-out) infinite 2.5s; }
+    .star:nth-child(11) { width: 1px; height: 1px; top: 38%; left: 72%; animation: starBlink 4.4s var(--ease-in-out) infinite 1.0s; }
+    .star:nth-child(12) { width: 2px; height: 2px; top: 4%;  left: 32%; animation: starBlink 5.7s var(--ease-in-out) infinite 1.7s; }
+    .star:nth-child(13) { width: 1px; height: 1px; top: 28%; left: 18%; animation: starBlink 4.6s var(--ease-in-out) infinite 0.9s; }
+    .star:nth-child(14) { width: 1px; height: 1px; top: 16%; left: 58%; animation: starBlink 5.1s var(--ease-in-out) infinite 2.3s; }
+    .star:nth-child(15) { width: 2px; height: 2px; top: 33%; left: 84%; animation: starBlink 4.8s var(--ease-in-out) infinite 0.5s; }
+
+    /* ═══════════════════════════════════════════════════════════════
+       内容区域
+       ═══════════════════════════════════════════════════════════════ */
+    .content {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 var(--space-lg);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       星澜形象 — 半透明剪影 + 月光环
+       铁律 1：非全屏立绘，半透明剪影 opacity ≤ 0.3
+       ═══════════════════════════════════════════════════════════════ */
+    .xinglan-figure {
+      margin-top: 72px;
+      position: relative;
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      /* 飘落入场 — 标准版 */
+      animation: figureEnter 800ms var(--ease-out) 200ms both;
+    }
+
+    @keyframes figureEnter {
+      from { opacity: 0; transform: translateY(-12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* 降级版：opacity only, 150ms linear, 无 translateY */
+
+    /* 月光环 — 标准版 box-shadow 光环 */
+    .xinglan-halo {
+      position: absolute;
+      width: 96px;
+      height: 96px;
+      border-radius: var(--radius-full);
+      box-shadow: var(--halo-avatar-active);
+      /* 降级版：border: 1px solid rgba(212,172,77,0.3); 移除 box-shadow */
+    }
+
+    /* 半透明剪影 — 仅轮廓，无面部细节 */
+    .xinglan-silhouette {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      border-radius: var(--radius-full);
+      background: linear-gradient(180deg, rgba(212,172,77,0.08) 0%, rgba(212,172,77,0.02) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* 剪影 SVG — 带月牙发饰的人物轮廓 */
+    .xinglan-silhouette svg {
+      width: 56px;
+      height: 56px;
+      opacity: 0.25;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       标题文字区
+       ═══════════════════════════════════════════════════════════════ */
+    .text-block {
+      margin-top: var(--space-2xl);
+      text-align: center;
+      /* 飘落入场 */
+      animation: textEnter 700ms var(--ease-out) 400ms both;
+    }
+
+    @keyframes textEnter {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* 降级版：opacity only, 150ms linear, 无 translateY */
+
+    .title {
+      font-size: var(--text-display-B);
+      font-weight: 300;
+      line-height: 1.15;
+      letter-spacing: 0.02em;
+      color: var(--text-primary-B);
+      margin-bottom: var(--space-xl);
+    }
+
+    .lead-text {
+      font-size: var(--text-lead-B);
+      font-weight: 300;
+      line-height: 1.9;
+      letter-spacing: 0.01em;
+      color: var(--text-secondary-B);
+    }
+
+    .lead-text p {
+      margin-bottom: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       底部区域 — 主按钮 + 免责声明
+       ═══════════════════════════════════════════════════════════════ */
+    .bottom-area {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      padding: 0 var(--space-lg) 48px var(--space-lg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      /* 底部安全区间距 */
+      z-index: 10;
+      /* 飘落入场 */
+      animation: bottomEnter 700ms var(--ease-out) 600ms both;
+    }
+
+    @keyframes bottomEnter {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* 降级版：opacity only, 150ms linear, 无 translateY */
+
+    /* ── 主按钮 — B 方案 ── */
+    .btn-primary {
+      width: 100%;
+      max-width: 320px;
+      height: 52px;
+      background-color: var(--bg-card-B);
+      border: none;
+      border-radius: var(--radius-btn-B);
+      color: var(--gold-core-B);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      font-weight: 400;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-glow-btn);
+      /* 标准版 hover：光晕增强 */
+      transition: box-shadow 200ms var(--ease-out),
+                  transform 150ms var(--ease-out),
+                  background-color 200ms var(--ease-out);
+      /* 涟漪反馈：点击时产生圆形扩散 rgba(212,172,77,0.15) → transparent, 400ms */
+    }
+
+    .btn-primary:hover {
+      box-shadow: var(--shadow-glow-btn-hover);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+      box-shadow: 0 0 12px rgba(212,172,77,0.08);
+    }
+
+    /* 降级版：
+       .btn-primary { box-shadow: none; }
+       .btn-primary:hover { background-color: #1A2A55; box-shadow: none; }
+       .btn-primary:active { transform: scale(0.98); }
+    */
+
+    /* ── 免责声明微文案 ── */
+    .disclaimer {
+      margin-top: var(--space-xl);
+      font-size: var(--text-disclaimer-B);
+      font-weight: 400;
+      line-height: 1.5;
+      color: var(--text-tertiary-B);
+      text-align: center;
+    }
+
+    .disclaimer p {
+      margin-bottom: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       底部波纹装饰 — 极微弱横向波纹线
+       ═══════════════════════════════════════════════════════════════ */
+    .water-ripple {
+      position: absolute;
+      bottom: 180px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 200px;
+      height: 1px;
+      background-color: rgba(255,255,255,0.015);
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    .water-ripple:nth-of-type(2) {
+      bottom: 200px;
+      width: 160px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════
+       降级：prefers-reduced-motion
+       铁律 4 执行：系统级降级，移除所有循环动画
+       ═══════════════════════════════════════════════════════════════ */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+      .moonlight-halo { opacity: 0.8; }
+      .star { opacity: 0.3; }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- 月光光晕层 -->
+    <div class="moonlight-halo"></div>
+
+    <!-- 星点层（15 颗） -->
+    <div class="stars">
+      <span class="star"></span><span class="star"></span><span class="star"></span>
+      <span class="star"></span><span class="star"></span><span class="star"></span>
+      <span class="star"></span><span class="star"></span><span class="star"></span>
+      <span class="star"></span><span class="star"></span><span class="star"></span>
+      <span class="star"></span><span class="star"></span><span class="star"></span>
+    </div>
+
+    <!-- 底部波纹装饰 -->
+    <div class="water-ripple"></div>
+    <div class="water-ripple"></div>
+
+    <!-- 内容区域 -->
+    <div class="content">
+
+      <!-- 星澜形象：半透明剪影 + 月光环（铁律 1：非全屏立绘） -->
+      <div class="xinglan-figure">
+        <div class="xinglan-halo"></div>
+        <div class="xinglan-silhouette">
+          <!-- 带月牙发饰的人物轮廓 SVG，仅轮廓无面部细节 -->
+          <svg viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- 月牙发饰 -->
+            <path d="M28 6 C24 6, 22 8, 22 11 C24 9, 26 9, 28 10 C30 9, 32 9, 34 11 C34 8, 32 6, 28 6 Z"
+                  fill="rgba(212,172,77,0.4)"/>
+            <!-- 人物头部轮廓 -->
+            <circle cx="28" cy="22" r="9" stroke="rgba(242,237,221,0.3)" stroke-width="1.2" fill="none"/>
+            <!-- 肩部轮廓 -->
+            <path d="M14 50 C14 40, 20 34, 28 34 C36 34, 42 40, 42 50"
+                  stroke="rgba(242,237,221,0.3)" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            <!-- 头发线条 -->
+            <path d="M19 18 C20 14, 24 12, 28 12 C32 12, 36 14, 37 18"
+                  stroke="rgba(242,237,221,0.2)" stroke-width="1" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 标题 + 引导语 -->
+      <div class="text-block">
+        <h1 class="title">慢慢说，星澜会先听你说完。</h1>
+        <div class="lead-text">
+          <p>你可以慢慢说。</p>
+          <p>星澜不会替你判断，也不会催你变好。</p>
+          <p>这里，只陪你把心里的话放下来一点。</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 底部区域：主按钮 + 免责声明 -->
+    <div class="bottom-area">
+      <button class="btn-primary" type="button" aria-label="进入星澜聊天">进入星澜聊天</button>
+      <div class="disclaimer">
+        <p>这里不预测未来，只陪你看见此刻。</p>
+        <p>星澜不是答案，是陪伴。</p>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

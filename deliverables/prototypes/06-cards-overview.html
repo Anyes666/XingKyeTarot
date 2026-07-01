@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<!--
+  星钥塔罗 · 卡牌总览（星钥之书）
+  设计系统：C 方案「星钥之书」
+  基准尺寸：390×844 (iPhone 14 / HarmonyOS 主流机型)
+  设计系统专家：彩格调（Cai）
+  原型构建师：筑原型（Zhu）
+
+  ▸ 铁律 2 执行：78 张牌完整开放，已浏览/未浏览区分，无锁图标/无付费解锁
+  ▸ 铁律 4 执行：页面进入错位动画（标准版），降级方案已标注
+  ▸ 设计意图：让 78 张牌看起来像安静的图书馆，而不是卖牌货架
+-->
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>星钥之书 · 卡牌总览</title>
+  <style>
+    :root {
+      --bg-base-C: #0A0D1A;
+      --bg-card-C: #121836;
+      --bg-floating-C: #181F40;
+      --bg-hover-C: #1C2450;
+      --text-primary-C: #EBE3CD;
+      --text-secondary-C: #8B869B;
+      --text-tertiary-C: #5C5870;
+      --gold-gilt-C: #C5A050;
+      --gold-gilt-soft-C: #E0CD95;
+      --spine-line-C: #1D2342;
+      --gilt-line-top: rgba(197,160,80,0.4);
+      --state-viewed-dot: rgba(197,160,80,0.4);
+      --state-unviewed-dot: rgba(139,134,155,0.3);
+      --font-sans: "HarmonyOS Sans", "Source Sans 3", "Inter", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      --font-serif: "HarmonyOS Serif", "Source Serif 4", "Noto Serif SC", Georgia, serif;
+      --font-mono: "HarmonyOS Sans Mono", "JetBrains Mono", "Consolas", monospace;
+      --text-title-C: 28px;
+      --text-subtitle-C: 20px;
+      --text-body-C: 15px;
+      --text-caption-C: 13px;
+      --space-2xs: 4px;
+      --space-xs: 8px;
+      --space-sm: 12px;
+      --space-md: 16px;
+      --space-md-b: 20px;
+      --space-lg: 24px;
+      --space-xl: 32px;
+      --radius-card-C: 12px;
+      --radius-sm-C: 8px;
+      --radius-xs-C: 6px;
+      --radius-full: 9999px;
+      --shadow-card-c: 0 2px 16px rgba(0,0,0,0.35);
+      --ease-out: cubic-bezier(0.25, 0.1, 0.25, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+      width: 390px; height: 844px; overflow: hidden;
+      font-family: var(--font-sans);
+      background-color: var(--bg-base-C);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      position: relative; width: 390px; height: 844px;
+      background-color: var(--bg-base-C); overflow: hidden;
+      display: flex; flex-direction: column;
+      /* 页面进入 — 标准版：opacity + translateY 300ms ease-out */
+      /* 降级版：opacity only, 150ms linear */
+      animation: pageEnter 300ms var(--ease-out) both;
+    }
+    @keyframes pageEnter { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    /* 降级版：@keyframes pageEnterD { from { opacity: 0; } to { opacity: 1; } } */
+
+    /* ── 顶部标题区 ── */
+    .header-area {
+      flex-shrink: 0;
+      padding: 16px var(--space-lg) var(--space-md) var(--space-lg);
+    }
+
+    .page-title {
+      font-family: var(--font-serif);
+      font-size: var(--text-title-C);
+      font-weight: 600;
+      color: var(--text-primary-C);
+      letter-spacing: 0.04em;
+      text-align: center;
+      margin-bottom: var(--space-xs);
+      /* 标题入场 */
+      animation: fadeIn 500ms var(--ease-out) both;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+    /* 降级版：opacity only, 150ms linear */
+
+    .page-subtitle {
+      font-size: var(--text-caption-C);
+      font-weight: 400;
+      color: var(--text-secondary-C);
+      text-align: center;
+      letter-spacing: 0.02em;
+      margin-bottom: var(--space-md);
+      animation: fadeIn 500ms var(--ease-out) 100ms both;
+    }
+
+    /* ── 分类筛选 chips ── */
+    .filter-chips {
+      display: flex;
+      gap: var(--space-2xs);
+      overflow-x: auto;
+      padding-bottom: var(--space-xs);
+      animation: fadeIn 500ms var(--ease-out) 200ms both;
+    }
+    .filter-chips::-webkit-scrollbar { display: none; }
+    .filter-chips { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .chip {
+      padding: 6px 14px;
+      background-color: rgba(197,160,80,0.04);
+      border: 1px solid var(--spine-line-C);
+      border-radius: var(--radius-xs-C); /* C 方案微圆角像书角 */
+      color: var(--text-secondary-C);
+      font-family: var(--font-serif); /* 衬线体 */
+      font-size: 13px;
+      font-weight: 400;
+      white-space: nowrap;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background-color 200ms var(--ease-out),
+                  border-color 200ms var(--ease-out),
+                  color 200ms var(--ease-out);
+    }
+
+    .chip:hover {
+      border-color: rgba(197,160,80,0.2);
+      color: var(--text-primary-C);
+    }
+
+    /* 选中态：底色加深 + 边框变亮 */
+    .chip.active {
+      background-color: rgba(197,160,80,0.12);
+      border-color: rgba(197,160,80,0.3);
+      color: var(--gold-gilt-C);
+    }
+
+    /* ── 卡牌列表区域 ── */
+    .cards-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-sm) var(--space-lg) 96px var(--space-lg); /* 底部留 96px 给悬浮胶囊导航 */
+    }
+    .cards-scroll::-webkit-scrollbar { display: none; }
+    .cards-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-sm);
+    }
+
+    /* ── 单张卡牌卡片 ── */
+    .card-item {
+      background-color: var(--bg-card-C);
+      border: 1px solid var(--spine-line-C);
+      border-radius: var(--radius-sm-C); /* C 方案 8px 书页感 */
+      box-shadow: var(--shadow-card-c);
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 200ms var(--ease-out),
+                  transform 150ms var(--ease-out);
+      /* 列表项错位入场 — 标准版：每项延迟 40ms，最多 8 项 */
+      animation: cardItemEnter 300ms var(--ease-out) both;
+      /* 降级版：全部同时出现，无延迟 */
+    }
+    @keyframes cardItemEnter { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .card-item:hover {
+      border-color: rgba(197,160,80,0.2);
+    }
+    .card-item:active {
+      transform: scale(0.98);
+    }
+
+    /* 错位延迟 */
+    .card-item:nth-child(1) { animation-delay: 300ms; }
+    .card-item:nth-child(2) { animation-delay: 340ms; }
+    .card-item:nth-child(3) { animation-delay: 380ms; }
+    .card-item:nth-child(4) { animation-delay: 420ms; }
+    .card-item:nth-child(5) { animation-delay: 460ms; }
+    .card-item:nth-child(6) { animation-delay: 500ms; }
+    .card-item:nth-child(7) { animation-delay: 540ms; }
+    .card-item:nth-child(8) { animation-delay: 580ms; }
+    /* 降级版：移除所有 animation-delay */
+
+    /* 牌面图占位区（上部 60%） */
+    .card-image {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      background: linear-gradient(180deg, rgba(197,160,80,0.03) 0%, transparent 100%);
+      border-bottom: 1px solid var(--spine-line-C);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-image svg {
+      width: 28px;
+      height: 28px;
+      opacity: 0.15;
+    }
+
+    /* 已浏览标记 — 右上角极小金色圆点（4px） */
+    .viewed-dot {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 4px;
+      height: 4px;
+      border-radius: var(--radius-full);
+      background-color: var(--state-viewed-dot);
+    }
+
+    /* 未浏览 — 无标记（不显示圆点） */
+    .card-item.unviewed .viewed-dot {
+      display: none;
+    }
+
+    /* 卡牌信息区（下部） */
+    .card-info {
+      padding: var(--space-xs) var(--space-sm) var(--space-sm) var(--space-sm);
+      text-align: center;
+    }
+
+    .card-name {
+      font-family: var(--font-serif);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary-C);
+      letter-spacing: 0.02em;
+      line-height: 1.3;
+      margin-bottom: 2px;
+    }
+
+    .card-num {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--text-secondary-C);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── 底部页码装饰 ── */
+    .page-number {
+      text-align: center;
+      padding: var(--space-md) 0 var(--space-xs);
+      font-family: var(--font-serif);
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-tertiary-C);
+      letter-spacing: 0.1em;
+      animation: fadeIn 500ms var(--ease-out) 700ms both;
+    }
+
+    /* ── 底部导航：悬浮毛玻璃胶囊（CompanionBottomNav 原样） ── */
+    .bottom-nav {
+      position: absolute; bottom: 0; left: 0;
+      width: 100%; height: 88px; padding-bottom: 8px;
+      display: flex; justify-content: center; align-items: center;
+      z-index: 20; pointer-events: none; flex-shrink: 0;
+    }
+    .nav-capsule {
+      pointer-events: auto;
+      width: 90%; height: 62px;
+      border-radius: 30px;
+      background-color: rgba(8, 16, 32, 0.5); /* #80081020 毛玻璃半透明深蓝 */
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.1); /* #1AFFFFFF 微弱白边 */
+      box-shadow: 0 5px 18px rgba(0, 0, 0, 0.28); /* 悬浮阴影 */
+      display: flex; align-items: center; justify-content: space-evenly;
+      transition: transform 280ms cubic-bezier(0.25, 0.1, 0.25, 1);
+      /* 降级版：移除 backdrop-filter，background-color: rgba(8,16,32,0.85) */
+    }
+    .nav-capsule:active { transform: scale(1.012, 0.988) translateY(1px); }
+    .nav-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 2px;
+      cursor: pointer; border: none; background: none; padding: 0; height: 100%;
+    }
+    .nav-icon { font-size: 22px; line-height: 1; color: #8F96B2; }
+    .nav-label { font-size: 12px; line-height: 1; color: #9AA2BD; font-weight: 400; margin-top: 2px; }
+    .nav-item.active .nav-icon, .nav-item.active .nav-label { color: #E8B83D; font-weight: 700; }
+    /* 导航切换动画 — 标准版 200ms ease 渐变 */
+    /* 降级版：直接切换无过渡 */
+
+    /* ── 降级 ── */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- ═══ 顶部标题区 ═══ -->
+    <header class="header-area">
+      <h1 class="page-title">星钥之书</h1>
+      <p class="page-subtitle">78 张牌，安静地等你翻阅。</p>
+
+      <!-- 分类筛选 chips -->
+      <div class="filter-chips">
+        <button class="chip active" type="button">全部</button>
+        <button class="chip" type="button">大阿尔卡那</button>
+        <button class="chip" type="button">权杖</button>
+        <button class="chip" type="button">圣杯</button>
+        <button class="chip" type="button">宝剑</button>
+        <button class="chip" type="button">星币</button>
+      </div>
+    </header>
+
+    <!-- ═══ 卡牌列表 ═══ -->
+    <main class="cards-scroll">
+      <div class="cards-grid">
+
+        <!-- 已浏览：愚者 -->
+        <div class="card-item viewed">
+          <div class="card-image">
+            <span class="viewed-dot"></span>
+            <svg viewBox="0 0 28 28" fill="none"><path d="M14 3 L16 11 L25 14 L16 17 L14 25 L12 17 L3 14 L12 11 Z" fill="#C5A050"/></svg>
+          </div>
+          <div class="card-info">
+            <div class="card-name">愚者</div>
+            <div class="card-num">0</div>
+          </div>
+        </div>
+
+        <!-- 已浏览：魔术师 -->
+        <div class="card-item viewed">
+          <div class="card-image">
+            <span class="viewed-dot"></span>
+            <svg viewBox="0 0 28 28" fill="none"><path d="M14 3 L16 11 L25 14 L16 17 L14 25 L12 17 L3 14 L12 11 Z" fill="#C5A050"/></svg>
+          </div>
+          <div class="card-info">
+            <div class="card-name">魔术师</div>
+            <div class="card-num">I</div>
+          </div>
+        </div>
+
+        <!-- 未浏览：女祭司 -->
+        <div class="card-item unviewed">
+          <div class="card-image">
+            <svg viewBox="0 0 28 28" fill="none"><path d="M14 3 L16 11 L25 14 L16 17 L14 25 L12 17 L3 14 L12 11 Z" fill="#C5A050"/></svg>
+          </div>
+          <div class="card-info">
+            <div class="card-name">女祭司</div>
+            <div class="card-num">II</div>
+          </div>
+        </div>
+
+        <!-- 已浏览：皇后 -->
+        <div class="card-item viewed">
+          <div class="card-image">
+            <span class="viewed-dot"></span>
+            <svg viewBox="0 0 28 28" fill="none"><path d="M14 3 L16 11 L25 14 L16 17 L14 25 L12 17 L3 14 L12 11 Z" fill="#C5A050"/></svg>
+          </div>
+          <div class="card-info">
+            <div class="card-name">皇后</div>
+            <div class="card-num">III</div>
+          </div>
+        </div>
+
+        <!-- 未浏览：皇帝 -->
+        <div class="card-item unviewed">
+          <div class="card-image">
+            <svg viewBox="0 0 28 28" fill="none"><path d="M14 3 L16 11 L25 14 L16 17 L14 25 L12 17 L3 14 L12 11 Z" fill="#C5A050"/></svg>
+          </div>
+          <div class="card-info">
+            <div class="card-name">皇帝</div>
+            <div class="card-num">IV</div>
+          </div>
+        </div>
+
+        <!-- 已浏览：教皇 -->
+        <div class="card-item viewed">
+          <div class="card-image">
+            <span class="viewed-dot"></span>
+            <svg viewBox="0 0 28 28" fill="none"><path d="M14 3 L16 11 L25 14 L16 17 L14 25 L12 17 L3 14 L12 11 Z" fill="#C5A050"/></svg>
+          </div>
+          <div class="card-info">
+            <div class="card-name">教皇</div>
+            <div class="card-num">V</div>
+          </div>
+        </div>
+
+        <!-- 未浏览：恋人 -->
+        <div class="card-item unviewed">
+          <div class="card-image">
+            <svg viewBox="0 0 28 28" fill="none"><path d="M14 3 L16 11 L25 14 L16 17 L14 25 L12 17 L3 14 L12 11 Z" fill="#C5A050"/></svg>
+          </div>
+          <div class="card-info">
+            <div class="card-name">恋人</div>
+            <div class="card-num">VI</div>
+          </div>
+        </div>
+
+        <!-- 已浏览：战车 -->
+        <div class="card-item viewed">
+          <div class="card-image">
+            <span class="viewed-dot"></span>
+            <svg viewBox="0 0 28 28" fill="none"><path d="M14 3 L16 11 L25 14 L16 17 L14 25 L12 17 L3 14 L12 11 Z" fill="#C5A050"/></svg>
+          </div>
+          <div class="card-info">
+            <div class="card-name">战车</div>
+            <div class="card-num">VII</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 底部页码装饰 -->
+      <div class="page-number">· 1 ·</div>
+    </main>
+
+    <!-- ═══ 底部导航：悬浮毛玻璃胶囊（5 Tab，卡牌高亮） ═══ -->
+    <nav class="bottom-nav">
+      <div class="nav-capsule">
+        <button class="nav-item" type="button">
+          <span class="nav-icon">◇</span>
+          <span class="nav-label">塔罗</span>
+        </button>
+        <button class="nav-item" type="button">
+          <span class="nav-icon">◉</span>
+          <span class="nav-label">星澜</span>
+        </button>
+        <button class="nav-item" type="button">
+          <span class="nav-icon">✦</span>
+          <span class="nav-label">语录</span>
+        </button>
+        <button class="nav-item active" type="button">
+          <span class="nav-icon">▦</span>
+          <span class="nav-label">卡牌</span>
+        </button>
+        <button class="nav-item" type="button">
+          <span class="nav-icon">☺</span>
+          <span class="nav-label">我的</span>
+        </button>
+      </div>
+    </nav>
+
+  </div>
+</body>
+</html>
