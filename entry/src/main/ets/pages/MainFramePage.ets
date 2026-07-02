@@ -7,6 +7,7 @@ import { PreferenceStore } from '../data/PreferenceStore';
 import { TAROT_CARDS } from '../data/TarotCardData';
 import { TarotCard, ArcanaType, TarotSuit } from '../model/TarotCard';
 import { TarotCardImage } from '../components/TarotCardImage';
+import { DivinationEntryCard } from '../components/DivinationEntryCard';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { GlobalBgmManager } from '../common/GlobalBgmManager';
 import { UserProfileStore } from '../common/UserProfileStore';
@@ -14,6 +15,7 @@ import { EmotionStarStorage, EmotionStarRecord, StarKeyLevel, NextLevelInfo } fr
 import { common } from '@kit.AbilityKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { XinglanChatEntranceContent } from './XinglanChatEntrancePage';
+import { DailyLightHeroCard } from '../daily/components/DailyLightHeroCard';
 
 /**
  * Phase 6.8：主框架页面 — 底部导航容器
@@ -130,7 +132,7 @@ struct MainFramePage {
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.V2C_BG_BASE)
+        .backgroundColor(Theme.V2_BG_BASE)
 
       Column() {
         // 页面内容区 — 只渲染当前 Tab（条件渲染）
@@ -150,7 +152,14 @@ struct MainFramePage {
           })
         }
         .width('100%')
-        .backgroundColor(Theme.V2C_BG_BASE)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            ['rgba(8, 11, 26, 0)', 0.0],
+            ['rgba(8, 11, 26, 0.72)', 0.32],
+            [Theme.V2_BG_BASE, 1.0]
+          ]
+        })
       }
       .width('100%')
       .height('100%')
@@ -309,26 +318,53 @@ struct DivinationCenterTabContent {
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.V2C_BG_BASE)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            [Theme.V2C_BG_BASE, 0.0],
+            ['#090D1C', 0.56],
+            [Theme.V2C_BG_BASE, 1.0]
+          ]
+        })
+
+      Column()
+        .width('100%')
+        .height('100%')
+        .radialGradient({
+          center: ['50%', '10%'],
+          radius: '70%',
+          colors: [
+            ['rgba(197,160,80,0.035)', 0.0],
+            ['rgba(197,160,80,0.012)', 0.42],
+            ['rgba(10,13,26,0)', 1.0]
+          ]
+        })
+        .hitTestBehavior(HitTestMode.Transparent)
+
+      Row()
+        .width(1)
+        .height('82%')
+        .backgroundColor('rgba(197,160,80,0.10)')
+        .position({ x: '50%', y: '8%' })
+        .hitTestBehavior(HitTestMode.Transparent)
 
       Column() {
         // 顶部安全区
         Column()
           .width('100%')
           .height(Theme.SAFE_TOP + 16)
-          .backgroundColor(Theme.V2C_BG_BASE)
 
         // 标题
         Text('占卜')
-          .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.V2C_GOLD_GILT)
+          .fontSize(Theme.V2C_FONT_TITLE)
+          .fontColor(Theme.V2C_GOLD_GILT_SOFT)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
           .width('100%')
           .margin({ top: Theme.SPACE_MD })
 
-        Text('用一张牌、一组牌阵，轻轻照见此刻的心事。')
-          .fontSize(Theme.FONT_BODY)
+        Text('翻开星钥之书，轻轻选择此刻想被照见的心事。')
+          .fontSize(Theme.V2C_FONT_BODY)
           .fontColor(Theme.V2C_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .width('100%')
@@ -336,43 +372,44 @@ struct DivinationCenterTabContent {
 
         Scroll() {
           Column() {
-            ForEach(this.buildEntries(), (entry: DivinationEntry, index: number) => {
-              Row() {
-                Text(entry.icon)
-                  .fontSize(28)
-                  .fontColor('#E8B83D')
-                  .width(56)
-                  .textAlign(TextAlign.Center)
-
-                Column() {
-                  Text(entry.title)
-                    .fontSize(Theme.FONT_SUBTITLE)
-                    .fontColor(Theme.V2C_TEXT_PRIMARY)
-                    .fontWeight(FontWeight.Medium)
-
-                  Text(entry.subtitle)
-                    .fontSize(Theme.FONT_CAPTION)
-                    .fontColor(Theme.V2C_TEXT_SECONDARY)
-                    .margin({ top: 4 })
-                    .lineHeight(18)
+            // 今日星页 Hero（DAILY-3）：未完成 / 已完成两态，不遮挡下方占卜入口
+            DailyLightHeroCard({
+              // DAILY-4：跳转今日星页展开流程
+              onExpand: (): void => {
+                try {
+                  const options: router.RouterOptions = { url: Routes.DAILY_LIGHT };
+                  router.pushUrl(options);
+                } catch (_err) {
+                  // ignore router error
                 }
-                .alignItems(HorizontalAlign.Start)
-                .layoutWeight(1)
-                .margin({ left: Theme.SPACE_SM })
-
-                Text('›')
-                  .fontSize(24)
-                  .fontColor(Theme.V2C_SPINE_LINE)
+              },
+              // DAILY-4：跳转今日星页回看模式（已完成态）
+              onReview: (): void => {
+                try {
+                  const options: router.RouterOptions = { url: Routes.DAILY_LIGHT };
+                  router.pushUrl(options);
+                } catch (_err) {
+                  // ignore router error
+                }
+              },
+              onChatWithXinglan: (): void => {
+                try {
+                  const options: router.RouterOptions = { url: Routes.XINGLAN_CHAT_ENTRANCE };
+                  router.pushUrl(options);
+                } catch (_err) {
+                  // ignore
+                }
               }
-              .width('92%')
-              .padding(Theme.SPACE_MD)
-              .margin({ bottom: Theme.SPACE_SM })
-              .backgroundColor('rgba(27, 27, 48, 0.68)')
-              .borderRadius(Theme.RADIUS_MD)
-              .border({ width: 1, color: 'rgba(216, 180, 90, 0.12)' })
-              .onClick(() => {
-                entry.routeAction();
+            })
+
+            ForEach(this.buildEntries(), (entry: DivinationEntry, index: number) => {
+              DivinationEntryCard({
+                icon: entry.icon,
+                title: entry.title,
+                subtitle: entry.subtitle,
+                action: entry.routeAction
               })
+                .margin({ bottom: Theme.V2_SPACE_SM })
             }, (_entry: DivinationEntry, index: number) => 'div_entry_' + index.toString())
           }
           .width('100%')
@@ -668,36 +705,59 @@ struct XinglanQuotesTabContent {
   build() {
     Stack() {
       // ═══════════════════════════════════════════
-      // Layer 1: 星澜背景图（月湖映心 B 方案）
+      // Layer 1: 月湖底色（月湖映心 B 方案）
       // ═══════════════════════════════════════════
+      Column()
+        .width('100%')
+        .height('100%')
+        .backgroundColor(Theme.V2B_BG_BASE)
+
       Image($r('app.media.xinglan_home_main'))
         .objectFit(ImageFit.Cover)
         .width('100%')
-        .height('100%')
-        .translate({ x: 0, y: -80 })
-        .opacity(0.82)
+        .height('82%')
+        .translate({ x: 0, y: -44 })
+        .opacity(0.46)
         .hitTestBehavior(HitTestMode.Transparent)
 
       // ═══════════════════════════════════════════
-      // Layer 2: 渐变遮罩（B 方案深蓝湖底过渡）
+      // Layer 2: 月光与湖面遮罩（低刺激，不做粒子爆发）
       // ═══════════════════════════════════════════
+      Column()
+        .width('100%')
+        .height(260)
+        .radialGradient({
+          center: ['50%', '18%'],
+          radius: '64%',
+          colors: [
+            ['rgba(236, 216, 157, 0.07)', 0.0],
+            ['rgba(212, 172, 77, 0.025)', 0.52],
+            ['rgba(6, 11, 26, 0)', 1.0]
+          ]
+        })
+        .hitTestBehavior(HitTestMode.Transparent)
+
       Column()
         .width('100%')
         .height('100%')
         .linearGradient({
           direction: GradientDirection.Bottom,
           colors: [
-            ['#060B1A', 0.0],
-            ['#060B1A', 0.08],
-            ['rgba(6, 11, 26, 0.88)', 0.12],
-            ['rgba(6, 11, 26, 0.50)', 0.22],
-            ['rgba(6, 11, 26, 0.15)', 0.40],
-            ['rgba(6, 11, 26, 0)', 0.58],
-            ['rgba(15, 15, 35, 0)', 0.65],
-            ['rgba(15, 15, 35, 0.78)', 0.87],
-            ['#060B1A', 1.0]
+            [Theme.V2B_BG_BASE, 0.0],
+            ['rgba(6, 11, 26, 0.72)', 0.14],
+            ['rgba(6, 11, 26, 0.28)', 0.38],
+            ['rgba(6, 11, 26, 0.18)', 0.56],
+            ['rgba(6, 11, 26, 0.70)', 0.84],
+            [Theme.V2B_BG_BASE, 1.0]
           ]
         })
+        .hitTestBehavior(HitTestMode.Transparent)
+
+      Column()
+        .width('70%')
+        .height(1)
+        .backgroundColor('rgba(236, 216, 157, 0.10)')
+        .position({ x: '15%', y: '60%' })
         .hitTestBehavior(HitTestMode.Transparent)
 
       // ═══════════════════════════════════════════
@@ -712,53 +772,93 @@ struct XinglanQuotesTabContent {
         // 标题 — B 方案暖金标题
         Text('星澜语录')
           .fontSize(Theme.V2B_FONT_TITLE)
-          .fontColor(Theme.V2B_GOLD_CORE)
-          .fontWeight(FontWeight.Bold)
+          .fontColor(Theme.V2B_GOLD_RIPPLE)
+          .fontWeight(FontWeight.Medium)
           .textAlign(TextAlign.Center)
           .width('100%')
           .margin({ top: Theme.V2_SPACE_MD })
 
-        Text('星澜想对你说的话，都在这里。')
+        Text('不问未来，只陪你看见此刻的自己。')
           .fontSize(Theme.V2B_FONT_BODY)
           .fontColor(Theme.V2B_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .width('100%')
-          .margin({ top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_LG })
+          .margin({ top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_MD_B })
 
-        // 语录滚动区 — B 方案柔和气泡
+        // 语录滚动区 — B 方案中央语录气泡
         Scroll(this.scroller) {
-          Column({ space: 12 }) {
+          Column({ space: 16 }) {
             ForEach(this.quoteList, (quote: string, index: number) => {
-              // 星澜气泡 — 左侧排列，暖金细边
-              Row() {
-                Image($r('app.media.app_icon5'))
-                  .width(34)
-                  .height(34)
-                  .borderRadius(17)
-                  .border({ width: 1.5, color: 'rgba(212, 172, 77, 0.55)' })
-                  .shadow(Theme.V2_HALO_AVATAR_STANDARD)
-                  .objectFit(ImageFit.Cover)
-                  .margin({ right: 10 })
+              // 中央语录气泡 — 吸收 Stitch 的金线角标与柔和遮罩
+              Stack() {
+                Column()
+                  .width('100%')
+                  .height('100%')
+                  .radialGradient({
+                    center: ['50%', '0%'],
+                    radius: '78%',
+                    colors: [
+                      ['rgba(236, 216, 157, 0.045)', 0.0],
+                      ['rgba(15, 24, 53, 0)', 1.0]
+                    ]
+                  })
+
+                Text('✦')
+                  .fontSize(11)
+                  .fontColor(Theme.V2B_GOLD_RIPPLE)
+                  .opacity(index === this.quoteList.length - 1 ? 0.46 : 0.24)
+                  .position({ x: '50%', y: 12 })
+                  .translate({ x: '-50%', y: 0 })
 
                 Text(quote)
-                  .fontSize(16)
+                  .fontSize(index === this.quoteList.length - 1 ? Theme.V2B_FONT_LEAD : Theme.V2B_FONT_BODY)
                   .fontColor(Theme.V2B_TEXT_PRIMARY)
-                  .lineHeight(24)
-                  .backgroundColor(Theme.V2B_BG_CARD)
-                  .border({ width: 1, color: Theme.V2B_BORDER })
-                  .borderRadius({ topLeft: 4, topRight: 16, bottomLeft: 16, bottomRight: 16 })
-                  .padding({ left: 14, right: 14, top: 12, bottom: 12 })
-                  .constraintSize({ maxWidth: '64%' })
+                  .fontWeight(FontWeight.Normal)
+                  .lineHeight(index === this.quoteList.length - 1 ? 29 : 24)
+                  .textAlign(TextAlign.Center)
+                  .width('100%')
+                  .padding({ left: 22, right: 22, top: 28, bottom: 20 })
 
-                Blank()
+                Column()
+                  .width(6)
+                  .height(6)
+                  .border({ width: { top: 0.5, left: 0.5 }, color: 'rgba(236, 216, 157, 0.09)' })
+                  .position({ x: 14, y: 14 })
+
+                Column()
+                  .width(6)
+                  .height(6)
+                  .border({ width: { top: 0.5, right: 0.5 }, color: 'rgba(236, 216, 157, 0.09)' })
+                  .position({ x: '100%', y: 14 })
+                  .translate({ x: -20, y: 0 })
+
+                Column()
+                  .width(6)
+                  .height(6)
+                  .border({ width: { bottom: 0.5, left: 0.5 }, color: 'rgba(236, 216, 157, 0.06)' })
+                  .position({ x: 14, y: '100%' })
+                  .translate({ x: 0, y: -20 })
+
+                Column()
+                  .width(6)
+                  .height(6)
+                  .border({ width: { bottom: 0.5, right: 0.5 }, color: 'rgba(236, 216, 157, 0.06)' })
+                  .position({ x: '100%', y: '100%' })
+                  .translate({ x: -20, y: -20 })
               }
-              .width('100%')
-              .alignItems(VerticalAlign.Top)
+              .width(index === this.quoteList.length - 1 ? '78%' : '68%')
+              .constraintSize({ minHeight: index === this.quoteList.length - 1 ? 106 : 86 })
+              .backgroundColor(index === this.quoteList.length - 1 ? 'rgba(15, 24, 53, 0.66)' : 'rgba(15, 24, 53, 0.46)')
+              .border({ width: 1, color: index === this.quoteList.length - 1 ? 'rgba(236, 216, 157, 0.16)' : Theme.V2B_BORDER })
+              .borderRadius(Theme.V2B_RADIUS_CARD)
+              .shadow(index === this.quoteList.length - 1 ? Theme.V2B_SHADOW_CARD : { radius: 12, color: 'rgba(0,0,0,0.22)', offsetX: 0, offsetY: 2 })
+              .opacity(index === this.quoteList.length - 1 ? 1.0 : 0.72)
             }, (quote: string, index: number) => 'ql_' + index.toString() + '_' + quote.substring(0, 4))
           }
           .width('100%')
-          .alignItems(HorizontalAlign.Start)
-          .padding({ top: 28, bottom: 12, left: Theme.V2_SPACE_LG, right: Theme.V2_SPACE_LG })
+          .alignItems(HorizontalAlign.Center)
+          .justifyContent(FlexAlign.Center)
+          .padding({ top: 24, bottom: 16, left: Theme.V2_SPACE_LG, right: Theme.V2_SPACE_LG })
         }
         .width('100%')
         .layoutWeight(1)
@@ -773,7 +873,7 @@ struct XinglanQuotesTabContent {
           .fontColor(Theme.V2B_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .width('100%')
-          .padding({ bottom: 12 })
+          .padding({ bottom: 10 })
 
         Text(Constants.COMPLIANCE_FOOTER)
           .fontSize(Theme.V2B_FONT_CAPTION)
@@ -781,7 +881,7 @@ struct XinglanQuotesTabContent {
           .textAlign(TextAlign.Center)
           .lineHeight(16)
           .width('100%')
-          .padding({ left: Theme.V2_SPACE_MD, right: Theme.V2_SPACE_MD, bottom: 12 })
+          .padding({ left: Theme.V2_SPACE_MD, right: Theme.V2_SPACE_MD, bottom: 16 })
       }
       .width('100%')
       .height('100%')
@@ -884,28 +984,49 @@ struct TarotCardsTabContent {
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.V2C_BG_BASE)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            [Theme.V2C_BG_BASE, 0.0],
+            ['#0C1024', 0.48],
+            [Theme.V2C_BG_BASE, 1.0]
+          ]
+        })
+
+      Column()
+        .width('100%')
+        .height('42%')
+        .radialGradient({
+          center: ['50%', '8%'],
+          radius: '78%',
+          colors: [
+            ['rgba(197,160,80,0.045)', 0.0],
+            ['rgba(197,160,80,0.014)', 0.44],
+            ['rgba(10,13,26,0)', 1.0]
+          ]
+        })
+        .hitTestBehavior(HitTestMode.Transparent)
 
       Column() {
         Column()
           .width('100%')
-          .height(Theme.SAFE_TOP + 16)
-          .backgroundColor(Theme.V2C_BG_BASE)
+          .height(Theme.SAFE_TOP + 12)
 
-        Text('卡牌总览')
-          .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.V2C_GOLD_GILT)
+        Text('星钥之书')
+          .fontSize(Theme.V2C_FONT_TITLE)
+          .fontColor(Theme.V2C_GOLD_GILT_SOFT)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
           .width('100%')
-          .margin({ top: Theme.SPACE_MD })
+          .margin({ top: Theme.V2_SPACE_SM })
 
-        Text('78 张塔罗牌，不是答案，而是看见自己的不同方式。')
-          .fontSize(Theme.FONT_CAPTION)
+        Text('翻阅七十八张牌，\n看看每一种意象如何照见不同的处境。')
+          .fontSize(Theme.V2C_FONT_CAPTION)
           .fontColor(Theme.V2C_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
+          .lineHeight(20)
           .width('100%')
-          .margin({ top: Theme.SPACE_SM, bottom: Theme.SPACE_MD })
+          .margin({ top: Theme.V2_SPACE_XS, bottom: Theme.V2_SPACE_MD })
 
         // 筛选区
         Scroll() {
@@ -913,29 +1034,36 @@ struct TarotCardsTabContent {
             ForEach(this.filters, (filter: FilterOption, index: number) => {
               Text(filter.label)
                 .fontSize(13)
-                .fontColor(this.selectedFilter === filter.value ? Theme.V2C_BG_BASE : Theme.V2C_TEXT_SECONDARY)
-                .fontWeight(this.selectedFilter === filter.value ? FontWeight.Bold : FontWeight.Normal)
-                .backgroundColor(this.selectedFilter === filter.value ? '#E8B83D' : 'rgba(27, 27, 48, 0.68)')
-                .borderRadius(16)
-                .padding({ left: 14, right: 14, top: 6, bottom: 6 })
-                .margin({ right: 8 })
+                .fontColor(this.selectedFilter === filter.value ? Theme.V2C_GOLD_GILT_SOFT : Theme.V2C_TEXT_SECONDARY)
+                .fontWeight(this.selectedFilter === filter.value ? FontWeight.Medium : FontWeight.Normal)
+                .height(32)
+                .padding({ left: 14, right: 14 })
+                .backgroundColor(this.selectedFilter === filter.value ? 'rgba(197,160,80,0.10)' : 'rgba(18,24,54,0.58)')
+                .borderRadius(Theme.V2C_RADIUS_CHIP)
+                .border({
+                  width: 1,
+                  color: this.selectedFilter === filter.value ? 'rgba(197,160,80,0.38)' : 'rgba(139,134,155,0.14)'
+                })
+                .margin({ right: Theme.V2_SPACE_XS })
                 .onClick(() => {
                   this.applyFilter(filter.value);
                 })
             }, (_filter: FilterOption, index: number) => 'tab_filter_' + index.toString())
           }
-          .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD })
+          .height(32)
+          .padding({ left: Theme.V2_SPACE_MD, right: Theme.V2_SPACE_MD })
         }
         .scrollable(ScrollDirection.Horizontal)
         .scrollBar(BarState.Off)
         .width('100%')
-        .height(44)
-        .margin({ bottom: Theme.SPACE_SM })
+        .height(40)
+        .margin({ bottom: Theme.V2_SPACE_XS })
 
         Divider()
           .strokeWidth(0.5)
-          .color(Theme.DEEP_STARRY)
-          .margin({ bottom: Theme.SPACE_SM })
+          .color('rgba(197,160,80,0.12)')
+          .width('88%')
+          .margin({ bottom: Theme.V2_SPACE_XS })
 
         // 卡牌网格（3 列真实牌面）
         Scroll() {
@@ -943,24 +1071,36 @@ struct TarotCardsTabContent {
             ForEach(this.displayedCards, (card: TarotCard, index: number) => {
               GridItem() {
                 Column() {
-                  TarotCardImage({ cardId: card.id, cardWidth: 90, cardHeight: 140 })
-                    .margin({ bottom: 6 })
+                  Column() {
+                    TarotCardImage({ cardId: card.id, cardWidth: 82, cardHeight: 132 })
+                  }
+                  .padding(4)
+                  .backgroundColor('rgba(10,13,26,0.68)')
+                  .borderRadius(Theme.V2C_RADIUS_CARD)
+                  .border({ width: 1, color: 'rgba(197,160,80,0.20)' })
+                  .margin({ bottom: Theme.V2_SPACE_XS })
 
                   Text(card.nameZh)
-                    .fontSize(11)
-                    .fontColor(Theme.V2C_TEXT_SECONDARY)
+                    .fontSize(12)
+                    .fontColor(Theme.V2C_TEXT_PRIMARY)
                     .fontWeight(FontWeight.Medium)
-                    .maxLines(1)
-                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    .maxLines(2)
                     .textAlign(TextAlign.Center)
+                    .lineHeight(17)
                     .width('100%')
+                    .height(36)
                 }
                 .width('100%')
-                .padding({ top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_SM })
-                .backgroundColor(Theme.V2C_BG_CARD)
+                .padding({ top: Theme.V2_SPACE_XS, left: Theme.V2_SPACE_2XS, right: Theme.V2_SPACE_2XS, bottom: Theme.V2_SPACE_XS })
+                .backgroundColor('rgba(18,24,54,0.72)')
                 .borderRadius(Theme.V2C_RADIUS_CARD)
-                .border({ width: 1, color: Theme.V2C_SPINE_LINE })
-                .shadow(Theme.V2C_SHADOW_CARD)
+                .border({ width: 1, color: 'rgba(197,160,80,0.12)' })
+                .shadow({
+                  radius: 10,
+                  color: 'rgba(0,0,0,0.28)',
+                  offsetX: 0,
+                  offsetY: 2
+                })
                 .onClick(() => {
                   this.navigateToDetail(card);
                 })
@@ -968,14 +1108,15 @@ struct TarotCardsTabContent {
             }, (card: TarotCard) => card.id)
           }
           .columnsTemplate('1fr 1fr 1fr')
-          .columnsGap(Theme.V2_SPACE_SM)
-          .rowsGap(Theme.V2_SPACE_SM)
+          .columnsGap(Theme.V2_SPACE_MD)
+          .rowsGap(Theme.V2_SPACE_MD)
           .width('100%')
-          .padding({ left: Theme.V2_SPACE_MD, right: Theme.V2_SPACE_MD, top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_LG })
+          .padding({ left: Theme.V2_SPACE_MD, right: Theme.V2_SPACE_MD, top: Theme.V2_SPACE_SM, bottom: 112 })
         }
         .width('100%')
         .layoutWeight(1)
         .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring)
       }
       .width('100%')
       .height('100%')
@@ -1487,7 +1628,7 @@ struct SettingsTabContent {
 
   build() {
     Stack() {
-      // 沉浸式深空背景
+      // 沉浸式深空背景（A 星图档案）
       Column()
         .width('100%')
         .height('100%')
@@ -1495,8 +1636,8 @@ struct SettingsTabContent {
           direction: GradientDirection.Bottom,
           colors: [
             [Theme.BG_DEEP_SPACE, 0.0],
-            [Theme.V2C_BG_BASE, 0.55],
-            [Theme.V2C_BG_BASE, 1.0]
+            [Theme.V2A_BG_BASE, 0.55],
+            [Theme.V2A_BG_BASE, 1.0]
           ]
         })
 
@@ -1509,19 +1650,35 @@ struct SettingsTabContent {
               direction: GradientDirection.Bottom,
               colors: [
                 [Theme.BG_DEEP_SPACE, 0.0],
-                ['rgba(15, 15, 35, 0)', 1.0]
+                ['rgba(8, 11, 24, 0)', 1.0]
               ]
             })
 
-          Text('我的')
-            .fontSize(Theme.FONT_HEADLINE)
-            .fontColor(Theme.V2C_GOLD_GILT)
-            .fontWeight(FontWeight.Bold)
-            .textAlign(TextAlign.Center)
-            .width('100%')
-            .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_SM })
+          // 档案主标题：月光白克制，配星轨细线（不抢）
+          Row() {
+            Column()
+              .width(28)
+              .height(1)
+              .backgroundColor(Theme.V2A_ORBIT_LINE)
 
-        // ═══ 头像区 ═══
+            Text('我的')
+              .fontSize(Theme.V2A_FONT_TITLE)
+              .fontColor(Theme.V2A_TEXT_PRIMARY)
+              .fontWeight(FontWeight.Medium)
+              .letterSpacing(2)
+              .margin({ left: 12, right: 12 })
+
+            Column()
+              .width(28)
+              .height(1)
+              .backgroundColor(Theme.V2A_ORBIT_LINE)
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.Center)
+          .alignItems(VerticalAlign.Center)
+          .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_SM })
+
+        // ═══ 头像档案圆章 ═══
         Column() {
           // 圆形头像
           Stack() {
@@ -1545,8 +1702,8 @@ struct SettingsTabContent {
           .width(92)
           .height(92)
           .borderRadius(46)
-          .border({ width: Theme.AVATAR_BORDER_WIDTH, color: Theme.AVATAR_BORDER })
-          .shadow(Theme.SHADOW_AVATAR_GLOW)
+          .border({ width: 1, color: Theme.V2A_GOLD_ACCENT })
+          .shadow(Theme.V2A_SHADOW_CARD)
           .alignContent(Alignment.Center)
           .margin({ bottom: 14 })
           .onClick(() => { this.showAvatarSheet = true; })
@@ -1554,15 +1711,15 @@ struct SettingsTabContent {
           // 昵称 + 编辑按钮
           Row() {
             Text(this.nickname)
-              .fontSize(Theme.FONT_SUBTITLE)
-              .fontColor(Theme.V2C_TEXT_PRIMARY)
+              .fontSize(Theme.V2A_FONT_SUBTITLE)
+              .fontColor(Theme.V2A_TEXT_PRIMARY)
               .fontWeight(FontWeight.Medium)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
             Text('✎')
-              .fontSize(15)
-              .fontColor('#A8A3B8')
+              .fontSize(Theme.V2A_FONT_CAPTION)
+              .fontColor(Theme.V2A_TEXT_SECONDARY)
               .margin({ left: 8 })
               .onClick(() => {
                 this.nicknameEditText = this.nickname;
@@ -1571,31 +1728,32 @@ struct SettingsTabContent {
           }
           .margin({ bottom: 8 })
 
-          // 等级标签
+          // 等级标签：柔和金细线徽章
           Text('星钥等级：' + this.level)
-            .fontSize(Theme.FONT_CAPTION)
-            .fontColor(Theme.V2C_GOLD_GILT_SOFT)
+            .fontSize(Theme.V2A_FONT_CAPTION)
+            .fontColor(Theme.V2A_GOLD_GLOW)
+            .letterSpacing(1)
             .padding({ left: 16, right: 16, top: 4, bottom: 4 })
-            .backgroundColor('rgba(202, 138, 4, 0.12)')
-            .border({ width: 1, color: 'rgba(202, 138, 4, 0.25)' })
-            .borderRadius(Theme.RADIUS_FULL)
+            .backgroundColor('rgba(201, 164, 75, 0.06)')
+            .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+            .borderRadius(Theme.V2A_RADIUS_CHIP)
         }
         .width('100%')
         .alignItems(HorizontalAlign.Center)
         .padding({ top: 16, bottom: 16 })
         .margin({ bottom: Theme.SPACE_MD })
 
-        // ═══ 今日点亮状态提示 ═══
+        // ═══ 今日点亮状态提示（档案时间戳） ═══
         Column() {
           Row() {
             Text(this.isTodayLit ? '⭐' : '☆')
-              .fontSize(20)
-              .fontColor(this.isTodayLit ? '#E5A50A' : '#3A3A5A')
+              .fontSize(Theme.V2A_FONT_DATE_NUM)
+              .fontColor(this.isTodayLit ? Theme.V2A_GOLD_ACCENT : Theme.V2_TEXT_TERTIARY)
               .margin({ right: 8 })
 
             Text(this.isTodayLit ? '今日已点亮' : '今日未点亮')
-              .fontSize(15)
-              .fontColor(this.isTodayLit ? '#E5D9B6' : '#94A3B8')
+              .fontSize(Theme.V2A_FONT_BODY)
+              .fontColor(this.isTodayLit ? Theme.V2A_GOLD_GLOW : Theme.V2A_TEXT_SECONDARY)
           }
           .width('100%')
           .justifyContent(FlexAlign.Center)
@@ -1606,44 +1764,55 @@ struct SettingsTabContent {
 
         // ═══ 星澜星历日历卡片 ═══
         Column() {
-          // 卡片标题
+          // 档案编号 + 卡片标题
+          Row() {
+            Text('档案 · 星历')
+              .fontSize(Theme.V2A_FONT_TIMESTAMP)
+              .fontColor(Theme.V2_TEXT_TERTIARY)
+              .letterSpacing(1)
+              .width('100%')
+          }
+          .width('100%')
+          .margin({ bottom: 6 })
+
           Text('星澜星历')
-            .fontSize(Theme.FONT_SUBTITLE)
-            .fontColor(Theme.V2C_GOLD_GILT)
-            .fontWeight(FontWeight.Bold)
+            .fontSize(Theme.V2A_FONT_SUBTITLE)
+            .fontColor(Theme.V2A_TEXT_PRIMARY)
+            .fontWeight(FontWeight.Medium)
             .width('100%')
             .margin({ bottom: 4 })
 
           Text('不是打卡，只是把认真感受过的日子轻轻留下。')
-            .fontSize(Theme.FONT_CAPTION)
-            .fontColor(Theme.V2C_TEXT_SECONDARY)
+            .fontSize(Theme.V2A_FONT_CAPTION)
+            .fontColor(Theme.V2A_TEXT_SECONDARY)
             .width('100%')
-            .margin({ bottom: 16 })
+            .margin({ bottom: Theme.V2_SPACE_MD })
 
           // ═══ 月份翻页控件 ═══
           Row() {
             // 左箭头
             Text('‹')
-              .fontSize(26)
-              .fontColor('#E5A50A')
+              .fontSize(Theme.V2A_FONT_TITLE)
+              .fontColor(Theme.V2A_GOLD_ACCENT)
               .fontWeight(FontWeight.Lighter)
               .width(36)
               .height(36)
               .textAlign(TextAlign.Center)
               .onClick(() => { this.goToPreviousMonth(); })
 
-            // 月份标题
+            // 月份标题（等宽时间戳风格）
             Text(this.visibleYear.toString() + ' 年 ' + this.visibleMonth.toString() + ' 月')
-              .fontSize(16)
-              .fontColor('#E5D9B6')
+              .fontSize(Theme.V2A_FONT_DATE_NUM)
+              .fontColor(Theme.V2A_GOLD_GLOW)
               .fontWeight(FontWeight.Medium)
+              .letterSpacing(1)
               .textAlign(TextAlign.Center)
               .layoutWeight(1)
 
             // 右箭头（始终可翻页）
             Text('›')
-              .fontSize(26)
-              .fontColor('#E5A50A')
+              .fontSize(Theme.V2A_FONT_TITLE)
+              .fontColor(Theme.V2A_GOLD_ACCENT)
               .fontWeight(FontWeight.Lighter)
               .width(36)
               .height(36)
@@ -1656,11 +1825,11 @@ struct SettingsTabContent {
           // 回到本月按钮（历史月份时显示）
           if (!this.isViewingCurrentMonth()) {
             Text('回到本月')
-              .fontSize(12)
-              .fontColor('#E5A50A')
+              .fontSize(Theme.V2A_FONT_DISCLAIMER)
+              .fontColor(Theme.V2A_GOLD_ACCENT)
               .padding({ left: 14, right: 14, top: 4, bottom: 4 })
-              .border({ width: 1, color: 'rgba(229, 165, 10, 0.3)' })
-              .borderRadius(Theme.RADIUS_FULL)
+              .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+              .borderRadius(Theme.V2A_RADIUS_CHIP)
               .onClick(() => { this.goToCurrentMonth(); })
               .margin({ bottom: 14 })
           } else {
@@ -1672,8 +1841,8 @@ struct SettingsTabContent {
           Row() {
             ForEach(['一', '二', '三', '四', '五', '六', '日'], (label: string) => {
               Text(label)
-                .fontSize(12)
-                .fontColor('#6B6380')
+                .fontSize(Theme.V2A_FONT_DISCLAIMER)
+                .fontColor(Theme.V2_TEXT_TERTIARY)
                 .width('14.28%')
                 .textAlign(TextAlign.Center)
                 .height(28)
@@ -1696,53 +1865,54 @@ struct SettingsTabContent {
                 if (this.isDayLit(day)) {
                   // 已点亮：金色星星
                   Text('⭐')
-                    .fontSize(16)
-                    .fontColor('#E5A50A')
+                    .fontSize(Theme.V2A_FONT_DATE_NUM)
+                    .fontColor(Theme.V2A_GOLD_ACCENT)
                 } else {
                   // 未点亮：灰蓝日期数字 或 未来日期置灰
                   Text(day.toString())
-                    .fontSize(13)
-                    .fontColor(this.dayIsFuture(day) ? '#2E2E4A' : '#5A5A7A')
+                    .fontSize(Theme.V2A_FONT_CAPTION)
+                    .fontColor(this.dayIsFuture(day) ? Theme.V2_STATE_FUTURE_TEXT : Theme.V2_TEXT_TERTIARY)
                 }
               }
               .width('14.28%')
               .height(42)
               .justifyContent(FlexAlign.Center)
-              .borderRadius(8)
+              .borderRadius(Theme.V2_RADIUS_SM)
               .border({
-                width: EmotionStarStorage.isToday(this.visibleYear, this.visibleMonth, day) ? 1.5 : 0,
+                width: EmotionStarStorage.isToday(this.visibleYear, this.visibleMonth, day) ? 1 : 0,
                 color: EmotionStarStorage.isToday(this.visibleYear, this.visibleMonth, day) ?
-                  '#E5A50A' : 'transparent'
+                  Theme.V2A_GOLD_ACCENT : 'transparent'
               })
               .backgroundColor(
                 EmotionStarStorage.isToday(this.visibleYear, this.visibleMonth, day) &&
-                  !this.isDayLit(day) ? 'rgba(229, 165, 10, 0.06)' : 'transparent'
+                  !this.isDayLit(day) ? 'rgba(201, 164, 75, 0.06)' : 'transparent'
               )
               .onClick(() => { this.handleDateClick(day); })
             }, (day: number) => 'cal_day_' + day.toString())
           }
           .width('100%')
-          .margin({ bottom: 16 })
+          .margin({ bottom: Theme.V2_SPACE_MD })
 
-          // 统计行
+          // 星轨贯穿线
           Divider()
             .strokeWidth(0.5)
-            .color('rgba(202, 138, 4, 0.12)')
+            .color(Theme.V2A_ORBIT_LINE)
             .width('100%')
-            .margin({ bottom: 14 })
+            .margin({ bottom: Theme.V2_SPACE_SM })
 
+          // 统计行（档案数据）
           Row() {
             Column() {
               Text(this.visibleMonthLightDays.toString())
-                .fontSize(20)
-                .fontColor('#E5A50A')
-                .fontWeight(FontWeight.Bold)
+                .fontSize(Theme.V2A_FONT_RANK_DAYS)
+                .fontColor(Theme.V2A_GOLD_ACCENT)
+                .fontWeight(FontWeight.Medium)
                 .textAlign(TextAlign.Center)
                 .width('100%')
 
               Text('本月点亮')
-                .fontSize(11)
-                .fontColor('#94A3B8')
+                .fontSize(Theme.V2A_FONT_DISCLAIMER)
+                .fontColor(Theme.V2A_TEXT_SECONDARY)
                 .textAlign(TextAlign.Center)
                 .width('100%')
                 .margin({ top: 2 })
@@ -1751,15 +1921,15 @@ struct SettingsTabContent {
 
             Column() {
               Text(this.cumulativeLightDays.toString())
-                .fontSize(20)
-                .fontColor('#E5D9B6')
-                .fontWeight(FontWeight.Bold)
+                .fontSize(Theme.V2A_FONT_RANK_DAYS)
+                .fontColor(Theme.V2A_GOLD_GLOW)
+                .fontWeight(FontWeight.Medium)
                 .textAlign(TextAlign.Center)
                 .width('100%')
 
               Text('累计点亮')
-                .fontSize(11)
-                .fontColor('#94A3B8')
+                .fontSize(Theme.V2A_FONT_DISCLAIMER)
+                .fontColor(Theme.V2A_TEXT_SECONDARY)
                 .textAlign(TextAlign.Center)
                 .width('100%')
                 .margin({ top: 2 })
@@ -1768,15 +1938,15 @@ struct SettingsTabContent {
 
             Column() {
               Text(this.streakDays.toString())
-                .fontSize(20)
-                .fontColor('#CA8A04')
-                .fontWeight(FontWeight.Bold)
+                .fontSize(Theme.V2A_FONT_RANK_DAYS)
+                .fontColor(Theme.V2A_GOLD_ACCENT)
+                .fontWeight(FontWeight.Medium)
                 .textAlign(TextAlign.Center)
                 .width('100%')
 
               Text('连续点亮')
-                .fontSize(11)
-                .fontColor('#94A3B8')
+                .fontSize(Theme.V2A_FONT_DISCLAIMER)
+                .fontColor(Theme.V2A_TEXT_SECONDARY)
                 .textAlign(TextAlign.Center)
                 .width('100%')
                 .margin({ top: 2 })
@@ -1784,26 +1954,26 @@ struct SettingsTabContent {
             .layoutWeight(1)
           }
           .width('100%')
-          .margin({ bottom: 14 })
+          .margin({ bottom: Theme.V2_SPACE_SM })
 
           // 下一称号信息
           if (!this.isMaxLevel) {
             Text('下一称号：' + this.nextLevelTitle)
-              .fontSize(13)
-              .fontColor('#94A3B8')
+              .fontSize(Theme.V2A_FONT_CAPTION)
+              .fontColor(Theme.V2A_TEXT_SECONDARY)
               .width('100%')
               .textAlign(TextAlign.Center)
               .margin({ bottom: 4 })
 
             Text('距离「' + this.nextLevelTitle + '」还差 ' + this.daysToNextLevel.toString() + ' 天')
-              .fontSize(12)
-              .fontColor('#6B6380')
+              .fontSize(Theme.V2A_FONT_DISCLAIMER)
+              .fontColor(Theme.V2_TEXT_TERTIARY)
               .width('100%')
               .textAlign(TextAlign.Center)
           } else {
             Text('你已到达最高星钥等级')
-              .fontSize(13)
-              .fontColor('#E5A50A')
+              .fontSize(Theme.V2A_FONT_CAPTION)
+              .fontColor(Theme.V2A_GOLD_ACCENT)
               .width('100%')
               .textAlign(TextAlign.Center)
           }
@@ -1811,19 +1981,19 @@ struct SettingsTabContent {
           // ═══ 查看完整星历入口 ═══
           Row() {
             Text('查看完整星历')
-              .fontSize(13)
-              .fontColor('#E5A50A')
+              .fontSize(Theme.V2A_FONT_CAPTION)
+              .fontColor(Theme.V2A_GOLD_ACCENT)
               .fontWeight(FontWeight.Medium)
 
             Text('›')
-              .fontSize(16)
-              .fontColor('#E5A50A')
+              .fontSize(Theme.V2A_FONT_BODY)
+              .fontColor(Theme.V2A_GOLD_ACCENT)
               .fontWeight(FontWeight.Lighter)
               .margin({ left: 4 })
           }
           .width('100%')
           .justifyContent(FlexAlign.Center)
-          .padding({ top: 14, bottom: 4 })
+          .padding({ top: Theme.V2_SPACE_MD, bottom: 4 })
           .onClick(() => {
             try {
               const options: router.RouterOptions = { url: Routes.STAR_CALENDAR };
@@ -1837,13 +2007,13 @@ struct SettingsTabContent {
           if (this.visibleMonthRecords.length > 0) {
             Divider()
               .strokeWidth(0.5)
-              .color('rgba(202, 138, 4, 0.12)')
+              .color(Theme.V2A_ORBIT_LINE)
               .width('100%')
-              .margin({ top: 16, bottom: 14 })
+              .margin({ top: Theme.V2_SPACE_MD, bottom: Theme.V2_SPACE_SM })
 
             Text('本月星光记录')
-              .fontSize(14)
-              .fontColor('#E5D9B6')
+              .fontSize(Theme.V2A_FONT_CAPTION)
+              .fontColor(Theme.V2A_GOLD_GLOW)
               .fontWeight(FontWeight.Medium)
               .width('100%')
               .margin({ bottom: 10 })
@@ -1851,21 +2021,21 @@ struct SettingsTabContent {
             ForEach(this.visibleMonthRecords, (record: EmotionStarRecord, idx: number) => {
               Row() {
                 Text(EmotionStarStorage.formatMonthDay(record.date))
-                  .fontSize(13)
-                  .fontColor('#94A3B8')
+                  .fontSize(Theme.V2A_FONT_CAPTION)
+                  .fontColor(Theme.V2A_TEXT_SECONDARY)
                   .width(72)
 
                 Text(record.starName)
-                  .fontSize(13)
-                  .fontColor('#E5D9B6')
+                  .fontSize(Theme.V2A_FONT_CAPTION)
+                  .fontColor(Theme.V2A_GOLD_GLOW)
                   .fontWeight(FontWeight.Medium)
                   .layoutWeight(1)
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                 Text('›')
-                  .fontSize(16)
-                  .fontColor(Theme.V2C_SPINE_LINE)
+                  .fontSize(Theme.V2A_FONT_BODY)
+                  .fontColor(Theme.V2A_ORBIT_LINE)
                   .width(20)
                   .textAlign(TextAlign.Center)
               }
@@ -1873,45 +2043,45 @@ struct SettingsTabContent {
               .padding({ top: 8, bottom: 8 })
               .border({
                 width: idx < this.visibleMonthRecords.length - 1 ? 0.5 : 0,
-                color: 'rgba(202, 138, 4, 0.08)'
+                color: Theme.V2A_ORBIT_LINE
               })
               .onClick(() => { this.handleHistoryItemClick(record); })
             }, (record: EmotionStarRecord) => 'star_month_item_' + record.date)
           } else {
             Divider()
               .strokeWidth(0.5)
-              .color('rgba(202, 138, 4, 0.12)')
+              .color(Theme.V2A_ORBIT_LINE)
               .width('100%')
-              .margin({ top: 16, bottom: 14 })
+              .margin({ top: Theme.V2_SPACE_MD, bottom: Theme.V2_SPACE_SM })
 
             if (this.isViewingCurrentMonth()) {
               Text('这个月还没有留下星光。\n完成一次每日一占，就能点亮今天。')
-                .fontSize(12)
-                .fontColor('#6B6380')
+                .fontSize(Theme.V2A_FONT_DISCLAIMER)
+                .fontColor(Theme.V2_TEXT_TERTIARY)
                 .textAlign(TextAlign.Center)
                 .lineHeight(20)
                 .width('100%')
             } else if (this.isViewingFutureMonth()) {
               Text('这些日子还在星光前方。')
-                .fontSize(12)
-                .fontColor('#6B6380')
+                .fontSize(Theme.V2A_FONT_DISCLAIMER)
+                .fontColor(Theme.V2_TEXT_TERTIARY)
                 .textAlign(TextAlign.Center)
                 .width('100%')
             } else {
               Text('这个月没有点亮记录。')
-                .fontSize(12)
-                .fontColor('#6B6380')
+                .fontSize(Theme.V2A_FONT_DISCLAIMER)
+                .fontColor(Theme.V2_TEXT_TERTIARY)
                 .textAlign(TextAlign.Center)
                 .width('100%')
             }
           }
         }
         .width('92%')
-        .padding(Theme.STARKEY_CARD_PADDING_H)
-        .backgroundColor(Theme.STARKEY_CARD_BG)
-        .borderRadius(Theme.STARKEY_CARD_RADIUS)
-        .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
-        .shadow(Theme.SHADOW_CARD_SUBTLE)
+        .padding(Theme.V2_SPACE_MD_B)
+        .backgroundColor(Theme.V2A_BG_CARD)
+        .borderRadius(Theme.V2A_RADIUS_CARD)
+        .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+        .shadow(Theme.V2A_SHADOW_CARD)
         .margin({ bottom: Theme.SPACE_MD })
 
         // ═══ 偏好设置卡片 ═══
@@ -1920,34 +2090,34 @@ struct SettingsTabContent {
           Row() {
             Column() {
               Text('背景音乐')
-                .fontSize(Theme.FONT_BODY)
-                .fontColor(Theme.V2C_TEXT_PRIMARY)
+                .fontSize(Theme.V2A_FONT_BODY)
+                .fontColor(Theme.V2A_TEXT_PRIMARY)
                 .fontWeight(FontWeight.Medium)
                 .width('100%')
 
               Text('开启后，星钥塔罗会播放一首低音量的全局主旋律。')
-                .fontSize(13)
-                .fontColor(Theme.V2C_TEXT_SECONDARY)
+                .fontSize(Theme.V2A_FONT_CAPTION)
+                .fontColor(Theme.V2A_TEXT_SECONDARY)
                 .width('100%')
                 .margin({ top: 4 })
             }
             .layoutWeight(1)
 
             Toggle({ type: ToggleType.Switch, isOn: this.bgmEnabled })
-              .selectedColor('#E8B83D')
+              .selectedColor(Theme.V2A_GOLD_ACCENT)
               .onChange((isOn: boolean) => {
                 this.toggleBgm(isOn);
               })
           }
           .width('100%')
           .alignItems(VerticalAlign.Center)
-          .padding({ top: 16, bottom: 16, left: 20, right: 20 })
+          .padding({ top: Theme.V2_SPACE_MD, bottom: Theme.V2_SPACE_MD, left: Theme.V2_SPACE_MD_B, right: Theme.V2_SPACE_MD_B })
         }
         .width('92%')
-        .backgroundColor(Theme.STARKEY_CARD_BG)
-        .borderRadius(Theme.STARKEY_CARD_RADIUS)
-        .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
-        .shadow(Theme.SHADOW_CARD_SUBTLE)
+        .backgroundColor(Theme.V2A_BG_CARD)
+        .borderRadius(Theme.V2A_RADIUS_CARD)
+        .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+        .shadow(Theme.V2A_SHADOW_CARD)
         .margin({ bottom: Theme.SPACE_MD })
 
         // 重新听听星澜的介绍
@@ -1955,32 +2125,32 @@ struct SettingsTabContent {
           Row() {
             Column() {
               Text('重新听听星澜的介绍')
-                .fontSize(Theme.FONT_BODY)
-                .fontColor(Theme.V2C_TEXT_PRIMARY)
+                .fontSize(Theme.V2A_FONT_BODY)
+                .fontColor(Theme.V2A_TEXT_PRIMARY)
                 .fontWeight(FontWeight.Medium)
                 .width('100%')
             }
             .layoutWeight(1)
 
             Text('›')
-              .fontSize(20)
-              .fontColor(Theme.V2C_SPINE_LINE)
+              .fontSize(Theme.V2A_FONT_SUBTITLE)
+              .fontColor(Theme.V2A_ORBIT_LINE)
           }
           .width('100%')
           .alignItems(VerticalAlign.Center)
-          .padding({ top: 16, bottom: 16, left: 20, right: 20 })
+          .padding({ top: Theme.V2_SPACE_MD, bottom: Theme.V2_SPACE_MD, left: Theme.V2_SPACE_MD_B, right: Theme.V2_SPACE_MD_B })
 
           Text('星澜会重新陪你走一遍语录页的第一次介绍。')
-            .fontSize(13)
-            .fontColor(Theme.V2C_TEXT_SECONDARY)
+            .fontSize(Theme.V2A_FONT_CAPTION)
+            .fontColor(Theme.V2A_TEXT_SECONDARY)
             .width('100%')
-            .padding({ left: 20, right: 20, bottom: 16 })
+            .padding({ left: Theme.V2_SPACE_MD_B, right: Theme.V2_SPACE_MD_B, bottom: Theme.V2_SPACE_MD })
         }
         .width('92%')
-        .backgroundColor(Theme.STARKEY_CARD_BG)
-        .borderRadius(Theme.STARKEY_CARD_RADIUS)
-        .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
-        .shadow(Theme.SHADOW_CARD_SUBTLE)
+        .backgroundColor(Theme.V2A_BG_CARD)
+        .borderRadius(Theme.V2A_RADIUS_CARD)
+        .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+        .shadow(Theme.V2A_SHADOW_CARD)
         .margin({ bottom: Theme.SPACE_MD })
         .onClick(() => { this.resetAllGuides(); })
 
@@ -1990,32 +2160,32 @@ struct SettingsTabContent {
           Row() {
             Column() {
               Text('使用说明')
-                .fontSize(Theme.FONT_BODY)
-                .fontColor(Theme.V2C_TEXT_PRIMARY)
+                .fontSize(Theme.V2A_FONT_BODY)
+                .fontColor(Theme.V2A_TEXT_PRIMARY)
                 .fontWeight(FontWeight.Medium)
                 .width('100%')
             }
             .layoutWeight(1)
 
             Text('›')
-              .fontSize(20)
-              .fontColor(Theme.V2C_SPINE_LINE)
+              .fontSize(Theme.V2A_FONT_SUBTITLE)
+              .fontColor(Theme.V2A_ORBIT_LINE)
           }
           .width('100%')
           .alignItems(VerticalAlign.Center)
-          .padding({ top: 16, bottom: 16, left: 20, right: 20 })
+          .padding({ top: Theme.V2_SPACE_MD, bottom: Theme.V2_SPACE_MD, left: Theme.V2_SPACE_MD_B, right: Theme.V2_SPACE_MD_B })
 
           Text('了解星钥塔罗每个板块的用法和设计初衷。')
-            .fontSize(13)
-            .fontColor(Theme.V2C_TEXT_SECONDARY)
+            .fontSize(Theme.V2A_FONT_CAPTION)
+            .fontColor(Theme.V2A_TEXT_SECONDARY)
             .width('100%')
-            .padding({ left: 20, right: 20, bottom: 16 })
+            .padding({ left: Theme.V2_SPACE_MD_B, right: Theme.V2_SPACE_MD_B, bottom: Theme.V2_SPACE_MD })
         }
         .width('92%')
-        .backgroundColor(Theme.STARKEY_CARD_BG)
-        .borderRadius(Theme.STARKEY_CARD_RADIUS)
-        .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
-        .shadow(Theme.SHADOW_CARD_SUBTLE)
+        .backgroundColor(Theme.V2A_BG_CARD)
+        .borderRadius(Theme.V2A_RADIUS_CARD)
+        .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+        .shadow(Theme.V2A_SHADOW_CARD)
         .margin({ bottom: Theme.SPACE_MD })
         .onClick(() => {
           try {
@@ -2032,32 +2202,32 @@ struct SettingsTabContent {
           Row() {
             Column() {
               Text('关于星钥塔罗')
-                .fontSize(Theme.FONT_BODY)
-                .fontColor(Theme.V2C_TEXT_PRIMARY)
+                .fontSize(Theme.V2A_FONT_BODY)
+                .fontColor(Theme.V2A_TEXT_PRIMARY)
                 .fontWeight(FontWeight.Medium)
                 .width('100%')
             }
             .layoutWeight(1)
 
             Text('›')
-              .fontSize(20)
-              .fontColor(Theme.V2C_SPINE_LINE)
+              .fontSize(Theme.V2A_FONT_SUBTITLE)
+              .fontColor(Theme.V2A_ORBIT_LINE)
           }
           .width('100%')
           .alignItems(VerticalAlign.Center)
-          .padding({ top: 16, bottom: 16, left: 20, right: 20 })
+          .padding({ top: Theme.V2_SPACE_MD, bottom: Theme.V2_SPACE_MD, left: Theme.V2_SPACE_MD_B, right: Theme.V2_SPACE_MD_B })
 
           Text('版本信息、隐私政策、用户协议、素材与授权。')
-            .fontSize(13)
-            .fontColor(Theme.V2C_TEXT_SECONDARY)
+            .fontSize(Theme.V2A_FONT_CAPTION)
+            .fontColor(Theme.V2A_TEXT_SECONDARY)
             .width('100%')
-            .padding({ left: 20, right: 20, bottom: 16 })
+            .padding({ left: Theme.V2_SPACE_MD_B, right: Theme.V2_SPACE_MD_B, bottom: Theme.V2_SPACE_MD })
         }
         .width('92%')
-        .backgroundColor(Theme.STARKEY_CARD_BG)
-        .borderRadius(Theme.STARKEY_CARD_RADIUS)
-        .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
-        .shadow(Theme.SHADOW_CARD_SUBTLE)
+        .backgroundColor(Theme.V2A_BG_CARD)
+        .borderRadius(Theme.V2A_RADIUS_CARD)
+        .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+        .shadow(Theme.V2A_SHADOW_CARD)
         .margin({ bottom: Theme.SPACE_MD })
         .onClick(() => {
           try {
@@ -2071,8 +2241,8 @@ struct SettingsTabContent {
         Blank()
 
         Text(Constants.COMPLIANCE_FOOTER)
-          .fontSize(11)
-          .fontColor(Theme.V2C_TEXT_SECONDARY)
+          .fontSize(Theme.V2A_FONT_DISCLAIMER)
+          .fontColor(Theme.V2_TEXT_TERTIARY)
           .textAlign(TextAlign.Center)
           .lineHeight(16)
           .width('100%')
@@ -2093,31 +2263,31 @@ struct SettingsTabContent {
         Column()
           .width('100%')
           .height('100%')
-          .backgroundColor('rgba(8, 11, 24, 0.6)')
+          .backgroundColor(Theme.V2_OVERLAY_SCRIM)
           .onClick(() => { this.showAvatarSheet = false; })
 
         // 底部面板
         Column() {
           // 标题
           Text('更换头像')
-            .fontSize(Theme.FONT_SUBTITLE)
-            .fontColor(Theme.V2C_GOLD_GILT)
-            .fontWeight(FontWeight.Bold)
+            .fontSize(Theme.V2A_FONT_SUBTITLE)
+            .fontColor(Theme.V2A_TEXT_PRIMARY)
+            .fontWeight(FontWeight.Medium)
             .width('100%')
             .textAlign(TextAlign.Center)
-            .padding({ top: 20, bottom: 16 })
+            .padding({ top: Theme.V2_SPACE_MD_B, bottom: Theme.V2_SPACE_MD })
 
           // 分割线
           Divider()
             .strokeWidth(0.5)
-            .color('rgba(212, 160, 42, 0.18)')
+            .color(Theme.V2A_ORBIT_LINE)
             .width('88%')
 
           // 从相册选择
           Row() {
             Text('从相册选择')
-              .fontSize(Theme.FONT_BODY)
-              .fontColor(Theme.V2C_TEXT_PRIMARY)
+              .fontSize(Theme.V2A_FONT_BODY)
+              .fontColor(Theme.V2A_TEXT_PRIMARY)
               .width('100%')
               .textAlign(TextAlign.Center)
               .padding({ top: 18, bottom: 18 })
@@ -2127,14 +2297,14 @@ struct SettingsTabContent {
 
           Divider()
             .strokeWidth(0.5)
-            .color('rgba(212, 160, 42, 0.12)')
+            .color(Theme.V2A_ORBIT_LINE)
             .width('88%')
 
           // 恢复默认头像
           Row() {
             Text('恢复默认头像')
-              .fontSize(Theme.FONT_BODY)
-              .fontColor(Theme.V2C_TEXT_PRIMARY)
+              .fontSize(Theme.V2A_FONT_BODY)
+              .fontColor(Theme.V2A_TEXT_PRIMARY)
               .width('100%')
               .textAlign(TextAlign.Center)
               .padding({ top: 18, bottom: 18 })
@@ -2144,14 +2314,14 @@ struct SettingsTabContent {
 
           Divider()
             .strokeWidth(0.5)
-            .color('rgba(212, 160, 42, 0.12)')
+            .color(Theme.V2A_ORBIT_LINE)
             .width('88%')
 
           // 取消
           Row() {
             Text('取消')
-              .fontSize(Theme.FONT_BODY)
-              .fontColor(Theme.V2C_TEXT_SECONDARY)
+              .fontSize(Theme.V2A_FONT_BODY)
+              .fontColor(Theme.V2A_TEXT_SECONDARY)
               .width('100%')
               .textAlign(TextAlign.Center)
               .padding({ top: 18, bottom: 18 })
@@ -2165,8 +2335,8 @@ struct SettingsTabContent {
             .height(Theme.SAFE_BOTTOM)
         }
         .width('100%')
-        .backgroundColor(Theme.V2C_BG_BASE)
-        .borderRadius({ topLeft: Theme.RADIUS_LG, topRight: Theme.RADIUS_LG })
+        .backgroundColor(Theme.V2A_BG_FLOATING)
+        .borderRadius({ topLeft: Theme.V2A_RADIUS_POPUP, topRight: Theme.V2A_RADIUS_POPUP })
         .position({ x: 0, y: '100%' })
         .translate({ x: 0, y: '-100%' })
         .zIndex(100)
@@ -2178,26 +2348,27 @@ struct SettingsTabContent {
         Column()
           .width('100%')
           .height('100%')
-          .backgroundColor('rgba(8, 11, 24, 0.65)')
+          .backgroundColor(Theme.V2_OVERLAY_SCRIM)
           .onClick(() => { this.closeDateDetail(); })
           .zIndex(150)
 
         // 居中详情卡片
         Column() {
-          // 日期标题
+          // 日期标题（等宽时间戳风格）
           Text(EmotionStarStorage.formatMonthDay(this.selectedDateKey))
-            .fontSize(20)
-            .fontColor('#E5D9B6')
-            .fontWeight(FontWeight.Bold)
+            .fontSize(Theme.V2A_FONT_RANK_TITLE)
+            .fontColor(Theme.V2A_GOLD_GLOW)
+            .fontWeight(FontWeight.Medium)
+            .letterSpacing(1)
             .width('100%')
             .textAlign(TextAlign.Center)
-            .margin({ bottom: 16 })
+            .margin({ bottom: Theme.V2_SPACE_MD })
 
           if (this.selectedRecord !== null) {
             // ======== 已点亮：展示详情 ========
             Text('这一天，你留下了一颗情绪星。')
-              .fontSize(14)
-              .fontColor('#94A3B8')
+              .fontSize(Theme.V2A_FONT_CAPTION)
+              .fontColor(Theme.V2A_TEXT_SECONDARY)
               .width('100%')
               .textAlign(TextAlign.Center)
               .margin({ bottom: 18 })
@@ -2205,13 +2376,13 @@ struct SettingsTabContent {
             // 星名
             Row() {
               Text('今日星名')
-                .fontSize(13)
-                .fontColor('#6B6380')
+                .fontSize(Theme.V2A_FONT_CAPTION)
+                .fontColor(Theme.V2_TEXT_TERTIARY)
                 .width(72)
 
               Text(this.selectedRecord.starName)
-                .fontSize(14)
-                .fontColor('#E5D9B6')
+                .fontSize(Theme.V2A_FONT_BODY)
+                .fontColor(Theme.V2A_GOLD_GLOW)
                 .fontWeight(FontWeight.Medium)
                 .layoutWeight(1)
             }
@@ -2221,13 +2392,13 @@ struct SettingsTabContent {
             // 牌名
             Row() {
               Text('今日牌名')
-                .fontSize(13)
-                .fontColor('#6B6380')
+                .fontSize(Theme.V2A_FONT_CAPTION)
+                .fontColor(Theme.V2_TEXT_TERTIARY)
                 .width(72)
 
               Text(this.selectedRecord.cardName)
-                .fontSize(14)
-                .fontColor('#E5D9B6')
+                .fontSize(Theme.V2A_FONT_BODY)
+                .fontColor(Theme.V2A_GOLD_GLOW)
                 .fontWeight(FontWeight.Medium)
                 .layoutWeight(1)
             }
@@ -2237,13 +2408,13 @@ struct SettingsTabContent {
             // 点亮时间
             Row() {
               Text('点亮时间')
-                .fontSize(13)
-                .fontColor('#6B6380')
+                .fontSize(Theme.V2A_FONT_CAPTION)
+                .fontColor(Theme.V2_TEXT_TERTIARY)
                 .width(72)
 
               Text(EmotionStarStorage.formatTimeFromTimestamp(this.selectedRecord.createdAt))
-                .fontSize(14)
-                .fontColor('#E5D9B6')
+                .fontSize(Theme.V2A_FONT_BODY)
+                .fontColor(Theme.V2A_GOLD_GLOW)
                 .layoutWeight(1)
             }
             .width('100%')
@@ -2251,95 +2422,95 @@ struct SettingsTabContent {
 
             Divider()
               .strokeWidth(0.5)
-              .color('rgba(202, 138, 4, 0.12)')
+              .color(Theme.V2A_ORBIT_LINE)
               .width('100%')
-              .margin({ bottom: 16 })
+              .margin({ bottom: Theme.V2_SPACE_MD })
 
             Text('星澜记得：')
-              .fontSize(13)
-              .fontColor('#E5A50A')
+              .fontSize(Theme.V2A_FONT_CAPTION)
+              .fontColor(Theme.V2A_GOLD_ACCENT)
               .width('100%')
               .margin({ bottom: 8 })
 
             Text('那天的你，也认真面对过自己的感受。')
-              .fontSize(14)
-              .fontColor('#E5D9B6')
+              .fontSize(Theme.V2A_FONT_BODY)
+              .fontColor(Theme.V2A_TEXT_PRIMARY)
               .lineHeight(22)
               .width('100%')
-              .margin({ bottom: 20 })
+              .margin({ bottom: Theme.V2_SPACE_MD_B })
           } else {
             // ======== 未点亮 ========
             if (this.isSelectedDateToday()) {
               Text('今天还没有点亮情绪星。')
-                .fontSize(15)
-                .fontColor('#E5D9B6')
+                .fontSize(Theme.V2A_FONT_BODY)
+                .fontColor(Theme.V2A_TEXT_PRIMARY)
                 .fontWeight(FontWeight.Medium)
                 .width('100%')
                 .textAlign(TextAlign.Center)
                 .margin({ bottom: 12 })
 
               Text('完成一次每日一占，就能为今天留下一点星光。')
-                .fontSize(13)
-                .fontColor('#94A3B8')
+                .fontSize(Theme.V2A_FONT_CAPTION)
+                .fontColor(Theme.V2A_TEXT_SECONDARY)
                 .lineHeight(20)
                 .width('100%')
                 .textAlign(TextAlign.Center)
-                .margin({ bottom: 20 })
+                .margin({ bottom: Theme.V2_SPACE_MD_B })
             } else if (this.isSelectedDateFuture()) {
               // ======== 未来日期 ========
               Text('这一天还在星光前方。')
-                .fontSize(15)
-                .fontColor('#E5D9B6')
+                .fontSize(Theme.V2A_FONT_BODY)
+                .fontColor(Theme.V2A_TEXT_PRIMARY)
                 .fontWeight(FontWeight.Medium)
                 .width('100%')
                 .textAlign(TextAlign.Center)
                 .margin({ bottom: 12 })
 
               Text('未来的每一天，都值得期待。')
-                .fontSize(13)
-                .fontColor('#94A3B8')
+                .fontSize(Theme.V2A_FONT_CAPTION)
+                .fontColor(Theme.V2A_TEXT_SECONDARY)
                 .lineHeight(20)
                 .width('100%')
                 .textAlign(TextAlign.Center)
-                .margin({ bottom: 20 })
+                .margin({ bottom: Theme.V2_SPACE_MD_B })
             } else {
               Text('这一天还没有留下星光。')
-                .fontSize(15)
-                .fontColor('#E5D9B6')
+                .fontSize(Theme.V2A_FONT_BODY)
+                .fontColor(Theme.V2A_TEXT_PRIMARY)
                 .fontWeight(FontWeight.Medium)
                 .width('100%')
                 .textAlign(TextAlign.Center)
                 .margin({ bottom: 12 })
 
               Text('没关系，不是每天都需要记录。\n你愿意回来看看自己，就已经很好了。')
-                .fontSize(13)
-                .fontColor('#94A3B8')
+                .fontSize(Theme.V2A_FONT_CAPTION)
+                .fontColor(Theme.V2A_TEXT_SECONDARY)
                 .lineHeight(20)
                 .width('100%')
                 .textAlign(TextAlign.Center)
-                .margin({ bottom: 20 })
+                .margin({ bottom: Theme.V2_SPACE_MD_B })
             }
           }
 
           // 关闭按钮
           Text('知道了')
-            .fontSize(15)
-            .fontColor('#E5A50A')
-            .fontWeight(FontWeight.Bold)
+            .fontSize(Theme.V2A_FONT_BODY)
+            .fontColor(Theme.V2A_GOLD_ACCENT)
+            .fontWeight(FontWeight.Medium)
             .width('100%')
             .height(44)
             .textAlign(TextAlign.Center)
-            .backgroundColor('rgba(229, 165, 10, 0.08)')
-            .border({ width: 1, color: 'rgba(229, 165, 10, 0.25)' })
-            .borderRadius(Theme.RADIUS_FULL)
+            .backgroundColor('rgba(201, 164, 75, 0.06)')
+            .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+            .borderRadius(Theme.V2A_RADIUS_CHIP)
             .onClick(() => { this.closeDateDetail(); })
         }
         .width('82%')
-        .padding(24)
-        .backgroundColor(Theme.BG_CARD_DARK)
-        .borderRadius(Theme.RADIUS_LG)
-        .border({ width: 1, color: 'rgba(216, 180, 90, 0.18)' })
-        .shadow(Theme.SHADOW_CARD_FLOAT)
+        .padding(Theme.V2_SPACE_MD_B)
+        .backgroundColor(Theme.V2A_BG_FLOATING)
+        .borderRadius(Theme.V2A_RADIUS_POPUP)
+        .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+        .shadow(Theme.V2A_SHADOW_CARD)
         .position({ x: '50%', y: '50%' })
         .translate({ x: '-50%', y: '-50%' })
         .zIndex(200)
@@ -2351,7 +2522,7 @@ struct SettingsTabContent {
         Column()
           .width('100%')
           .height('100%')
-          .backgroundColor('rgba(8, 11, 24, 0.65)')
+          .backgroundColor(Theme.V2_OVERLAY_SCRIM)
           .onClick(() => { this.showNicknameDialog = false; })
           .zIndex(150)
           .hitTestBehavior(HitTestMode.Block)
@@ -2359,46 +2530,46 @@ struct SettingsTabContent {
         // 居中编辑卡片
         Column() {
           Text('给自己取一个星钥昵称')
-            .fontSize(18)
-            .fontColor('#E5D9B6')
-            .fontWeight(FontWeight.Bold)
+            .fontSize(Theme.V2A_FONT_SUBTITLE)
+            .fontColor(Theme.V2A_TEXT_PRIMARY)
+            .fontWeight(FontWeight.Medium)
             .width('100%')
             .textAlign(TextAlign.Center)
             .margin({ bottom: 12 })
 
           Text('这个昵称只保存在你的设备上，用来让星澜更自然地称呼你。')
-            .fontSize(13)
-            .fontColor('#94A3B8')
+            .fontSize(Theme.V2A_FONT_CAPTION)
+            .fontColor(Theme.V2A_TEXT_SECONDARY)
             .lineHeight(20)
             .width('100%')
             .textAlign(TextAlign.Center)
-            .margin({ bottom: 20 })
+            .margin({ bottom: Theme.V2_SPACE_MD_B })
 
           TextInput({ placeholder: '比如：小月、阿澜、旅人、今晚的我', text: this.nicknameEditText })
             .width('100%')
             .height(48)
-            .fontSize(15)
-            .fontColor('#E5D9B6')
-            .placeholderColor('#5A5A7A')
-            .backgroundColor('rgba(255, 255, 255, 0.06)')
-            .borderRadius(10)
-            .border({ width: 1, color: 'rgba(212, 172, 77, 0.25)' })
+            .fontSize(Theme.V2A_FONT_BODY)
+            .fontColor(Theme.V2A_TEXT_PRIMARY)
+            .placeholderColor(Theme.V2_TEXT_TERTIARY)
+            .backgroundColor('rgba(255, 255, 255, 0.04)')
+            .borderRadius(Theme.V2_RADIUS_SM)
+            .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
             .padding({ left: 14, right: 14 })
             .maxLength(12)
             .type(InputType.Normal)
             .onChange((value: string) => {
               this.nicknameEditText = value;
             })
-            .margin({ bottom: 24 })
+            .margin({ bottom: Theme.V2_SPACE_MD_B })
 
           Row() {
             Button('恢复默认')
               .type(ButtonType.Normal)
-              .fontSize(14)
-              .fontColor('#94A3B8')
+              .fontSize(Theme.V2A_FONT_CAPTION)
+              .fontColor(Theme.V2A_TEXT_SECONDARY)
               .backgroundColor('rgba(255, 255, 255, 0.04)')
-              .border({ width: 1, color: 'rgba(148, 163, 184, 0.25)' })
-              .borderRadius(Theme.RADIUS_FULL)
+              .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+              .borderRadius(Theme.V2A_RADIUS_CHIP)
               .height(42)
               .layoutWeight(1)
               .onClick(() => { this.handleResetNickname(); })
@@ -2407,11 +2578,11 @@ struct SettingsTabContent {
 
             Button('取消')
               .type(ButtonType.Normal)
-              .fontSize(14)
-              .fontColor('#94A3B8')
+              .fontSize(Theme.V2A_FONT_CAPTION)
+              .fontColor(Theme.V2A_TEXT_SECONDARY)
               .backgroundColor('rgba(255, 255, 255, 0.04)')
-              .border({ width: 1, color: 'rgba(148, 163, 184, 0.25)' })
-              .borderRadius(Theme.RADIUS_FULL)
+              .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+              .borderRadius(Theme.V2A_RADIUS_CHIP)
               .height(42)
               .layoutWeight(1)
               .onClick(() => { this.showNicknameDialog = false; })
@@ -2420,10 +2591,10 @@ struct SettingsTabContent {
 
             Button('保存')
               .type(ButtonType.Normal)
-              .fontSize(14)
-              .fontColor('#1A1530')
-              .backgroundColor('#E8B83D')
-              .borderRadius(Theme.RADIUS_FULL)
+              .fontSize(Theme.V2A_FONT_CAPTION)
+              .fontColor(Theme.V2A_BG_BASE)
+              .backgroundColor(Theme.V2A_GOLD_ACCENT)
+              .borderRadius(Theme.V2A_RADIUS_CHIP)
               .height(42)
               .layoutWeight(1)
               .onClick(() => { this.handleSaveNickname(); })
@@ -2431,11 +2602,11 @@ struct SettingsTabContent {
           .width('100%')
         }
         .width('80%')
-        .padding(24)
-        .backgroundColor(Theme.BG_CARD_DARK)
-        .borderRadius(Theme.RADIUS_LG)
-        .border({ width: 1, color: 'rgba(216, 180, 90, 0.18)' })
-        .shadow(Theme.SHADOW_CARD_FLOAT)
+        .padding(Theme.V2_SPACE_MD_B)
+        .backgroundColor(Theme.V2A_BG_FLOATING)
+        .borderRadius(Theme.V2A_RADIUS_POPUP)
+        .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+        .shadow(Theme.V2A_SHADOW_CARD)
         .position({ x: '50%', y: '50%' })
         .translate({ x: '-50%', y: '-50%' })
         .zIndex(200)

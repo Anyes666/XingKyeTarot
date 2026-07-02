@@ -97,86 +97,89 @@ struct EmotionStarPage {
 
         Scroll() {
           Column() {
-            // ══ 顶部点亮反馈区（B 方案月光白 + A 方案标记感）══
+            // ══ 顶部点亮反馈区（B 方案月光仪式 — 安静的月光点亮）══
             Column() {
-              Text('✨')
-                .fontSize(48)
+              // 月光符号 — 用柔和月相替代 ✨ 表情，避免奖励到账感
+              Text('☾')
+                .fontSize(52)
+                .fontColor(Theme.V2B_GOLD_RIPPLE)
                 .margin({ bottom: Theme.V2_SPACE_MD })
 
               Text('你点亮了今天的情绪星')
-                .fontSize(Theme.V2B_FONT_TITLE)
-                .fontWeight(FontWeight.Bold)
+                .fontSize(Theme.V2B_FONT_SUBTITLE)
+                .fontWeight(FontWeight.Medium)
                 .fontColor(Theme.V2B_TEXT_PRIMARY)
                 .textAlign(TextAlign.Center)
+                .letterSpacing(1)
                 .margin({ bottom: Theme.V2_SPACE_SM })
 
-              // 今日星名（A 方案金色标记感）
+              // 今日星名（B 方案月光金，降低到柔和级别）
               Text('今日星名：' + this.emotionTag)
-                .fontSize(Theme.V2B_FONT_SUBTITLE)
+                .fontSize(Theme.V2B_FONT_BODY)
                 .fontColor(Theme.V2B_GOLD_CORE)
                 .fontWeight(FontWeight.Medium)
                 .textAlign(TextAlign.Center)
-                .margin({ bottom: Theme.V2_SPACE_XS })
+                .margin({ bottom: Theme.V2_SPACE_2XS })
 
-              // 今日牌名（A 方案等宽时间戳风格）
+              // 今日牌名
               Text('今日星钥：' + this.cardName)
-                .fontSize(Theme.V2B_FONT_BODY)
+                .fontSize(Theme.V2B_FONT_CAPTION)
                 .fontColor(Theme.V2B_TEXT_SECONDARY)
                 .textAlign(TextAlign.Center)
                 .fontFamily('HarmonyOS Sans Mono')
             }
             .width('100%')
-            .padding({ top: Theme.V2_SPACE_XL, bottom: Theme.V2_SPACE_XL })
+            .padding({ top: Theme.V2_SPACE_XL, bottom: Theme.V2_SPACE_LG })
 
             // ══ 星澜陪伴文案 ══
             Text('星澜会替你记住：\n今天的你，也认真面对过自己的感受。')
-              .fontSize(Theme.V2B_FONT_LEAD)
-              .fontColor(Theme.V2B_GOLD_RIPPLE)
+              .fontSize(Theme.V2B_FONT_CAPTION)
+              .fontColor(Theme.V2B_TEXT_SECONDARY)
               .textAlign(TextAlign.Center)
-              .lineHeight(26)
+              .lineHeight(24)
               .width('82%')
-              .margin({ bottom: Theme.V2_SPACE_XL })
+              .margin({ bottom: Theme.V2_SPACE_LG })
 
-            // ══ 累计点亮天数卡片（A 方案星图档案标记感）══
+            // ══ 累计点亮天数卡片（B 方案月湖柔和卡片）══
             Column() {
               Row() {
-                // 累计天数（A 方案等宽数字风格）
+                // 累计天数
                 Column() {
                   Text(this.totalLightDays.toString())
                     .fontSize(Theme.V2A_FONT_RANK_DAYS)
-                    .fontColor(Theme.V2A_GOLD_ACCENT)
+                    .fontColor(Theme.V2B_GOLD_CORE)
                     .fontWeight(FontWeight.Bold)
                     .textAlign(TextAlign.Center)
                     .width('100%')
                     .fontFamily('HarmonyOS Sans Mono')
 
                   Text('累计点亮')
-                    .fontSize(Theme.V2A_FONT_CAPTION)
-                    .fontColor(Theme.V2A_TEXT_SECONDARY)
+                    .fontSize(Theme.V2B_FONT_CAPTION)
+                    .fontColor(Theme.V2B_TEXT_SECONDARY)
                     .textAlign(TextAlign.Center)
                     .width('100%')
                     .margin({ top: Theme.V2_SPACE_2XS })
                 }
                 .layoutWeight(1)
 
-                // 分隔线（A 方案星轨线）
+                // 分隔线（月湖细线）
                 Column()
                   .width(1)
                   .height(48)
-                  .backgroundColor(Theme.V2A_ORBIT_LINE)
+                  .backgroundColor(Theme.V2B_BORDER)
 
-                // 当前等级（A 方案标记感）
+                // 当前等级
                 Column() {
                   Text(this.currentLevelTitle)
-                    .fontSize(Theme.V2A_FONT_RANK_TITLE)
-                    .fontColor(Theme.V2A_GOLD_GLOW)
-                    .fontWeight(FontWeight.Bold)
+                    .fontSize(Theme.V2B_FONT_SUBTITLE)
+                    .fontColor(Theme.V2B_GOLD_RIPPLE)
+                    .fontWeight(FontWeight.Medium)
                     .textAlign(TextAlign.Center)
                     .width('100%')
 
                   Text('当前星钥等级')
-                    .fontSize(Theme.V2A_FONT_CAPTION)
-                    .fontColor(Theme.V2A_TEXT_SECONDARY)
+                    .fontSize(Theme.V2B_FONT_CAPTION)
+                    .fontColor(Theme.V2B_TEXT_SECONDARY)
                     .textAlign(TextAlign.Center)
                     .width('100%')
                     .margin({ top: Theme.V2_SPACE_2XS })
@@ -190,33 +193,33 @@ struct EmotionStarPage {
               if (!this.isMaxLevel) {
                 Divider()
                   .strokeWidth(0.5)
-                  .color(Theme.V2A_ORBIT_LINE)
+                  .color(Theme.V2B_BORDER)
                   .width('88%')
 
                 Text('下一称号：' + this.nextLevelTitle + '\n还差 ' + this.daysToNextLevel.toString() + ' 天')
-                  .fontSize(Theme.V2A_FONT_BODY)
-                  .fontColor(Theme.V2A_TEXT_SECONDARY)
+                  .fontSize(Theme.V2B_FONT_CAPTION)
+                  .fontColor(Theme.V2B_TEXT_SECONDARY)
                   .textAlign(TextAlign.Center)
                   .lineHeight(22)
                   .padding({ top: Theme.V2_SPACE_MD, bottom: Theme.V2_SPACE_2XS })
               } else {
                 Divider()
                   .strokeWidth(0.5)
-                  .color(Theme.V2A_ORBIT_LINE)
+                  .color(Theme.V2B_BORDER)
                   .width('88%')
 
                 Text('你已到达最高星钥等级')
-                  .fontSize(Theme.V2A_FONT_BODY)
-                  .fontColor(Theme.V2A_GOLD_ACCENT)
+                  .fontSize(Theme.V2B_FONT_CAPTION)
+                  .fontColor(Theme.V2B_GOLD_CORE)
                   .textAlign(TextAlign.Center)
                   .padding({ top: Theme.V2_SPACE_MD, bottom: Theme.V2_SPACE_2XS })
               }
             }
             .width('88%')
-            .backgroundColor(Theme.V2A_BG_CARD)
-            .borderRadius(Theme.V2A_RADIUS_CARD)
-            .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
-            .margin({ bottom: Theme.V2_SPACE_XL })
+            .backgroundColor(Theme.V2B_BG_CARD)
+            .borderRadius(Theme.V2B_RADIUS_CARD)
+            .border({ width: 1, color: Theme.V2B_BORDER })
+            .margin({ bottom: Theme.V2_SPACE_LG })
 
             // ══ P2：LevelUpPopup 等级提升弹窗（替换 P1 占位）══
             if (this.showLevelUp) {
@@ -230,18 +233,19 @@ struct EmotionStarPage {
               })
             }
 
-            // ══ 操作按钮 ══
+            // ══ 操作按钮（B 方案月湖柔和）══
             Column({ space: Theme.V2_SPACE_SM }) {
-              // 回到首页
+              // 回到首页 — 月光金主按钮
               Button('回到首页')
                 .type(ButtonType.Normal)
                 .width('82%')
                 .height(48)
                 .fontSize(Theme.V2B_FONT_BODY)
                 .fontColor(Theme.V2B_BG_BASE)
-                .fontWeight(FontWeight.Bold)
+                .fontWeight(FontWeight.Medium)
                 .backgroundColor(Theme.V2B_GOLD_CORE)
                 .borderRadius(Theme.V2B_RADIUS_BTN)
+                .shadow(Theme.V2B_SHADOW_BTN_GLOW)
                 .scale({
                   x: this.homeBtnPressed ? Theme.PRESS_SCALE : 1.0,
                   y: this.homeBtnPressed ? Theme.PRESS_SCALE : 1.0
@@ -265,7 +269,7 @@ struct EmotionStarPage {
                   }
                 })
 
-              // 查看我的星历（跳转到我的页面的 tab=4）
+              // 查看我的星历 — 月湖次级按钮
               Button('查看我的星历')
                 .type(ButtonType.Normal)
                 .width('82%')
@@ -273,7 +277,7 @@ struct EmotionStarPage {
                 .fontSize(Theme.V2B_FONT_BODY)
                 .fontColor(Theme.V2B_GOLD_RIPPLE)
                 .backgroundColor(Theme.V2B_BG_CARD)
-                .border({ width: 1, color: Theme.V2B_GOLD_CORE })
+                .border({ width: 1, color: 'rgba(212, 172, 77, 0.18)' })
                 .borderRadius(Theme.V2B_RADIUS_BTN)
                 .scale({
                   x: this.calendarBtnPressed ? Theme.PRESS_SCALE : 1.0,

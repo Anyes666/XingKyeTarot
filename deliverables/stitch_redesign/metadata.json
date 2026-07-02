@@ -1,0 +1,6 @@
+{
+  "name": "星澜塔罗",
+  "description": "星澜 (Xinglan) - 沉浸式塔罗占卜、心灵对话与星钥之语，温暖温和的心灵陪伴旅程。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

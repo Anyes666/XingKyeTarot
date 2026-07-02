@@ -31,49 +31,70 @@ export struct HeartOptionCard {
   @State private pressed: boolean = false;
 
   build() {
-    Row() {
-      // 图标
-      if (this.icon.length > 0) {
-        Text(this.icon)
-          .fontSize(24)
-          .fontColor(this.selected ? Theme.V2C_GOLD_GILT : Theme.V2C_TEXT_SECONDARY)
-          .width(40)
-          .textAlign(TextAlign.Center)
-      }
+    Stack() {
+      Row()
+        .width(1)
+        .height('62%')
+        .backgroundColor(this.selected ? 'rgba(197,160,80,0.20)' : 'rgba(139,134,155,0.10)')
+        .position({ x: 8, y: '19%' })
 
-      // 文字区
-      Column() {
-        Text(this.label)
-          .fontSize(Theme.V2C_FONT_BODY)
-          .fontColor(this.selected ? Theme.V2C_GOLD_GILT_SOFT : Theme.V2C_TEXT_PRIMARY)
-          .fontWeight(FontWeight.Medium)
-
-        if (this.description.length > 0) {
-          Text(this.description)
-            .fontSize(Theme.V2C_FONT_CAPTION)
-            .fontColor(Theme.V2C_TEXT_SECONDARY)
-            .margin({ top: 2 })
-            .lineHeight(18)
-            .maxLines(2)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
+      Row() {
+        // 图标
+        if (this.icon.length > 0) {
+          Stack() {
+            Text(this.icon)
+              .fontSize(16)
+              .fontColor(this.selected ? Theme.V2C_GOLD_GILT_SOFT : Theme.V2C_TEXT_SECONDARY)
+              .textAlign(TextAlign.Center)
+              .opacity(this.selected ? 0.78 : 0.54)
+          }
+          .width(34)
+          .height(34)
+          .borderRadius(Theme.V2C_RADIUS_CARD)
+          .backgroundColor(this.selected ? 'rgba(197,160,80,0.075)' : 'rgba(10,13,26,0.26)')
+          .border({ width: 1, color: this.selected ? 'rgba(197,160,80,0.22)' : 'rgba(139,134,155,0.08)' })
         }
+
+        // 文字区
+        Column() {
+          Text(this.label)
+            .fontSize(Theme.V2C_FONT_BODY)
+            .fontColor(this.selected ? Theme.V2C_GOLD_GILT_SOFT : Theme.V2C_TEXT_PRIMARY)
+            .fontWeight(this.selected ? FontWeight.Medium : FontWeight.Normal)
+            .lineHeight(21)
+
+          if (this.description.length > 0) {
+            Text(this.description)
+              .fontSize(Theme.V2C_FONT_CAPTION)
+              .fontColor(Theme.V2C_TEXT_SECONDARY)
+              .margin({ top: 3 })
+              .lineHeight(18)
+              .maxLines(2)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+          }
+        }
+        .alignItems(HorizontalAlign.Start)
+        .layoutWeight(1)
+        .margin({ left: this.icon.length > 0 ? Theme.V2_SPACE_SM : 0 })
       }
-      .alignItems(HorizontalAlign.Start)
-      .layoutWeight(1)
-      .margin({ left: this.icon.length > 0 ? Theme.V2_SPACE_SM : 0 })
+      .width('100%')
+      .height('100%')
+      .alignItems(VerticalAlign.Center)
+      .padding({
+        left: Theme.V2_SPACE_LG,
+        right: Theme.V2_SPACE_LG,
+        top: 13,
+        bottom: 13
+      })
     }
     .width('100%')
-    .padding({
-      left: Theme.V2_SPACE_LG,
-      right: Theme.V2_SPACE_LG,
-      top: 14,
-      bottom: 14
-    })
-    .backgroundColor(this.selected ? Theme.V2C_BG_FLOATING : Theme.V2C_BG_CARD)
+    .height(this.description.length > 0 ? 82 : 66)
+    .clip(true)
+    .backgroundColor(this.selected ? 'rgba(24,31,64,0.82)' : 'rgba(18,24,54,0.74)')
     .borderRadius(Theme.V2C_RADIUS_CARD)
     .border({
-      width: this.selected ? 2 : 1,
-      color: this.selected ? Theme.V2C_GOLD_GILT : Theme.V2C_SPINE_LINE,
+      width: 1,
+      color: this.selected ? 'rgba(197,160,80,0.30)' : 'rgba(29,35,66,0.92)',
       style: BorderStyle.Solid
     })
     .scale({

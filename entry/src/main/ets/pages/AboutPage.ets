@@ -71,9 +71,10 @@ struct AboutPage {
 
         // 标题
         Text('关于星钥塔罗')
-          .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.V2A_GOLD_ACCENT)
-          .fontWeight(FontWeight.Bold)
+          .fontSize(Theme.V2A_FONT_TITLE)
+          .fontColor(Theme.V2A_TEXT_PRIMARY)
+          .fontWeight(FontWeight.Medium)
+          .letterSpacing(2)
           .textAlign(TextAlign.Center)
           .width('100%')
           .margin({ top: Theme.SPACE_MD })
@@ -81,22 +82,23 @@ struct AboutPage {
         // 说明文案
         Column() {
           Text('星钥塔罗是一款塔罗式情绪陪伴与自我探索 App。')
-            .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+            .fontSize(Theme.V2A_FONT_BODY)
+            .fontColor(Theme.V2A_TEXT_PRIMARY)
             .lineHeight(24)
             .width('100%')
 
           Text('星澜不会替你预言未来，只陪你慢慢看见自己。')
-            .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+            .fontSize(Theme.V2A_FONT_BODY)
+            .fontColor(Theme.V2A_TEXT_SECONDARY)
             .lineHeight(24)
             .width('100%')
             .margin({ top: Theme.SPACE_SM })
         }
         .width('92%')
-        .backgroundColor('rgba(27, 27, 48, 0.52)')
-        .borderRadius(Theme.RADIUS_MD)
-        .padding(Theme.SPACE_MD)
+        .backgroundColor(Theme.V2A_BG_CARD)
+        .borderRadius(Theme.V2A_RADIUS_CARD)
+        .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+        .padding(Theme.V2_SPACE_MD)
         .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_LG })
 
         // 入口列表
@@ -106,28 +108,28 @@ struct AboutPage {
               Row() {
                 Column() {
                   Text(entry.title)
-                    .fontSize(Theme.FONT_BODY)
-                    .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                    .fontSize(Theme.V2A_FONT_BODY)
+                    .fontColor(Theme.V2A_TEXT_PRIMARY)
                     .fontWeight(FontWeight.Medium)
 
                   Text(entry.subtitle)
-                    .fontSize(Theme.FONT_CAPTION)
-                    .fontColor(Theme.MOON_MUTED)
+                    .fontSize(Theme.V2A_FONT_CAPTION)
+                    .fontColor(Theme.V2A_TEXT_SECONDARY)
                     .margin({ top: 4 })
                 }
                 .alignItems(HorizontalAlign.Start)
                 .layoutWeight(1)
 
                 Text('›')
-                  .fontSize(20)
-                  .fontColor(Theme.GOLD_DIM)
+                  .fontSize(Theme.V2A_FONT_SUBTITLE)
+                  .fontColor(Theme.V2A_GOLD_ACCENT)
               }
               .width('92%')
-              .padding(Theme.SPACE_MD)
+              .padding(Theme.V2_SPACE_MD)
               .margin({ bottom: Theme.SPACE_SM })
-              .backgroundColor('rgba(27, 27, 48, 0.68)')
-              .borderRadius(Theme.RADIUS_MD)
-              .border({ width: 1, color: 'rgba(216, 180, 90, 0.12)' })
+              .backgroundColor(Theme.V2A_BG_CARD)
+              .borderRadius(Theme.V2A_RADIUS_CARD)
+              .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
               .onClick(() => {
                 this.navigateTo(entry.routeUrl);
               })

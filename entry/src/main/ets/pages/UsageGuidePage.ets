@@ -84,33 +84,33 @@ struct UsageGuidePage {
     Column() {
       // 图标
       Text(icon)
-        .fontSize(28)
-        .fontColor('#E8B83D')
-        .margin({ bottom: 12 })
+        .fontSize(Theme.V2A_FONT_TITLE)
+        .fontColor(Theme.V2A_GOLD_ACCENT)
+        .margin({ bottom: Theme.V2_SPACE_SM })
 
-      // 标题
+      // 标题（柔和金次级标题，不抢）
       Text(title)
-        .fontSize(Theme.FONT_SUBTITLE)
-        .fontColor(Theme.GOLD_LIGHT)
-        .fontWeight(FontWeight.Bold)
+        .fontSize(Theme.V2A_FONT_SUBTITLE)
+        .fontColor(Theme.V2A_GOLD_GLOW)
+        .fontWeight(FontWeight.Medium)
         .width('100%')
         .textAlign(TextAlign.Start)
-        .margin({ bottom: 12 })
+        .margin({ bottom: Theme.V2_SPACE_SM })
 
       // 正文
       Text(body)
-        .fontSize(Theme.FONT_BODY)
-        .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+        .fontSize(Theme.V2A_FONT_BODY)
+        .fontColor(Theme.V2A_TEXT_PRIMARY)
         .lineHeight(24)
         .width('100%')
         .textAlign(TextAlign.Start)
     }
     .width('100%')
-    .padding({ top: Theme.STARKEY_CARD_PADDING_V, bottom: Theme.STARKEY_CARD_PADDING_V, left: Theme.STARKEY_CARD_PADDING_H, right: Theme.STARKEY_CARD_PADDING_H })
-    .backgroundColor(Theme.STARKEY_CARD_BG)
-    .borderRadius(Theme.STARKEY_CARD_RADIUS)
-    .border({ width: 1, color: Theme.STARKEY_CARD_BORDER })
-    .shadow(Theme.SHADOW_CARD_SUBTLE)
+    .padding({ top: Theme.V2_SPACE_MD, bottom: Theme.V2_SPACE_MD, left: Theme.V2_SPACE_MD_B, right: Theme.V2_SPACE_MD_B })
+    .backgroundColor(Theme.V2A_BG_CARD)
+    .borderRadius(Theme.V2A_RADIUS_CARD)
+    .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+    .shadow(Theme.V2A_SHADOW_CARD)
     .margin({ bottom: Theme.SPACE_MD })
   }
 
@@ -142,17 +142,18 @@ struct UsageGuidePage {
 
         // 标题
         Text('使用说明')
-          .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.V2A_GOLD_ACCENT)
-          .fontWeight(FontWeight.Bold)
+          .fontSize(Theme.V2A_FONT_TITLE)
+          .fontColor(Theme.V2A_TEXT_PRIMARY)
+          .fontWeight(FontWeight.Medium)
+          .letterSpacing(2)
           .textAlign(TextAlign.Center)
           .width('100%')
           .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_SM })
 
         // 副标题
         Text('了解星钥塔罗每个板块的用法和设计初衷')
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2A_FONT_BODY)
+          .fontColor(Theme.V2A_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
           .width('100%')
           .margin({ bottom: Theme.SPACE_LG })

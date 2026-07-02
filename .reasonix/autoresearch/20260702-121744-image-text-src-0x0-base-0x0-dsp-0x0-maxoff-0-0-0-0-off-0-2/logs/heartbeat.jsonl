@@ -1,0 +1,8 @@
+{"status":"starting_turn","iteration":0,"created_at":"2026-07-02T12:24:08.8328019Z"}
+{"status":"turn_done","iteration":1,"created_at":"2026-07-02T12:28:10.0149124Z"}
+{"status":"starting_turn","iteration":1,"created_at":"2026-07-02T12:28:10.0772922Z"}
+{"status":"turn_done","iteration":2,"created_at":"2026-07-02T12:31:53.7663649Z"}
+{"status":"starting_turn","iteration":2,"created_at":"2026-07-02T12:31:53.8055875Z"}
+{"status":"turn_done","iteration":3,"created_at":"2026-07-02T12:34:18.4469621Z"}
+{"status":"starting_turn","iteration":3,"created_at":"2026-07-02T12:34:18.4850749Z"}
+{"status":"warning","iteration":3,"message":"context canceled","created_at":"2026-07-02T12:37:38.3922648Z"}

@@ -39,6 +39,7 @@
     "pages/UsageGuidePage",
     "pages/AvatarCropPage",
     "pages/XinglanChatEntrancePage",
-    "pages/StarCalendarPage"
+    "pages/StarCalendarPage",
+    "daily/pages/DailyLightPage"
   ]
 }

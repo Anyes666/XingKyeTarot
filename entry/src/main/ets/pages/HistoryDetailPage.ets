@@ -119,7 +119,8 @@ struct HistoryDetailPage {
   }
 
   build() {
-    Column() {
+    Stack() {
+      Column() {
       if (this.isLoading) {
         Column() {
           LoadingProgress()
@@ -179,96 +180,126 @@ struct HistoryDetailPage {
             .width('100%')
             .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, top: Theme.SAFE_TOP, bottom: Theme.SPACE_SM })
 
-            // ── 基本信息区 ──
+            // ── 基本信息区（A 档案 · 标题 + 等宽时间戳）──
             Column() {
               Text(this.record!.modeTitle)
-                .fontSize(Theme.V2A_FONT_DISPLAY)
-                .fontColor(Theme.V2A_GOLD_ACCENT)
-                .fontWeight(FontWeight.Bold)
-                .margin({ bottom: Theme.SPACE_XS })
+                .fontSize(Theme.V2A_FONT_TITLE)
+                .fontColor(Theme.V2A_GOLD_GLOW)
+                .fontWeight(FontWeight.Medium)
+                .letterSpacing(1)
+                .margin({ bottom: Theme.V2_SPACE_XS })
 
               Text(this.formatDate(this.record!.timestamp))
-                .fontSize(Theme.V2A_FONT_CAPTION)
-                .fontColor(Theme.V2A_TEXT_SECONDARY)
-                .margin({ bottom: 4 })
+                .fontSize(Theme.V2A_FONT_TIMESTAMP)
+                .fontColor(Theme.V2_TEXT_TERTIARY)
+                .fontFamily('HarmonyOS Sans Mono')
+                .letterSpacing(0.5)
+                .margin({ bottom: Theme.V2_SPACE_XS })
 
               // 展示用户选择的情绪方向
               if (this.record!.questionText && this.record!.questionText.length > 0) {
+                Divider()
+                  .strokeWidth(1)
+                  .color('rgba(201,164,75,0.20)')
+                  .margin({ top: Theme.V2_SPACE_XS, bottom: Theme.V2_SPACE_SM })
+
                 Text(this.record!.questionText)
                   .fontSize(Theme.V2A_FONT_CAPTION)
                   .fontColor(Theme.V2A_TEXT_SECONDARY)
-                  .maxLines(1)
+                  .maxLines(2)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
-                  .margin({ bottom: Theme.SPACE_SM })
+                  .lineHeight(20)
               }
             }
             .width('90%')
-            .padding(Theme.SPACE_LG)
+            .padding(Theme.V2_SPACE_LG)
             .backgroundColor(Theme.V2A_BG_CARD)
             .borderRadius(Theme.V2A_RADIUS_CARD)
             .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
-            .margin({ bottom: Theme.SPACE_MD })
+            .shadow(Theme.V2A_SHADOW_CARD)
+            .margin({ bottom: Theme.V2_SPACE_MD })
 
             // ── 卡牌区（P0.3 整改：使用 TarotCardImage）──
             if (this.record!.cards && this.record!.cards.length > 0) {
               this.buildCardsSection(this.record!.cards)
             }
 
-            // ── 解读内容区 ──
+            // ── 解读内容区（A 档案 · 月光白标题 + 金色细线分隔）──
             if (this.record!.summaryText) {
               Column() {
-                Text('综合解读')
-                  .fontSize(Theme.V2A_FONT_SUBTITLE)
-                  .fontColor(Theme.V2A_GOLD_GLOW)
-                  .fontWeight(FontWeight.Bold)
-                  .margin({ bottom: Theme.SPACE_SM })
+                Row() {
+                  Text('综合解读')
+                    .fontSize(Theme.V2A_FONT_SUBTITLE)
+                    .fontColor(Theme.V2A_TEXT_PRIMARY)
+                    .fontWeight(FontWeight.Medium)
+                    .letterSpacing(0.5)
+                }
+                .width('100%')
+                .margin({ bottom: Theme.V2_SPACE_XS })
+
+                // 金色细线分隔（档案脊线感）
+                Divider()
+                  .strokeWidth(1)
+                  .color('rgba(201,164,75,0.25)')
+                  .margin({ bottom: Theme.V2_SPACE_MD })
 
                 Text(this.record!.summaryText)
                   .fontSize(Theme.V2A_FONT_BODY)
                   .fontColor(Theme.V2A_TEXT_PRIMARY)
-                  .lineHeight(Theme.FONT_BODY * 1.6)
+                  .lineHeight(Theme.V2A_FONT_BODY * 1.7)
               }
               .width('90%')
-              .padding(Theme.SPACE_LG)
-              .backgroundColor(Theme.BG_CARD_DARK)
-              .borderRadius(Theme.RADIUS_MD)
-              .border({ width: 1, color: 'rgba(202, 138, 4, 0.12)' })
-              .margin({ bottom: Theme.SPACE_MD })
+              .padding(Theme.V2_SPACE_LG)
+              .backgroundColor(Theme.V2A_BG_CARD)
+              .borderRadius(Theme.V2A_RADIUS_CARD)
+              .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+              .shadow(Theme.V2A_SHADOW_CARD)
+              .margin({ bottom: Theme.V2_SPACE_MD })
             }
 
-            // ── 行动建议区 ──
+            // ── 行动建议区（A 档案 · 统一 token）──
             if (this.record!.adviceText) {
               Column() {
-                Text('行动建议')
-                  .fontSize(Theme.V2A_FONT_SUBTITLE)
-                  .fontColor(Theme.V2A_GOLD_GLOW)
-                  .fontWeight(FontWeight.Bold)
-                  .margin({ bottom: Theme.SPACE_SM })
+                Row() {
+                  Text('行动建议')
+                    .fontSize(Theme.V2A_FONT_SUBTITLE)
+                    .fontColor(Theme.V2A_TEXT_PRIMARY)
+                    .fontWeight(FontWeight.Medium)
+                    .letterSpacing(0.5)
+                }
+                .width('100%')
+                .margin({ bottom: Theme.V2_SPACE_XS })
+
+                Divider()
+                  .strokeWidth(1)
+                  .color('rgba(201,164,75,0.25)')
+                  .margin({ bottom: Theme.V2_SPACE_MD })
 
                 Text(this.record!.adviceText)
-                  .fontSize(Theme.FONT_BODY)
-                  .fontColor(Theme.TEXT_PRIMARY_LIGHT)
-                  .lineHeight(Theme.FONT_BODY * 1.6)
+                  .fontSize(Theme.V2A_FONT_BODY)
+                  .fontColor(Theme.V2A_TEXT_PRIMARY)
+                  .lineHeight(Theme.V2A_FONT_BODY * 1.7)
               }
               .width('90%')
-              .padding(Theme.SPACE_LG)
-              .backgroundColor(Theme.BG_CARD_DARK)
-              .borderRadius(Theme.RADIUS_MD)
-              .border({ width: 1, color: 'rgba(202, 138, 4, 0.12)' })
-              .margin({ bottom: Theme.SPACE_MD })
+              .padding(Theme.V2_SPACE_LG)
+              .backgroundColor(Theme.V2A_BG_CARD)
+              .borderRadius(Theme.V2A_RADIUS_CARD)
+              .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+              .shadow(Theme.V2A_SHADOW_CARD)
+              .margin({ bottom: Theme.V2_SPACE_MD })
             }
 
-            // ── 删除按钮 ──
+            // ── 删除按钮（A 档案 · 暖铜细线降级）──
             Button('删除这条记录')
               .type(ButtonType.Normal)
-              .fontSize(Theme.FONT_BODY)
-              .fontColor('#E5998A')
-              .backgroundColor('rgba(229, 153, 138, 0.08)')
-              .border({ width: 1, color: '#E5998A' })
-              .borderRadius(Theme.RADIUS_FULL)
+              .fontSize(Theme.V2A_FONT_CAPTION)
+              .fontColor(Theme.V2A_CRISIS)
+              .backgroundColor('rgba(212,133,107,0.06)')
+              .border({ width: 1, color: 'rgba(212,133,107,0.35)' })
+              .borderRadius(Theme.V2_RADIUS_FULL)
               .width('70%')
               .height(44)
-              .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_MD })
+              .margin({ top: Theme.V2_SPACE_MD, bottom: Theme.V2_SPACE_MD })
               .onClick(() => {
                 this.confirmDelete();
               })
@@ -292,6 +323,20 @@ struct HistoryDetailPage {
     .width('100%')
     .height('100%')
     .backgroundColor(Theme.V2A_BG_BASE)
+
+      // 顶部渐变遮罩（消除状态栏硬边 · 与 HistoryPage 一致）
+      Column()
+        .width('100%')
+        .height(Theme.SAFE_TOP + 64)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [['#080B18', 0], ['rgba(15,15,35,0)', 1]]
+        })
+        .hitTestBehavior(HitTestMode.Transparent)
+        .position({ x: 0, y: 0 })
+    }
+    .width('100%')
+    .height('100%')
   }
 
   /**
@@ -304,9 +349,10 @@ struct HistoryDetailPage {
         Column() {
           Text(cardRecord.positionTitle)
             .fontSize(Theme.V2A_FONT_CAPTION)
-            .fontColor(Theme.V2A_GOLD_ACCENT)
-            .fontWeight(FontWeight.Bold)
-            .margin({ bottom: Theme.SPACE_XS })
+            .fontColor(Theme.V2A_GOLD_GLOW)
+            .fontWeight(FontWeight.Medium)
+            .letterSpacing(0.5)
+            .margin({ bottom: Theme.V2_SPACE_XS })
 
           TarotCardImage({
             cardId: cardRecord.cardId,

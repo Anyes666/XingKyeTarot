@@ -19,6 +19,8 @@ interface CardWheelDrawRouteParams {
 @Entry
 @Component
 struct CardWheelModePage {
+  @State private pressedMode: number = 0;
+
   build() {
     Stack() {
       // 背景
@@ -27,135 +29,178 @@ struct CardWheelModePage {
         .height('100%')
         .backgroundColor(Theme.V2C_BG_BASE)
 
-      // 主内容
-      Column() {
-        // 顶部安全区 + 返回按钮
-        Row() {
-          AppBackButton({ fallbackUrl: Routes.DIVINATION_CENTER })
+      Column()
+        .width('100%')
+        .height('100%')
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            ['rgba(197,160,80,0.05)', 0.0],
+            ['rgba(18,24,54,0.12)', 0.42],
+            ['rgba(10,13,26,0)', 1.0]
+          ]
+        })
+        .hitTestBehavior(HitTestMode.None)
+
+      // 主内容 — 可纵向滚动
+      Scroll() {
+        Column() {
+          // 标题
+          Text('旋转牌轮')
+            .fontSize(Theme.V2C_FONT_TITLE)
+            .fontColor(Theme.V2C_GOLD_GILT)
+            .fontWeight(FontWeight.Bold)
+            .textAlign(TextAlign.Center)
+            .width('100%')
+            .margin({ top: Theme.V2_SPACE_LG })
+
+          // 副标题
+          Text('让手指慢一点，停在此刻最有感觉的那张牌上。')
+            .fontSize(Theme.V2C_FONT_BODY)
+            .fontColor(Theme.V2C_TEXT_SECONDARY)
+            .textAlign(TextAlign.Center)
+            .width('100%')
+            .lineHeight(22)
+            .margin({ top: Theme.V2_SPACE_2XS, bottom: Theme.V2_SPACE_MD })
+
+          Text('ASTRO WHEEL')
+            .fontSize(Theme.V2C_FONT_DISCLAIMER)
+            .fontColor('rgba(224,205,149,0.44)')
+            .textAlign(TextAlign.Center)
+            .width('100%')
+            .margin({ bottom: Theme.V2_SPACE_SM })
+
+          // 抽一张卡片
+          this.modeCard(1, '◇', '抽一张星钥', '适合现在只想听一句轻轻的提醒。')
+
+          // 抽三张卡片
+          this.modeCard(3, '△', '抽三张星钥', '适合把一件心事拆成三个角度慢慢看。')
+
+          // 底部提示
+          Text('不用急着选。\n当某张牌让你多看了一眼，就从那里开始。')
+            .fontSize(Theme.V2C_FONT_CAPTION)
+            .fontColor(Theme.V2C_TEXT_SECONDARY)
+            .textAlign(TextAlign.Center)
+            .lineHeight(18)
+            .width('88%')
+            .margin({ top: Theme.V2_SPACE_XL })
         }
         .width('100%')
-        .height(56)
-        .padding({ top: Theme.SAFE_TOP, left: Theme.V2_SPACE_SM, right: Theme.V2_SPACE_SM })
-        .alignItems(VerticalAlign.Center)
-
-        // 标题
-        Text('旋转牌轮')
-          .fontSize(Theme.V2C_FONT_TITLE)
-          .fontColor(Theme.V2C_GOLD_GILT)
-          .fontWeight(FontWeight.Bold)
-          .textAlign(TextAlign.Center)
-          .width('100%')
-          .margin({ top: Theme.SPACE_MD })
-
-        // 副标题
-        Text('让手指慢一点，停在此刻最有感觉的那张牌上。')
-          .fontSize(Theme.V2C_FONT_BODY)
-          .fontColor(Theme.V2C_TEXT_SECONDARY)
-          .textAlign(TextAlign.Center)
-          .width('100%')
-          .margin({ top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_XL })
-
-        // 抽一张卡片
-        Column() {
-          Row() {
-            Column() {
-              Text('◇')
-                .fontSize(32)
-                .fontColor(Theme.V2C_GOLD_GILT)
-                .textAlign(TextAlign.Center)
-            }
-            .width(64)
-            .height(64)
-            .justifyContent(FlexAlign.Center)
-            .borderRadius(Theme.V2_RADIUS_FULL)
-            .backgroundColor(Theme.V2C_BG_FLOATING)
-
-            Column() {
-              Text('抽一张星钥')
-                .fontSize(Theme.V2C_FONT_SUBTITLE)
-                .fontColor(Theme.V2C_TEXT_PRIMARY)
-                .fontWeight(FontWeight.Medium)
-
-              Text('适合现在只想听一句轻轻的提醒。')
-                .fontSize(Theme.V2C_FONT_BODY)
-                .fontColor(Theme.V2C_TEXT_SECONDARY)
-                .margin({ top: 4 })
-                .lineHeight(20)
-            }
-            .alignItems(HorizontalAlign.Start)
-            .layoutWeight(1)
-            .margin({ left: Theme.V2_SPACE_MD })
-          }
-          .width('100%')
-          .padding(Theme.V2_SPACE_LG)
-        }
-        .width('88%')
-        .backgroundColor(Theme.V2C_BG_CARD)
-        .borderRadius(Theme.V2C_RADIUS_CARD)
-        .border({ width: 1, color: Theme.V2C_SPINE_LINE })
-        .margin({ bottom: Theme.SPACE_LG })
-        .onClick(() => {
-          this.navigateToWheelDraw(1);
-        })
-
-        // 抽三张卡片
-        Column() {
-          Row() {
-            Column() {
-              Text('△')
-                .fontSize(32)
-                .fontColor(Theme.V2C_GOLD_GILT)
-                .textAlign(TextAlign.Center)
-            }
-            .width(64)
-            .height(64)
-            .justifyContent(FlexAlign.Center)
-            .borderRadius(Theme.V2_RADIUS_FULL)
-            .backgroundColor(Theme.V2C_BG_FLOATING)
-
-            Column() {
-              Text('抽三张星钥')
-                .fontSize(Theme.V2C_FONT_SUBTITLE)
-                .fontColor(Theme.V2C_TEXT_PRIMARY)
-                .fontWeight(FontWeight.Medium)
-
-              Text('适合把一件心事拆成三个角度慢慢看。')
-                .fontSize(Theme.V2C_FONT_BODY)
-                .fontColor(Theme.V2C_TEXT_SECONDARY)
-                .margin({ top: 4 })
-                .lineHeight(20)
-            }
-            .alignItems(HorizontalAlign.Start)
-            .layoutWeight(1)
-            .margin({ left: Theme.SPACE_MD })
-          }
-          .width('100%')
-          .padding(Theme.SPACE_LG)
-        }
-        .width('88%')
-        .backgroundColor(Theme.V2C_BG_CARD)
-        .borderRadius(Theme.V2C_RADIUS_CARD)
-        .border({ width: 1, color: Theme.V2C_SPINE_LINE })
-        .onClick(() => {
-          this.navigateToWheelDraw(3);
-        })
-
-        // 底部提示
-        Text('不用急着选。\n当某张牌让你多看了一眼，就从那里开始。')
-          .fontSize(Theme.V2C_FONT_CAPTION)
-          .fontColor(Theme.V2C_TEXT_SECONDARY)
-          .textAlign(TextAlign.Center)
-          .lineHeight(18)
-          .width('88%')
-          .margin({ top: Theme.V2_SPACE_XL })
+        .alignItems(HorizontalAlign.Center)
+        .justifyContent(FlexAlign.Start)
+        .padding({ top: Theme.SAFE_TOP + 48, bottom: Theme.SAFE_BOTTOM + Theme.V2_SPACE_MD })
       }
       .width('100%')
       .height('100%')
-      .alignItems(HorizontalAlign.Center)
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
+
+      // 返回按钮 — 独立层，不跟随滚动
+      AppBackButton({ fallbackUrl: Routes.DIVINATION_CENTER })
+        .position({ x: Theme.V2_SPACE_SM, y: Theme.SAFE_TOP + 8 })
     }
     .width('100%')
     .height('100%')
     .alignContent(Alignment.TopStart)
+  }
+
+  @Builder
+  modeCard(mode: number, symbol: string, title: string, description: string): void {
+    Stack() {
+      Column()
+        .width('100%')
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            ['rgba(197,160,80,0.08)', 0.0],
+            ['rgba(18,24,54,0.12)', 0.34],
+            ['rgba(10,13,26,0)', 1.0]
+          ]
+        })
+        .hitTestBehavior(HitTestMode.None)
+
+      Row() {
+        Stack() {
+          Circle()
+            .width(54)
+            .height(54)
+            .stroke('rgba(197,160,80,0.32)')
+            .strokeWidth(1)
+
+          Circle()
+            .width(36)
+            .height(36)
+            .stroke(Theme.V2C_SPINE_LINE)
+            .strokeWidth(1)
+
+          Text(symbol)
+            .fontSize(30)
+            .fontColor(Theme.V2C_GOLD_GILT_SOFT)
+            .textAlign(TextAlign.Center)
+        }
+        .width(64)
+        .height(64)
+        .alignContent(Alignment.Center)
+        .borderRadius(Theme.V2C_RADIUS_CARD)
+        .backgroundColor('rgba(24,31,64,0.72)')
+        .border({ width: 1, color: 'rgba(197,160,80,0.16)' })
+
+        Column() {
+          Text(title)
+            .fontSize(Theme.V2C_FONT_SUBTITLE)
+            .fontColor(Theme.V2C_TEXT_PRIMARY)
+            .fontWeight(FontWeight.Medium)
+
+          Text(description)
+            .fontSize(Theme.V2C_FONT_BODY)
+            .fontColor(Theme.V2C_TEXT_SECONDARY)
+            .margin({ top: Theme.V2_SPACE_2XS })
+            .lineHeight(21)
+
+          Text(mode === 1 ? 'ONE CARD' : 'THREE CARDS')
+            .fontSize(Theme.V2C_FONT_DISCLAIMER)
+            .fontColor('rgba(224,205,149,0.42)')
+            .margin({ top: Theme.V2_SPACE_SM })
+        }
+        .alignItems(HorizontalAlign.Start)
+        .margin({ left: Theme.V2_SPACE_MD })
+      }
+      .width('100%')
+      .padding(Theme.V2_SPACE_LG)
+    }
+    .width('88%')
+    .clip(true)
+    .backgroundColor('rgba(18,24,54,0.82)')
+    .borderRadius(Theme.V2C_RADIUS_CARD)
+    .border({
+      width: 1,
+      color: this.pressedMode === mode ? 'rgba(197,160,80,0.42)' : 'rgba(197,160,80,0.18)'
+    })
+    .shadow({
+      radius: this.pressedMode === mode ? 12 : 8,
+      color: 'rgba(0,0,0,0.26)',
+      offsetX: 0,
+      offsetY: 3
+    })
+    .scale({
+      x: this.pressedMode === mode ? Theme.PRESS_SCALE : 1.0,
+      y: this.pressedMode === mode ? Theme.PRESS_SCALE : 1.0
+    })
+    .animation({
+      duration: Theme.ANIM_PRESS_DURATION,
+      curve: Theme.V2_EASE_OUT
+    })
+    .margin({ bottom: Theme.V2_SPACE_LG })
+    .onTouch((event: TouchEvent) => {
+      if (event.type === TouchType.Down) {
+        this.pressedMode = mode;
+      } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+        this.pressedMode = 0;
+      }
+    })
+    .onClick(() => {
+      this.navigateToWheelDraw(mode);
+    })
   }
 
   private navigateToWheelDraw(drawCount: number): void {

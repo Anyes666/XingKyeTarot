@@ -1,5 +1,6 @@
 import { router } from '@kit.ArkUI';
 import { Routes } from '../common/Routes';
+import { Theme } from '../common/Theme';
 
 /**
  * 导航 Tab 配置项
@@ -38,6 +39,22 @@ export struct CompanionBottomNav {
 
   // ═══ 按压状态 ═══
   @State navPressed: boolean = false;
+
+  private static readonly NAV_HEIGHT: number = 96;
+  private static readonly CAPSULE_HEIGHT: number = 64;
+  private static readonly ICON_BOX_HEIGHT: number = 24;
+  private static readonly ICON_FONT_SIZE: number = 22;
+  private static readonly ICON_LINE_HEIGHT: number = 24;
+  private static readonly LABEL_FONT_SIZE: number = 12;
+  private static readonly LABEL_LINE_HEIGHT: number = 16;
+  private static readonly ICON_LABEL_GAP: number = 4;
+  private static readonly SELECTED_COLOR: string = '#D8B86A';
+  private static readonly SELECTED_LABEL_COLOR: string = Theme.V2_GOLD_SOFT;
+  private static readonly UNSELECTED_ICON_COLOR: string = '#7D849C';
+  private static readonly UNSELECTED_LABEL_COLOR: string = Theme.V2_TEXT_SECONDARY;
+  private static readonly NAV_BG: string = 'rgba(5, 8, 20, 0.84)';
+  private static readonly NAV_BG_PRESSED: string = 'rgba(8, 11, 26, 0.90)';
+  private static readonly NAV_BORDER: string = 'rgba(201, 164, 75, 0.13)';
 
   private readonly tabs: NavTabConfig[] = [
     {
@@ -93,30 +110,71 @@ export struct CompanionBottomNav {
 
   build() {
     Stack() {
+      // ═══ 胶囊背后极弱暗影，托住底部安全区层级 ═══
+      Column()
+        .width('88%')
+        .height(54)
+        .borderRadius(28)
+        .backgroundColor('rgba(0, 0, 0, 0.20)')
+        .blur(18)
+        .position({ x: '6%', y: 18 })
+        .hitTestBehavior(HitTestMode.Transparent)
+
       // ═══ 胶囊底座（clip(true)）═══
       Stack() {
+        Column()
+          .width('100%')
+          .height('100%')
+          .linearGradient({
+            direction: GradientDirection.Bottom,
+            colors: [
+              ['rgba(18, 24, 48, 0.78)', 0.0],
+              [this.navPressed ? CompanionBottomNav.NAV_BG_PRESSED : CompanionBottomNav.NAV_BG, 1.0]
+            ]
+          })
+          .hitTestBehavior(HitTestMode.Transparent)
+
+        // 顶部 1vp 极细边线，使用低透明暖金，避免强发光。
+        Column()
+          .width('88%')
+          .height(1)
+          .linearGradient({
+            direction: GradientDirection.Right,
+            colors: [
+              ['rgba(201, 164, 75, 0)', 0.0],
+              ['rgba(201, 164, 75, 0.24)', 0.5],
+              ['rgba(201, 164, 75, 0)', 1.0]
+            ]
+          })
+          .position({ x: '6%', y: 0 })
+          .hitTestBehavior(HitTestMode.Transparent)
+
         Row() {
           ForEach(this.tabs, (tab: NavTabConfig, index: number) => {
             Column() {
               // 图标固定高度容器 + 垂直微调
               Column() {
                 Text(tab.icon)
-                  .fontSize(21)
-                  .lineHeight(24)
-                  .fontColor(this.currentTab === index ? '#E8B83D' : '#8F96B2')
+                  .fontSize(CompanionBottomNav.ICON_FONT_SIZE)
+                  .lineHeight(CompanionBottomNav.ICON_LINE_HEIGHT)
+                  .fontColor(this.currentTab === index ?
+                    CompanionBottomNav.SELECTED_COLOR :
+                    CompanionBottomNav.UNSELECTED_ICON_COLOR)
                   .textAlign(TextAlign.Center)
               }
               .width('100%')
-              .height(24)
+              .height(CompanionBottomNav.ICON_BOX_HEIGHT)
               .justifyContent(FlexAlign.Center)
               .translate({ y: tab.iconOffsetY ?? 0 })
 
               Text(tab.label)
-                .fontSize(12)
-                .lineHeight(16)
-                .fontColor(this.currentTab === index ? '#E8B83D' : '#9AA2BD')
-                .fontWeight(this.currentTab === index ? FontWeight.Bold : FontWeight.Normal)
-                .margin({ top: 3 })
+                .fontSize(CompanionBottomNav.LABEL_FONT_SIZE)
+                .lineHeight(CompanionBottomNav.LABEL_LINE_HEIGHT)
+                .fontColor(this.currentTab === index ?
+                  CompanionBottomNav.SELECTED_LABEL_COLOR :
+                  CompanionBottomNav.UNSELECTED_LABEL_COLOR)
+                .fontWeight(this.currentTab === index ? FontWeight.Medium : FontWeight.Normal)
+                .margin({ top: CompanionBottomNav.ICON_LABEL_GAP })
             }
             .layoutWeight(1)
             .height('100%')
@@ -132,35 +190,35 @@ export struct CompanionBottomNav {
         .alignItems(VerticalAlign.Center)
         .justifyContent(FlexAlign.SpaceEvenly)
       }
-      .width('90%')
-      .height(62)
-      .borderRadius(30)
-      .backgroundColor(this.navPressed ? '#90081020' : '#80081020')
-      .backdropBlur(16)
+      .width('91%')
+      .height(CompanionBottomNav.CAPSULE_HEIGHT)
+      .borderRadius(32)
+      .backgroundColor(this.navPressed ? CompanionBottomNav.NAV_BG_PRESSED : CompanionBottomNav.NAV_BG)
+      .backdropBlur(18)
       .border({
         width: 1,
-        color: '#1AFFFFFF'
+        color: CompanionBottomNav.NAV_BORDER
       })
       .shadow({
-        radius: 18,
-        color: '#47000000',
+        radius: 20,
+        color: 'rgba(0, 0, 0, 0.40)',
         offsetX: 0,
-        offsetY: 5
+        offsetY: 6
       })
       .clip(true)
       .scale({
-        x: this.navPressed ? 1.012 : 1.0,
-        y: this.navPressed ? 0.988 : 1.0
+        x: this.navPressed ? 0.998 : 1.0,
+        y: this.navPressed ? 0.992 : 1.0
       })
       .translate({ y: this.navPressed ? 1 : 0 })
-      .animation({ duration: 280, curve: Curve.EaseOut })
+      .animation({ duration: Theme.V2_ANIM_BTN_RELEASE, curve: Theme.V2_EASE_OUT })
       .onTouch((event: TouchEvent) => {
         this.handleNavTouch(event);
       })
     }
     .width('100%')
-    .height(88)
-    .margin({ bottom: 8 })
+    .height(CompanionBottomNav.NAV_HEIGHT)
+    .padding({ bottom: 10 })
     .alignContent(Alignment.Center)
   }
 }

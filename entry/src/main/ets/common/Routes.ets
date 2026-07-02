@@ -55,4 +55,7 @@ export class Routes {
   // ── Phase 5 P2: 聊天入口 + 星澜星历 ──
   static readonly XINGLAN_CHAT_ENTRANCE: string = 'pages/XinglanChatEntrancePage';
   static readonly STAR_CALENDAR: string = 'pages/StarCalendarPage';
+
+  // ── DAILY-4: 今日星页完整页面 ──
+  static readonly DAILY_LIGHT: string = 'daily/pages/DailyLightPage';
 }

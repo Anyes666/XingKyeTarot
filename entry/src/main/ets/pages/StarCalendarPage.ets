@@ -146,43 +146,61 @@ struct StarCalendarPage {
 
         Scroll() {
           Column() {
-            // ══ 页面标题 ══
+            // ══ 页面标题（A 档案 · 克制字距）══
             Text('星澜星历')
               .fontSize(Theme.V2A_FONT_DISPLAY)
               .fontColor(Theme.V2A_TEXT_PRIMARY)
               .fontWeight(FontWeight.Lighter)
-              .letterSpacing(2)
+              .letterSpacing(3)
               .textAlign(TextAlign.Center)
               .width('100%')
               .margin({ top: Theme.V2_SPACE_MD, bottom: Theme.V2_SPACE_2XS })
 
-            // 时间戳副标题（A 方案等宽字体）
+            // 时间戳副标题（A 方案等宽字体 · 档案标记）
             Text(EmotionStarStorage.todayString())
               .fontSize(Theme.V2A_FONT_TIMESTAMP)
-              .fontColor(Theme.V2A_TEXT_SECONDARY)
+              .fontColor(Theme.V2_TEXT_TERTIARY)
               .fontFamily('HarmonyOS Sans Mono')
-              .letterSpacing(1)
+              .letterSpacing(1.5)
               .textAlign(TextAlign.Center)
               .width('100%')
               .margin({ bottom: Theme.V2_SPACE_XL })
 
-            // ══ 当前星钥等级卡片 ══
+            // ══ 当前星钥等级卡片（A 档案 · 脊线 + 编号）══
             Column() {
+              // 档案脊线（顶部细金线）
+              Row()
+                .width(48)
+                .height(1)
+                .backgroundColor('rgba(201,164,75,0.45)')
+                .margin({ bottom: Theme.V2_SPACE_SM })
+
+              // 档案编号（等宽字体 · 记录感）
+              Text('NO.' + this.totalLightDays.toString().padStart(4, '0'))
+                .fontSize(Theme.V2A_FONT_TIMESTAMP)
+                .fontColor(Theme.V2_TEXT_TERTIARY)
+                .fontFamily('HarmonyOS Sans Mono')
+                .letterSpacing(2)
+                .textAlign(TextAlign.Center)
+                .width('100%')
+                .margin({ bottom: Theme.V2_SPACE_XS })
+
               // 等级称号（A 方案标记感）
               Text(this.currentLevelTitle)
                 .fontSize(Theme.V2A_FONT_RANK_TITLE)
                 .fontColor(Theme.V2A_GOLD_GLOW)
-                .fontWeight(FontWeight.Bold)
+                .fontWeight(FontWeight.Medium)
+                .letterSpacing(1)
                 .textAlign(TextAlign.Center)
                 .width('100%')
-                .margin({ bottom: Theme.V2_SPACE_2XS })
+                .margin({ bottom: Theme.V2_SPACE_SM })
 
               // 累计天数（等宽大字）
               Row() {
                 Text(this.totalLightDays.toString())
                   .fontSize(Theme.V2A_FONT_RANK_DAYS)
                   .fontColor(Theme.V2A_GOLD_ACCENT)
-                  .fontWeight(FontWeight.Bold)
+                  .fontWeight(FontWeight.Medium)
                   .fontFamily('HarmonyOS Sans Mono')
 
                 Text(' 天')
@@ -197,7 +215,7 @@ struct StarCalendarPage {
               if (!this.isMaxLevel) {
                 Text('下一称号：' + this.nextLevelTitle + ' · 还差 ' + this.daysToNextLevel.toString() + ' 天')
                   .fontSize(Theme.V2A_FONT_CAPTION)
-                  .fontColor(Theme.V2A_TEXT_SECONDARY)
+                  .fontColor(Theme.V2_TEXT_TERTIARY)
                   .textAlign(TextAlign.Center)
                   .lineHeight(18)
               } else {
@@ -215,7 +233,7 @@ struct StarCalendarPage {
             .shadow(Theme.V2A_SHADOW_CARD)
             .margin({ bottom: Theme.V2_SPACE_XL })
 
-            // ══ 最近7日情绪星图 ══
+            // ══ 最近7日情绪星图（A 档案 · 星轨贯穿）══
             Column() {
               // 区域标题
               Row() {
@@ -223,68 +241,90 @@ struct StarCalendarPage {
                   .fontSize(Theme.V2A_FONT_SUBTITLE)
                   .fontColor(Theme.V2A_TEXT_PRIMARY)
                   .fontWeight(FontWeight.Medium)
+                  .letterSpacing(0.5)
               }
               .width('100%')
-              .margin({ bottom: Theme.V2_SPACE_MD })
+              .margin({ bottom: Theme.V2_SPACE_SM })
 
-              // 7日星点行
-              Row() {
-                ForEach(this.weekStars, (item: WeekStarItem, index: number) => {
-                  Column() {
-                    // 星点
-                    Stack() {
-                      if (item.isLit) {
-                        // 已点亮：金色实心星
-                        Text('★')
-                          .fontSize(24)
-                          .fontColor(Theme.V2_STATE_STAR_LIT)
-                          .shadow({
-                            radius: 8,
-                            color: 'rgba(201,164,75,0.3)',
-                            offsetX: 0,
-                            offsetY: 0
-                          })
-                      } else {
-                        // 未点亮：灰色空心圈
-                        Text('○')
-                          .fontSize(20)
-                          .fontColor(Theme.V2_STATE_STAR_UNLIT)
+              // 星轨贯穿线（背景细线）
+              Stack() {
+                // 星轨线
+                Row()
+                  .width('80%')
+                  .height(1)
+                  .backgroundColor('rgba(201,164,75,0.15)')
+                  .position({ x: '10%', y: 17 })
+
+                // 7日星点行
+                Row() {
+                  ForEach(this.weekStars, (item: WeekStarItem, index: number) => {
+                    Column() {
+                      // 星点
+                      Stack() {
+                        if (item.isLit) {
+                          // 已点亮：金色实心星（克制光晕）
+                          Text('★')
+                            .fontSize(22)
+                            .fontColor(Theme.V2_STATE_STAR_LIT)
+                        } else {
+                          // 未点亮：灰色空心圈
+                          Text('○')
+                            .fontSize(18)
+                            .fontColor(Theme.V2_STATE_STAR_UNLIT)
+                        }
+                      }
+                      .width(34)
+                      .height(34)
+
+                      // 日期标签（等宽字体）
+                      Text(item.dateLabel)
+                        .fontSize(Theme.V2A_FONT_TIMESTAMP)
+                        .fontColor(item.isToday ? Theme.V2A_GOLD_ACCENT : Theme.V2_TEXT_TERTIARY)
+                        .fontFamily('HarmonyOS Sans Mono')
+                        .margin({ top: Theme.V2_SPACE_2XS })
+
+                      // 日期数字（档案标记 · M/D）
+                      Text(this.formatDateNum(item.dateStr))
+                        .fontSize(10)
+                        .fontColor(Theme.V2_TEXT_TERTIARY)
+                        .fontFamily('HarmonyOS Sans Mono')
+                        .margin({ top: 1 })
+
+                      // 星名（如已点亮）
+                      if (item.isLit && item.starName.length > 0) {
+                        Text(item.starName)
+                          .fontSize(9)
+                          .fontColor(Theme.V2A_GOLD_GLOW)
+                          .maxLines(1)
+                          .textOverflow({ overflow: TextOverflow.Ellipsis })
+                          .width(48)
+                          .textAlign(TextAlign.Center)
+                          .margin({ top: 2 })
                       }
                     }
-                    .width(36)
-                    .height(36)
-
-                    // 日期标签（等宽字体）
-                    Text(item.dateLabel)
-                      .fontSize(Theme.V2A_FONT_TIMESTAMP)
-                      .fontColor(item.isToday ? Theme.V2A_GOLD_ACCENT : Theme.V2A_TEXT_SECONDARY)
-                      .fontFamily('HarmonyOS Sans Mono')
-                      .margin({ top: Theme.V2_SPACE_2XS })
-
-                    // 星名（如已点亮）
-                    if (item.isLit && item.starName.length > 0) {
-                      Text(item.starName)
-                        .fontSize(10)
-                        .fontColor(Theme.V2A_GOLD_GLOW)
-                        .maxLines(1)
-                        .textOverflow({ overflow: TextOverflow.Ellipsis })
-                        .width(48)
-                        .textAlign(TextAlign.Center)
-                        .margin({ top: 2 })
-                    }
-                  }
-                  .layoutWeight(1)
-                  .alignItems(HorizontalAlign.Center)
-                }, (item: WeekStarItem) => item.dateStr)
+                    .layoutWeight(1)
+                    .alignItems(HorizontalAlign.Center)
+                  }, (item: WeekStarItem) => item.dateStr)
+                }
+                .width('100%')
               }
               .width('100%')
 
-              // 今天标记
-              Text('● 今天')
-                .fontSize(Theme.V2A_FONT_CAPTION)
-                .fontColor(Theme.V2A_GOLD_ACCENT)
-                .fontFamily('HarmonyOS Sans Mono')
-                .margin({ top: Theme.V2_SPACE_SM })
+              // 今天标记（档案化 · 等宽）
+              Row() {
+                Text('●')
+                  .fontSize(10)
+                  .fontColor(Theme.V2A_GOLD_ACCENT)
+                  .margin({ right: 4 })
+
+                Text('今天')
+                  .fontSize(Theme.V2A_FONT_TIMESTAMP)
+                  .fontColor(Theme.V2A_GOLD_ACCENT)
+                  .fontFamily('HarmonyOS Sans Mono')
+                  .letterSpacing(0.5)
+              }
+              .margin({ top: Theme.V2_SPACE_SM })
+              .justifyContent(FlexAlign.Center)
             }
             .width('92%')
             .padding(Theme.V2_SPACE_LG)
@@ -297,9 +337,10 @@ struct StarCalendarPage {
             // ══ 温柔提示 ══
             Text('每一颗星，都是你认真面对自己的证明。')
               .fontSize(Theme.V2A_FONT_LEAD)
-              .fontColor(Theme.V2A_TEXT_SECONDARY)
+              .fontColor(Theme.V2_TEXT_TERTIARY)
               .textAlign(TextAlign.Center)
               .lineHeight(24)
+              .letterSpacing(0.5)
               .width('82%')
               .margin({ bottom: Theme.V2_SPACE_2XL })
 
@@ -314,8 +355,32 @@ struct StarCalendarPage {
       }
       .width('100%')
       .height('100%')
+
+      // 顶部渐变遮罩（消除状态栏硬边）
+      Column()
+        .width('100%')
+        .height(Theme.SAFE_TOP + 64)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [['#080B18', 0], ['rgba(15,15,35,0)', 1]]
+        })
+        .hitTestBehavior(HitTestMode.Transparent)
+        .position({ x: 0, y: 0 })
     }
     .width('100%')
     .height('100%')
+  }
+
+  /**
+   * 将 yyyy-MM-dd 格式化为 "M/D" 等宽档案标记
+   */
+  private formatDateNum(dateStr: string): string {
+    const parts: string[] = dateStr.split('-');
+    if (parts.length !== 3) {
+      return '';
+    }
+    const month: number = parseInt(parts[1]);
+    const day: number = parseInt(parts[2]);
+    return month.toString() + '/' + day.toString();
   }
 }

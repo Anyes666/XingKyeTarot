@@ -97,9 +97,10 @@ struct MaterialsLicensePage {
 
         // 标题
         Text('素材与授权')
-          .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.GOLD_LIGHT)
-          .fontWeight(FontWeight.Bold)
+          .fontSize(Theme.V2A_FONT_TITLE)
+          .fontColor(Theme.V2A_TEXT_PRIMARY)
+          .fontWeight(FontWeight.Medium)
+          .letterSpacing(2)
           .textAlign(TextAlign.Center)
           .width('100%')
           .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_LG })
@@ -109,25 +110,26 @@ struct MaterialsLicensePage {
           Column() {
             ForEach(this.sections, (section: LicenseEntry, index: number) => {
               Column() {
-                // 分区标题
+                // 分区标题（柔和金次级标题）
                 Text(section.title)
-                  .fontSize(Theme.FONT_SUBTITLE)
-                  .fontColor(Theme.GOLD_LIGHT)
-                  .fontWeight(FontWeight.Bold)
+                  .fontSize(Theme.V2A_FONT_SUBTITLE)
+                  .fontColor(Theme.V2A_GOLD_GLOW)
+                  .fontWeight(FontWeight.Medium)
                   .width('100%')
                   .margin({ bottom: Theme.SPACE_SM })
 
                 // 分区内容
                 Text(section.content)
-                  .fontSize(Theme.FONT_BODY)
-                  .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+                  .fontSize(Theme.V2A_FONT_BODY)
+                  .fontColor(Theme.V2A_TEXT_PRIMARY)
                   .lineHeight(26)
                   .width('100%')
               }
               .width('92%')
-              .backgroundColor('rgba(27, 27, 48, 0.52)')
-              .borderRadius(Theme.RADIUS_MD)
-              .padding(Theme.SPACE_MD)
+              .backgroundColor(Theme.V2A_BG_CARD)
+              .borderRadius(Theme.V2A_RADIUS_CARD)
+              .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+              .padding(Theme.V2_SPACE_MD)
               .margin({ bottom: Theme.SPACE_SM })
             }, (_section: LicenseEntry, index: number) => 'license_' + index.toString())
 

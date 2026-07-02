@@ -61,8 +61,8 @@ struct CardDrawPage {
   @State private animPhase: string = 'loading';
   @State private flipAngle: number = 0;
   @State private cardOpacity: number = 0;
-  // ── B 方案月光呼吸动画状态 ──
-  @State private moonlightOpacity: number = 0.6;
+  // ── C 方案旧书封壳弱光状态 ──
+  @State private bookGlowOpacity: number = 0.6;
   // ── Timer 生命周期管理 ──
   private isPageAlive: boolean = true;
   private timerIds: number[] = [];
@@ -89,13 +89,13 @@ struct CardDrawPage {
       this.isPositiveMode = false;
     }
 
-    // B 方案月光呼吸动画（6s 无限循环）
+    // C 方案弱光呼吸动画（6s 无限循环）
     animateTo({
       duration: Theme.V2_ANIM_MOONLIGHT_BREATH,
       iterations: -1,
       curve: Curve.EaseInOut
     }, () => {
-      this.moonlightOpacity = 1.0;
+      this.bookGlowOpacity = 1.0;
     });
   }
 
@@ -220,23 +220,37 @@ struct CardDrawPage {
       Column()
         .width('100%')
         .height('100%')
-        .backgroundColor(Theme.V2C_BG_BASE)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            [Theme.V2C_BG_BASE, 0.0],
+            ['#090D1C', 0.52],
+            [Theme.V2C_BG_BASE, 1.0]
+          ]
+        })
 
-      // ── B 方案月光呼吸光晕层（顶部 6s 循环）──
+      // ── C 方案旧书封壳弱光层 ──
       Column()
         .width('100%')
-        .height(220)
+        .height('100%')
         .radialGradient({
-          center: ['50%', '20%'],
-          radius: '55%',
+          center: ['50%', '12%'],
+          radius: '72%',
           colors: [
-            ['rgba(212,172,77,0.04)', 0.0],
-            ['rgba(212,172,77,0.01)', 0.6],
+            ['rgba(197,160,80,0.04)', 0.0],
+            ['rgba(197,160,80,0.014)', 0.45],
             ['rgba(10,13,26,0)', 1.0]
           ]
         })
-        .opacity(this.moonlightOpacity)
+        .opacity(this.bookGlowOpacity)
         .hitTestBehavior(HitTestMode.None)
+
+      Row()
+        .width(1)
+        .height('72%')
+        .backgroundColor('rgba(197,160,80,0.10)')
+        .position({ x: '50%', y: '14%' })
+        .hitTestBehavior(HitTestMode.Transparent)
 
       // ── 星星背景粒子（简化为静态暗色背景 + loading 指示）──
       if (this.animPhase === 'loading' || this.animPhase === 'fadeIn') {
@@ -245,6 +259,7 @@ struct CardDrawPage {
             .width(48)
             .height(48)
             .color(Theme.V2C_GOLD_GILT_SOFT)
+            .opacity(0.72)
         }
         .width('100%')
         .height('100%')
@@ -276,25 +291,45 @@ struct CardDrawPage {
         // ── CardStage 牌面舞台区（layoutWeight 60，主体）──
         Column() {
           if (this.cardId) {
-            Image(
-              this.animPhase === 'revealed' || this.animPhase === 'particles' || this.animPhase === 'done'
-                ? (MVP8_CARD_IMAGES[this.cardId] ?? $r('app.media.tarot_major_18_moon'))
-                : $r('app.media.card_back')
-            )
-              .width('46%')
-              .height('100%')
-              .objectFit(ImageFit.Cover)
-              .borderRadius(Theme.TAROT_CARD_RADIUS)
-              .rotate({
-                y: this.flipAngle,
-                centerX: '50%',
-              })
-              .opacity(this.cardOpacity)
-              .animation({
-                duration: Theme.ANIM_FLIP_DURATION,
-                curve: Curve.EaseInOut,
-              })
-              .constraintSize({ maxWidth: Theme.CARD_SIZE_DRAW_STAGE.width, maxHeight: Theme.CARD_SIZE_DRAW_STAGE.height })
+            Stack() {
+              Column()
+                .width('62%')
+                .height('92%')
+                .borderRadius(Theme.V2C_RADIUS_CARD)
+                .backgroundColor('rgba(18,24,54,0.38)')
+                .border({ width: 1, color: 'rgba(197,160,80,0.12)' })
+                .shadow(Theme.V2C_SHADOW_CARD)
+
+              Column()
+                .width('54%')
+                .height('84%')
+                .borderRadius(Theme.V2C_RADIUS_CARD)
+                .border({ width: 1, color: 'rgba(197,160,80,0.20)' })
+
+              Image(
+                this.animPhase === 'revealed' || this.animPhase === 'particles' || this.animPhase === 'done'
+                  ? (MVP8_CARD_IMAGES[this.cardId] ?? $r('app.media.tarot_major_18_moon'))
+                  : $r('app.media.card_back')
+              )
+                .width('46%')
+                .height('100%')
+                .objectFit(ImageFit.Cover)
+                .borderRadius(Theme.TAROT_CARD_RADIUS)
+                .border({ width: 1, color: 'rgba(224,205,149,0.22)' })
+                .rotate({
+                  y: this.flipAngle,
+                  centerX: '50%',
+                })
+                .opacity(this.cardOpacity)
+                .animation({
+                  duration: Theme.ANIM_FLIP_DURATION,
+                  curve: Curve.EaseInOut,
+                })
+                .constraintSize({ maxWidth: Theme.CARD_SIZE_DRAW_STAGE.width, maxHeight: Theme.CARD_SIZE_DRAW_STAGE.height })
+            }
+            .width('100%')
+            .height('100%')
+            .alignContent(Alignment.Center)
           }
         }
         .width('100%')
@@ -305,7 +340,7 @@ struct CardDrawPage {
         // ── Prompt 提示区 + Action 操作区（layoutWeight 26，底部安全区）──
         Column() {
           if (this.animPhase !== 'particles' && this.animPhase !== 'done' && this.cardId) {
-            Text('星澜正在解读你的心事...')
+            Text('星澜正在翻开这一页...')
               .fontSize(Theme.V2C_FONT_BODY)
               .fontColor(Theme.V2C_TEXT_SECONDARY)
               .margin({ top: Theme.SPACE_MD })
@@ -316,6 +351,7 @@ struct CardDrawPage {
             .width(40)
             .height(40)
             .color(Theme.V2C_GOLD_GILT_SOFT)
+            .opacity(0.68)
             .margin({ top: Theme.SPACE_MD })
         }
         .width('100%')

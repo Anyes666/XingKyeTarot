@@ -110,13 +110,13 @@ const MIN_SCALE: number = 0.42;
 /** 中心牌透明度 */
 const CENTER_OPACITY: number = 1.0;
 /** 边缘牌最小透明度 */
-const MIN_OPACITY: number = 0.08;
+const MIN_OPACITY: number = 0.06;
 /** 中心牌亮度偏移（0=不变） */
 const CENTER_BRIGHTNESS: number = 1.0;
 /** 边缘牌亮度偏移 */
-const EDGE_BRIGHTNESS: number = 0.35;
+const EDGE_BRIGHTNESS: number = 0.28;
 /** 悬浮高度（vp）— 中心牌上浮 */
-const CENTER_LIFT: number = 3;
+const CENTER_LIFT: number = 6;
 /** 中心光晕渐显时长（ms） */
 const GLOW_FADE_DURATION: number = 200;
 
@@ -514,22 +514,50 @@ struct CardWheelDrawPage {
   wheelArea(): void {
     Column() {
       // 提示文字
-      Text('让牌轮慢慢转动。')
-        .fontSize(Theme.FONT_SUBTITLE)
-        .fontColor(Theme.GOLD_LIGHT)
+      Text('让牌轮安静停在星盘中央。')
+        .fontSize(Theme.V2C_FONT_SUBTITLE)
+        .fontColor(Theme.V2C_GOLD_GILT_SOFT)
         .fontWeight(FontWeight.Medium)
         .textAlign(TextAlign.Center)
         .width('100%')
 
-      Text('当它停下时，选中最靠近你的那一张。')
-        .fontSize(Theme.FONT_CAPTION)
-        .fontColor(Theme.MOON_MUTED)
+      Text('左右轻滑，等待中心框里的牌稳定下来。')
+        .fontSize(Theme.V2C_FONT_CAPTION)
+        .fontColor(Theme.V2C_TEXT_SECONDARY)
         .textAlign(TextAlign.Center)
         .width('100%')
-        .margin({ top: Theme.SPACE_XS })
+        .margin({ top: Theme.V2_SPACE_XS })
 
       // 牌轮可视区域
       Stack() {
+        // 书页式暗底
+        Column()
+          .width('92%')
+          .height(FRAME_HEIGHT + 88)
+          .borderRadius(Theme.V2C_RADIUS_CARD)
+          .backgroundColor('rgba(18,24,54,0.42)')
+          .border({ width: 1, color: 'rgba(197,160,80,0.10)' })
+          .hitTestBehavior(HitTestMode.None)
+
+        // 极低透明度微光点缀（非完整圆环）
+        Column()
+          .width(10)
+          .height(10)
+          .borderRadius(Theme.V2_RADIUS_FULL)
+          .backgroundColor('rgba(224,205,149,0.10)')
+          .opacity(0.45)
+          .translate({ x: -106, y: -46 })
+          .hitTestBehavior(HitTestMode.None)
+
+        Column()
+          .width(6)
+          .height(6)
+          .borderRadius(Theme.V2_RADIUS_FULL)
+          .backgroundColor('rgba(224,205,149,0.14)')
+          .opacity(0.42)
+          .translate({ x: 104, y: 42 })
+          .hitTestBehavior(HitTestMode.None)
+
         // 牌背层 — 渲染可见牌（中心 ± VISIBLE_RANGE）
         Stack() {
           ForEach(
@@ -547,26 +575,34 @@ struct CardWheelDrawPage {
         }
         .width(FRAME_WIDTH * 5)
         .height(FRAME_HEIGHT + 40)
-        .hitTestBehavior(HitTestMode.None)
+        .hitTestBehavior(HitTestMode.Transparent)
         .alignContent(Alignment.Center)
 
         // 中心金色选择框（固定，不随牌移动）+ 光晕吸引层
         Stack() {
           // 外层光晕（吸附后渐显，模拟金色漫反射）
           Column()
-            .width(FRAME_WIDTH + 24)
-            .height(FRAME_HEIGHT + 24)
-            .borderRadius(Theme.TAROT_CARD_RADIUS + 12)
+            .width(FRAME_WIDTH + 34)
+            .height(FRAME_HEIGHT + 34)
+            .borderRadius(Theme.TAROT_CARD_RADIUS + 14)
             .radialGradient({
               center: ['50%', '50%'],
               radius: '50%',
               colors: [
-                ['rgba(229, 165, 10, 0.15)', 0.0],
-                ['rgba(229, 165, 10, 0.06)', 0.4],
-                ['rgba(229, 165, 10, 0)', 1.0]
+                ['rgba(224,205,149,0.18)', 0.0],
+                ['rgba(197,160,80,0.07)', 0.42],
+                ['rgba(197,160,80,0)', 1.0]
               ]
             })
             .opacity(this.centerGlowAlpha)
+            .hitTestBehavior(HitTestMode.None)
+
+          Column()
+            .width(FRAME_WIDTH + 18)
+            .height(FRAME_HEIGHT + 18)
+            .borderRadius(Theme.TAROT_CARD_RADIUS + 8)
+            .border({ width: 1, color: 'rgba(197,160,80,0.18)' })
+            .backgroundColor('rgba(10,13,26,0.16)')
             .hitTestBehavior(HitTestMode.None)
 
           // 内层选择框
@@ -574,16 +610,16 @@ struct CardWheelDrawPage {
             .width(FRAME_WIDTH)
             .height(FRAME_HEIGHT)
             .borderRadius(Theme.TAROT_CARD_RADIUS + 2)
-            .border({ width: 2, color: Theme.GOLD_LIGHT })
-            .backgroundColor('rgba(229, 165, 10, 0.06)')
+            .border({ width: 1.5, color: Theme.V2C_GOLD_GILT })
+            .backgroundColor('rgba(197,160,80,0.05)')
             .hitTestBehavior(HitTestMode.None)
         }
         .hitTestBehavior(HitTestMode.None)
       }
       .width('100%')
-      .height(FRAME_HEIGHT + 60)
+      .height(FRAME_HEIGHT + 112)
       .alignContent(Alignment.Center)
-      .margin({ top: Theme.SPACE_LG })
+      .margin({ top: Theme.V2_SPACE_LG })
       // 手势层 — 捕获速度用于惯性计算
       .gesture(
         PanGesture({ direction: PanDirection.Horizontal, distance: 8 })
@@ -779,11 +815,11 @@ struct CardWheelDrawPage {
           // 进度文字（不显示牌名）
           Text(this.progressText)
             .fontSize(Theme.V2C_FONT_SUBTITLE)
-            .fontColor(Theme.V2C_GOLD_GILT_SOFT)
-            .fontWeight(FontWeight.Medium)
-            .textAlign(TextAlign.Center)
-            .width('100%')
-            .margin({ bottom: Theme.SPACE_XS })
+          .fontColor(Theme.V2C_GOLD_GILT_SOFT)
+          .fontWeight(FontWeight.Medium)
+          .textAlign(TextAlign.Center)
+          .width('100%')
+            .margin({ bottom: Theme.V2_SPACE_XS })
 
           // 引导提示（不显示牌名）
           Text(this.instructionText)
@@ -791,18 +827,32 @@ struct CardWheelDrawPage {
             .fontColor(Theme.V2C_TEXT_SECONDARY)
             .textAlign(TextAlign.Center)
             .width('100%')
-            .margin({ bottom: Theme.SPACE_MD })
+            .lineHeight(18)
+            .margin({ bottom: Theme.V2_SPACE_MD })
 
-          // 确认按钮
+          // 确认按钮 — 深蓝黑玻璃底 + 暖金细边
           Button(this.confirmText)
+            .type(ButtonType.Normal)
             .fontSize(Theme.V2C_FONT_BODY)
-            .fontColor(Theme.V2C_BG_BASE)
+            .fontColor(this.confirmBtnEnabled ? Theme.V2C_GOLD_GILT : Theme.V2_STATE_DISABLED_TEXT)
             .fontWeight(FontWeight.Medium)
-            .width('72%')
-            .height(Theme.BTN_HEIGHT)
-            .backgroundColor(Theme.V2C_GOLD_GILT)
-            .borderRadius(Theme.V2_RADIUS_FULL)
-            .opacity(this.confirmBtnEnabled ? 1.0 : 0.5)
+            .constraintSize({ maxWidth: 300 })
+            .width('100%')
+            .height(54)
+            .backgroundColor('rgba(18,24,54,0.82)')
+            .borderRadius(20)
+            .border({
+              width: 1,
+              color: this.confirmBtnEnabled ? 'rgba(197,160,80,0.38)' : 'rgba(197,160,80,0.12)'
+            })
+            .margin({ left: 36, right: 36 })
+            .shadow({
+              radius: this.confirmBtnEnabled ? 14 : 0,
+              color: 'rgba(197,160,80,0.12)',
+              offsetX: 0,
+              offsetY: 4
+            })
+            .opacity(this.confirmBtnEnabled ? 1.0 : 0.72)
             .scale({
               x: this.confirmPressed ? Theme.PRESS_SCALE : 1.0,
               y: this.confirmPressed ? Theme.PRESS_SCALE : 1.0
@@ -824,7 +874,7 @@ struct CardWheelDrawPage {
             })
         }
         .width('100%')
-        .padding({ bottom: 32 })
+        .padding({ bottom: Theme.SAFE_BOTTOM + Theme.V2_SPACE_SM })
         .alignItems(HorizontalAlign.Center)
       }
       .width('100%')
@@ -851,18 +901,46 @@ struct WheelCardItemContent {
   build() {
     Column() {
       // 牌背图片（支持中心亮度提升 + 边缘暗化）
-      Image($r('app.media.card_back'))
-        .width(CARD_WIDTH * this.getCardScale())
-        .height(CARD_HEIGHT * this.getCardScale())
-        .objectFit(ImageFit.Cover)
-        .borderRadius(Theme.TAROT_CARD_RADIUS)
-        .opacity(this.getCardOpacity())
-        .brightness(this.getCardBrightness())
-        .rotate({
-          angle: this.getCardRotate(),
-          centerX: '50%',
-          centerY: '50%',
-        })
+      Stack() {
+        Image($r('app.media.card_back'))
+          .width('100%')
+          .height('100%')
+          .objectFit(ImageFit.Cover)
+          .borderRadius(Theme.TAROT_CARD_RADIUS)
+          .brightness(this.getCardBrightness())
+
+        if (this.isNearCenter()) {
+          Column()
+            .width('100%')
+            .height('100%')
+            .borderRadius(Theme.TAROT_CARD_RADIUS)
+            .border({ width: 1, color: 'rgba(224,205,149,0.38)' })
+            .backgroundColor('rgba(197,160,80,0.04)')
+            .hitTestBehavior(HitTestMode.None)
+        } else {
+          Column()
+            .width('100%')
+            .height('100%')
+            .borderRadius(Theme.TAROT_CARD_RADIUS)
+            .backgroundColor('rgba(10,13,26,0.24)')
+            .hitTestBehavior(HitTestMode.None)
+        }
+      }
+      .width(CARD_WIDTH * this.getCardScale())
+      .height(CARD_HEIGHT * this.getCardScale())
+      .borderRadius(Theme.TAROT_CARD_RADIUS)
+      .opacity(this.getCardOpacity())
+      .rotate({
+        angle: this.getCardRotate(),
+        centerX: '50%',
+        centerY: '50%',
+      })
+      .shadow({
+        radius: this.isNearCenter() ? 18 : 6,
+        color: this.isNearCenter() ? 'rgba(197,160,80,0.16)' : 'rgba(0,0,0,0.22)',
+        offsetX: 0,
+        offsetY: this.isNearCenter() ? 5 : 2
+      })
     }
     .width(CARD_WIDTH)
     .height(CARD_HEIGHT)
@@ -921,5 +999,9 @@ struct WheelCardItemContent {
     }
     const lift: number = -CENTER_LIFT * Math.max(0, 1 - distance * 0.5);
     return Math.round(lift * 10) / 10;
+  }
+
+  private isNearCenter(): boolean {
+    return Math.abs(this.visualPosition()) < 0.48;
   }
 }

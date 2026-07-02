@@ -5,19 +5,19 @@ import { Theme } from '../common/Theme';
  */
 export interface PressableScaleButtonStyle {
   text: string;
-  onClick: () => void;
-  width?: Length;
-  height?: number;
+  action: () => void;
+  btnWidth?: Length;
+  btnHeight?: number;
   fontSize?: number;
   fontColor?: ResourceColor;
   fontWeight?: FontWeight;
-  backgroundColor?: ResourceColor;
-  pressedBackgroundColor?: ResourceColor;
-  borderColor?: ResourceColor;
-  pressedBorderColor?: ResourceColor;
-  borderWidth?: number;
-  borderRadius?: number;
-  enabled?: boolean;
+  fillColor?: ResourceColor;
+  pressedFillColor?: ResourceColor;
+  strokeColor?: ResourceColor;
+  pressedStrokeColor?: ResourceColor;
+  strokeWidth?: number;
+  cornerRadius?: number;
+  isEnabled?: boolean;
 }
 
 /**
@@ -30,19 +30,19 @@ export interface PressableScaleButtonStyle {
 @Component
 export struct PressableScaleButton {
   @Prop text: string = '按钮';
-  @Prop width: Length = '100%';
-  @Prop height: number = 48;
+  @Prop btnWidth: Length = '100%';
+  @Prop btnHeight: number = 48;
   @Prop fontSize: number = 15;
   @Prop fontColor: ResourceColor = Theme.V2C_GOLD_GILT;
   @Prop fontWeight: FontWeight = FontWeight.Medium;
-  @Prop backgroundColor: ResourceColor = Theme.V2C_BG_CARD;
-  @Prop pressedBackgroundColor: ResourceColor = Theme.V2C_BG_FLOATING;
-  @Prop borderColor: ResourceColor = Theme.V2C_SPINE_LINE;
-  @Prop pressedBorderColor: ResourceColor = Theme.V2C_GOLD_GILT;
-  @Prop borderWidth: number = 1;
-  @Prop borderRadius: number = 14;
-  @Prop enabled: boolean = true;
-  onClick: () => void = () => {};
+  @Prop fillColor: ResourceColor = Theme.V2C_BG_CARD;
+  @Prop pressedFillColor: ResourceColor = Theme.V2C_BG_FLOATING;
+  @Prop strokeColor: ResourceColor = Theme.V2C_SPINE_LINE;
+  @Prop pressedStrokeColor: ResourceColor = Theme.V2C_GOLD_GILT;
+  @Prop strokeWidth: number = 1;
+  @Prop cornerRadius: number = 14;
+  @Prop isEnabled: boolean = true;
+  action: () => void = () => {};
 
   @State private pressed: boolean = false;
 
@@ -52,15 +52,15 @@ export struct PressableScaleButton {
       .fontSize(this.fontSize)
       .fontColor(this.fontColor)
       .fontWeight(this.fontWeight)
-      .width(this.width)
-      .height(this.height)
-      .backgroundColor(this.pressed ? this.pressedBackgroundColor : this.backgroundColor)
-      .borderRadius(this.borderRadius)
+      .width(this.btnWidth)
+      .height(this.btnHeight)
+      .backgroundColor(this.pressed ? this.pressedFillColor : this.fillColor)
+      .borderRadius(this.cornerRadius)
       .border({
-        width: this.borderWidth,
-        color: this.pressed ? this.pressedBorderColor : this.borderColor
+        width: this.strokeWidth,
+        color: this.pressed ? this.pressedStrokeColor : this.strokeColor
       })
-      .opacity(this.enabled ? 1.0 : 0.5)
+      .opacity(1.0)
       .scale({
         x: this.pressed ? Theme.PRESS_SCALE : 1.0,
         y: this.pressed ? Theme.PRESS_SCALE : 1.0
@@ -70,7 +70,7 @@ export struct PressableScaleButton {
         curve: Theme.V2_EASE_OUT
       })
       .onTouch((event: TouchEvent) => {
-        if (!this.enabled) {
+        if (!this.isEnabled) {
           return;
         }
         if (event.type === TouchType.Down) {
@@ -80,8 +80,8 @@ export struct PressableScaleButton {
         }
       })
       .onClick(() => {
-        if (this.enabled) {
-          this.onClick();
+        if (this.isEnabled) {
+          this.action();
         }
       })
   }

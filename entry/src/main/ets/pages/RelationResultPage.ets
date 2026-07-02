@@ -4,6 +4,7 @@ import { Routes } from '../common/Routes';
 import { ComplianceFooter } from '../components/ComplianceFooter';
 import { AppBackButton } from '../components/AppBackButton';
 import { TarotCardImage } from '../components/TarotCardImage';
+import { BoundaryReminder } from '../components/BoundaryReminder';
 import { HistoryStore } from '../common/HistoryStore';
 import { getRelationCompanionText } from '../data/XinglanResultCompanionText';
 import {
@@ -124,7 +125,7 @@ struct RelationResultPage {
    * 边界提醒模板（温柔措辞，符合内容铁律）
    */
   private buildBoundaryText(): string {
-    return '关系探索不判断对方心意，只陪你看清自己的感受、期待与边界。牌面是一面镜子，映照的是你此刻的内心，而非对方的想法或关系的结局。';
+    return '关系探索不判断对方心意，只陪你看清自己的感受、期待与边界。牌面是一面镜子，映照的是你此刻的关系体验，而非第三方内心或关系结局。';
   }
 
   /**
@@ -149,9 +150,33 @@ struct RelationResultPage {
     this.hasHeardCompanionResult = true;
   }
 
+  private getOrientationText(card: RelationResultSlotInfo): string {
+    return card.isReversed ? '逆位' : '正位';
+  }
+
   build() {
-    Scroll() {
-      Column({ space: Theme.SPACE_LG }) {
+    Stack() {
+      Column()
+        .width('100%')
+        .height('100%')
+        .backgroundColor(Theme.V2C_BG_BASE)
+
+      Column()
+        .width('100%')
+        .height(240)
+        .radialGradient({
+          center: ['50%', '12%'],
+          radius: '68%',
+          colors: [
+            ['rgba(197,160,80,0.05)', 0.0],
+            ['rgba(197,160,80,0.012)', 0.58],
+            ['rgba(10,13,26,0)', 1.0]
+          ]
+        })
+        .hitTestBehavior(HitTestMode.None)
+
+      Scroll() {
+        Column({ space: Theme.V2_SPACE_LG }) {
         // ── P0.3 整改：左上角统一返回按钮（安全区修复）──
         Row() {
           AppBackButton({ fallbackUrl: Routes.HOME })
@@ -160,29 +185,70 @@ struct RelationResultPage {
         .padding({ top: Theme.SAFE_TOP })
 
         Column() {
-          Text('💞 关系探索结果')
+          Text('星钥之书 · 关系探索')
+            .fontSize(Theme.V2C_FONT_CAPTION)
+            .fontColor(Theme.V2C_TEXT_SECONDARY)
+            .margin({ bottom: Theme.V2_SPACE_SM })
+
+          Row()
+            .width(44)
+            .height(1)
+            .backgroundColor(Theme.V2C_GOLD_GILT)
+            .opacity(0.32)
+            .margin({ bottom: Theme.V2_SPACE_MD })
+
+          Text('把这段关系，按三张牌慢慢读')
             .fontSize(Theme.V2C_FONT_TITLE)
             .fontColor(Theme.V2C_TEXT_PRIMARY)
             .fontWeight(FontWeight.Bold)
-            .margin({ top: 0 })
+            .textAlign(TextAlign.Center)
 
-          Text('星澜帮你看见这段关系里的三个位置')
+          Text('这不是关系判定，也不是替你做决定。它只把你此刻能观察到的感受、互动和边界放到一页书里。')
             .fontSize(Theme.V2C_FONT_BODY)
             .fontColor(Theme.V2C_TEXT_SECONDARY)
+            .textAlign(TextAlign.Center)
+            .lineHeight(24)
             .margin({ top: Theme.SPACE_SM })
         }
         .width('100%')
+        .alignItems(HorizontalAlign.Center)
 
         if (this.questionText) {
-          Text('「' + this.questionText + '」')
-            .fontSize(Theme.V2C_FONT_SUBTITLE)
-            .fontColor(Theme.V2C_GOLD_GILT)
-            .fontStyle(FontStyle.Italic)
-            .textAlign(TextAlign.Center)
-            .width('100%')
+          Column() {
+            Text('这次想整理的关系主题')
+              .fontSize(Theme.V2C_FONT_CAPTION)
+              .fontColor(Theme.V2C_TEXT_SECONDARY)
+              .width('100%')
+              .margin({ bottom: Theme.V2_SPACE_SM })
+
+            Text('「' + this.questionText + '」')
+              .fontSize(Theme.V2C_FONT_BODY)
+              .fontColor(Theme.V2C_GOLD_GILT_SOFT)
+              .textAlign(TextAlign.Center)
+              .lineHeight(24)
+              .width('100%')
+
+            Text(this.relationType)
+              .fontSize(Theme.V2C_FONT_DISCLAIMER)
+              .fontColor(Theme.V2C_GOLD_GILT)
+              .padding({ left: 10, right: 10, top: 3, bottom: 3 })
+              .backgroundColor('rgba(197, 160, 80, 0.07)')
+              .borderRadius(Theme.V2C_RADIUS_CHIP)
+              .border({ width: 1, color: 'rgba(197, 160, 80, 0.20)' })
+              .margin({ top: Theme.V2_SPACE_SM })
+          }
+          .width('100%')
+          .alignItems(HorizontalAlign.Center)
+          .padding({ left: Theme.V2_SPACE_MD, right: Theme.V2_SPACE_MD, top: Theme.V2_SPACE_MD, bottom: Theme.V2_SPACE_MD })
+          .backgroundColor('rgba(197, 160, 80, 0.06)')
+          .borderRadius(Theme.V2C_RADIUS_CARD)
+          .border({ width: 1, color: 'rgba(197, 160, 80, 0.14)' })
         }
 
-        // 三张牌
+        // 三张牌总览
+        this.buildCardOverview()
+
+        // 三张牌逐张阅读
         ForEach(this.cards, (card: RelationResultSlotInfo) => {
           this.buildCardSlot(card);
         }, (card: RelationResultSlotInfo) => card.positionKey)
@@ -193,11 +259,11 @@ struct RelationResultPage {
         // 边界提醒
         this.buildBoundarySection()
 
-        // 今日行动
-        this.buildActionSection()
-
         // 星澜陪你把关系放轻
         this.buildCompanionSection()
+
+        // 今日行动
+        this.buildActionSection()
 
         Divider().strokeWidth(0.5).color(Theme.V2C_SPINE_LINE)
 
@@ -207,114 +273,234 @@ struct RelationResultPage {
         ComplianceFooter({ fontSize: Theme.V2C_FONT_CAPTION, textColor: Theme.V2C_TEXT_SECONDARY, showDivider: true })
       }
       .width('100%')
-      .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: Theme.SAFE_BOTTOM })
+      .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: Theme.SAFE_BOTTOM + 40 })
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(Theme.V2C_BG_BASE)
     .scrollBar(BarState.Off)
+    }
+    .width('100%')
+    .height('100%')
+  }
+
+  @Builder
+  buildCardOverview(): void {
+    Column() {
+      Row() {
+        Text('三张牌总览')
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_GOLD_GILT)
+          .fontWeight(FontWeight.Medium)
+
+        Blank()
+
+        Row()
+          .width(36)
+          .height(1)
+          .backgroundColor(Theme.V2C_GOLD_GILT)
+          .opacity(0.22)
+      }
+      .width('100%')
+      .margin({ bottom: Theme.V2_SPACE_MD })
+
+      Row({ space: Theme.V2_SPACE_XS }) {
+        ForEach(this.cards, (card: RelationResultSlotInfo) => {
+          Column() {
+            Text(card.positionTitle)
+              .fontSize(Theme.V2C_FONT_DISCLAIMER)
+              .fontColor(Theme.V2C_GOLD_GILT)
+              .fontWeight(FontWeight.Medium)
+              .textAlign(TextAlign.Center)
+              .height(28)
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+            TarotCardImage({
+              cardId: card.cardId,
+              cardWidth: 72,
+              cardHeight: 115
+            })
+              .rotate({
+                angle: card.isReversed ? 180 : 0,
+                centerX: '50%',
+                centerY: '50%'
+              })
+
+            Text(card.cardName)
+              .fontSize(Theme.V2C_FONT_DISCLAIMER)
+              .fontColor(Theme.V2C_TEXT_PRIMARY)
+              .textAlign(TextAlign.Center)
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .margin({ top: Theme.V2_SPACE_XS })
+              .width('100%')
+
+            Text(this.getOrientationText(card))
+              .fontSize(10)
+              .fontColor(Theme.V2C_TEXT_SECONDARY)
+              .margin({ top: 2 })
+          }
+          .layoutWeight(1)
+          .alignItems(HorizontalAlign.Center)
+        }, (card: RelationResultSlotInfo) => card.positionKey)
+      }
+      .width('100%')
+      .justifyContent(FlexAlign.SpaceBetween)
+    }
+    .width('100%')
+    .padding(Theme.V2_SPACE_LG)
+    .backgroundColor('rgba(18, 24, 54, 0.72)')
+    .borderRadius(Theme.V2C_RADIUS_CARD)
+    .border({ width: 1, color: Theme.V2C_SPINE_LINE })
   }
 
   @Builder
   buildCardSlot(card: RelationResultSlotInfo): void {
     Column() {
       Row() {
-        Text('📍 ' + card.positionTitle)
-          .fontSize(Theme.V2C_FONT_SUBTITLE)
+        Column()
+          .width(3)
+          .height(22)
+          .backgroundColor(Theme.V2C_GOLD_GILT)
+          .opacity(0.42)
+          .borderRadius(2)
+
+        Text(card.positionTitle)
+          .fontSize(Theme.V2C_FONT_BODY)
           .fontColor(Theme.V2C_GOLD_GILT)
           .fontWeight(FontWeight.Bold)
+          .margin({ left: Theme.V2_SPACE_SM })
+
+        Blank()
+
+        Text(this.getOrientationText(card))
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_GOLD_GILT_SOFT)
+          .padding({ left: 10, right: 10, top: 3, bottom: 3 })
+          .backgroundColor('rgba(197, 160, 80, 0.07)')
+          .borderRadius(Theme.V2C_RADIUS_CHIP)
+          .border({ width: 1, color: 'rgba(197, 160, 80, 0.22)' })
       }
       .width('100%')
-      .margin({ bottom: Theme.SPACE_MD })
+      .alignItems(VerticalAlign.Center)
+      .margin({ bottom: Theme.V2_SPACE_MD })
 
       Row() {
-        TarotCardImage({
-          cardId: card.cardId,
-          cardWidth: Theme.CARD_SIZE_TRIO.width,
-          cardHeight: Theme.CARD_SIZE_TRIO.height
-        })
+        Stack({ alignContent: Alignment.Center }) {
+          Column()
+            .width(Theme.CARD_SIZE_TRIO.width + 16)
+            .height(Theme.CARD_SIZE_TRIO.height + 16)
+            .backgroundColor('rgba(10, 13, 26, 0.48)')
+            .borderRadius(Theme.V2C_RADIUS_CARD)
+            .border({ width: 1, color: 'rgba(197, 160, 80, 0.14)' })
+
+          TarotCardImage({
+            cardId: card.cardId,
+            cardWidth: Theme.CARD_SIZE_TRIO.width,
+            cardHeight: Theme.CARD_SIZE_TRIO.height
+          })
+            .rotate({
+              angle: card.isReversed ? 180 : 0,
+              centerX: '50%',
+              centerY: '50%'
+            })
+        }
+        .width(Theme.CARD_SIZE_TRIO.width + 16)
+        .height(Theme.CARD_SIZE_TRIO.height + 16)
 
         Column() {
           Text(card.cardName)
             .fontSize(Theme.V2C_FONT_BODY)
             .fontColor(Theme.V2C_TEXT_PRIMARY)
             .fontWeight(FontWeight.Bold)
-            .margin({ bottom: Theme.SPACE_XS })
+            .margin({ bottom: Theme.V2_SPACE_XS })
 
           Text(card.keyword)
             .fontSize(Theme.V2C_FONT_CAPTION)
             .fontColor(Theme.V2C_GOLD_GILT)
+            .margin({ bottom: Theme.V2_SPACE_SM })
 
           Text(card.goldenSentence)
             .fontSize(Theme.V2C_FONT_BODY)
             .fontColor(Theme.V2C_TEXT_PRIMARY)
-            .maxLines(3)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-            .margin({ top: Theme.SPACE_SM })
-            .lineHeight(22)
+            .lineHeight(24)
+            .width('100%')
         }
         .layoutWeight(1)
-        .margin({ left: Theme.SPACE_MD })
+        .margin({ left: Theme.V2_SPACE_MD })
         .alignItems(HorizontalAlign.Start)
       }
       .width('100%')
+      .alignItems(VerticalAlign.Center)
     }
     .width('100%')
-    .padding(Theme.SPACE_LG)
+    .padding(Theme.V2_SPACE_LG)
     .backgroundColor(Theme.V2C_BG_CARD)
     .borderRadius(Theme.V2C_RADIUS_CARD)
-    .border({ width: 1, color: 'rgba(197, 160, 80, 0.15)' })
+    .border({ width: 1, color: 'rgba(197, 160, 80, 0.12)' })
+    .shadow(Theme.V2C_SHADOW_CARD)
   }
 
   @Builder
   buildSummarySection(): void {
     Column() {
-      Text('🔮 综合解读')
+      Text('三张牌放在一起时')
         .fontSize(Theme.V2C_FONT_SUBTITLE)
         .fontColor(Theme.V2C_GOLD_GILT)
         .fontWeight(FontWeight.Bold)
         .width('100%')
-        .margin({ bottom: Theme.SPACE_MD })
+        .margin({ bottom: Theme.V2_SPACE_XS })
+
+      Row()
+        .width(42)
+        .height(1)
+        .backgroundColor(Theme.V2C_GOLD_GILT)
+        .opacity(0.26)
+        .margin({ bottom: Theme.V2_SPACE_MD })
 
       Text(this.buildSummaryText())
         .fontSize(Theme.V2C_FONT_BODY)
         .fontColor(Theme.V2C_TEXT_PRIMARY)
-        .lineHeight(24)
+        .lineHeight(26)
+        .width('100%')
+
+      Text('这组牌提供的是观察角度，不是关系结论。你可以先把真实发生过的互动和自己的感受放在一起看。')
+        .fontSize(Theme.V2C_FONT_CAPTION)
+        .fontColor(Theme.V2C_TEXT_SECONDARY)
+        .lineHeight(20)
+        .margin({ top: Theme.V2_SPACE_MD })
         .width('100%')
     }
     .width('100%')
-    .padding(Theme.SPACE_LG)
+    .padding(Theme.V2_SPACE_LG)
     .backgroundColor(Theme.V2C_BG_CARD)
     .borderRadius(Theme.V2C_RADIUS_CARD)
-    .border({ width: 1, color: 'rgba(197, 160, 80, 0.15)' })
+    .border({ width: 1, color: 'rgba(197, 160, 80, 0.14)' })
   }
 
   @Builder
   buildBoundarySection(): void {
-    Row() {
-      // 烫金竖线装饰
-      Column()
-        .width(2)
-        .height('100%')
-        .backgroundColor(Theme.V2C_GOLD_GILT)
-        .margin({ right: Theme.V2_SPACE_MD })
+    BoundaryReminder({
+      text: this.buildBoundaryText(),
+      showAccentLine: true
+    })
+  }
 
-      Column() {
-        Text('边界提醒')
-          .fontSize(Theme.V2C_FONT_SUBTITLE)
-          .fontColor(Theme.V2C_GOLD_GILT)
-          .fontWeight(FontWeight.Bold)
-          .width('100%')
-          .margin({ bottom: Theme.V2_SPACE_SM })
+  @Builder
+  buildActionSection(): void {
+    Column() {
+      Text('可以先照顾的一件小事')
+        .fontSize(Theme.V2C_FONT_SUBTITLE)
+        .fontColor(Theme.V2C_GOLD_GILT)
+        .fontWeight(FontWeight.Bold)
+        .width('100%')
+        .margin({ bottom: Theme.V2_SPACE_MD })
 
-        Text(this.buildBoundaryText())
-          .fontSize(Theme.V2C_FONT_BODY)
-          .fontColor(Theme.V2C_TEXT_PRIMARY)
-          .lineHeight(24)
-          .width('100%')
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start)
+      Text(this.buildActionText())
+        .fontSize(Theme.V2C_FONT_BODY)
+        .fontColor(Theme.V2C_TEXT_PRIMARY)
+        .lineHeight(25)
+        .width('100%')
     }
     .width('100%')
     .padding(Theme.V2_SPACE_LG)
@@ -324,79 +510,77 @@ struct RelationResultPage {
   }
 
   @Builder
-  buildActionSection(): void {
-    Column() {
-      Text('✅ 今日行动')
-        .fontSize(Theme.V2C_FONT_SUBTITLE)
-        .fontColor(Theme.V2C_GOLD_GILT)
-        .fontWeight(FontWeight.Bold)
-        .width('100%')
-        .margin({ bottom: Theme.SPACE_MD })
-
-      Text(this.buildActionText())
-        .fontSize(Theme.V2C_FONT_BODY)
-        .fontColor(Theme.V2C_TEXT_PRIMARY)
-        .lineHeight(24)
-        .width('100%')
-    }
-    .width('100%')
-    .padding(Theme.SPACE_LG)
-    .backgroundColor(Theme.V2C_BG_CARD)
-    .borderRadius(Theme.V2C_RADIUS_CARD)
-    .border({ width: 1, color: 'rgba(197, 160, 80, 0.12)' })
-  }
-
-  @Builder
   buildCompanionSection(): void {
     Column() {
-      Text(getRelationCompanionText().title)
-        .fontSize(Theme.V2C_FONT_SUBTITLE)
-        .fontColor(Theme.V2C_GOLD_GILT)
-        .fontWeight(FontWeight.Bold)
-        .width('100%')
-        .margin({ bottom: Theme.SPACE_MD })
+      Row() {
+        Text(getRelationCompanionText().title)
+          .fontSize(Theme.V2C_FONT_SUBTITLE)
+          .fontColor(Theme.V2C_GOLD_GILT)
+          .fontWeight(FontWeight.Bold)
 
-      Column({ space: Theme.SPACE_MD }) {
+        Blank()
+
+        Text('月光旁注')
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
+      }
+      .width('100%')
+      .margin({ bottom: Theme.V2_SPACE_MD })
+
+      Column({ space: Theme.V2_SPACE_MD }) {
         Text(getRelationCompanionText().receive)
           .fontSize(Theme.V2C_FONT_BODY)
           .fontColor(Theme.V2C_TEXT_PRIMARY)
-          .lineHeight(24)
+          .lineHeight(25)
           .width('100%')
 
         Text(getRelationCompanionText().reflect)
           .fontSize(Theme.V2C_FONT_BODY)
           .fontColor(Theme.V2C_TEXT_PRIMARY)
-          .lineHeight(24)
+          .lineHeight(25)
           .width('100%')
 
         Text(getRelationCompanionText().question)
           .fontSize(Theme.V2C_FONT_BODY)
           .fontColor(Theme.V2C_GOLD_GILT_SOFT)
           .fontWeight(FontWeight.Medium)
-          .lineHeight(24)
+          .lineHeight(25)
           .width('100%')
-          .margin({ top: Theme.SPACE_XS })
+          .padding({ left: Theme.V2_SPACE_MD, right: Theme.V2_SPACE_MD, top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_SM })
+          .backgroundColor('rgba(197, 160, 80, 0.055)')
+          .borderRadius(Theme.V2C_RADIUS_CHIP)
+          .border({ width: 1, color: 'rgba(197, 160, 80, 0.16)' })
+          .margin({ top: Theme.V2_SPACE_XS })
 
         Text(getRelationCompanionText().action)
           .fontSize(Theme.V2C_FONT_BODY)
           .fontColor(Theme.V2C_TEXT_SECONDARY)
-          .lineHeight(24)
+          .lineHeight(25)
           .width('100%')
           .fontStyle(FontStyle.Italic)
       }
       .width('100%')
     }
     .width('100%')
-    .padding(Theme.SPACE_LG)
-    .backgroundColor(Theme.V2C_BG_FLOATING)
+    .padding(Theme.V2_SPACE_LG)
+    .backgroundColor('rgba(18, 24, 54, 0.68)')
     .borderRadius(Theme.V2C_RADIUS_CARD)
-    .margin({ top: Theme.SPACE_LG })
+    .border({ width: 1, color: 'rgba(197, 160, 80, 0.10)' })
+    .margin({ top: Theme.V2_SPACE_MD })
   }
 
   @Builder
   buildActionButtons(): void {
-    Column({ space: Theme.SPACE_MD }) {
-      Button('📤 生成分享卡')
+    Column({ space: Theme.V2_SPACE_MD }) {
+      Text('继续整理这次抽牌')
+        .fontSize(Theme.V2C_FONT_SUBTITLE)
+        .fontColor(Theme.V2C_GOLD_GILT)
+        .fontWeight(FontWeight.Bold)
+        .width('100%')
+        .margin({ bottom: Theme.V2_SPACE_XS })
+
+      Button('生成分享卡')
+        .type(ButtonType.Normal)
         .fontSize(Theme.V2C_FONT_BODY)
         .fontColor(Theme.V2C_GOLD_GILT)
         .fontWeight(FontWeight.Medium)
@@ -417,7 +601,8 @@ struct RelationResultPage {
           }
         })
 
-      Button('📋 已保存到历史')
+      Button('已保存到历史')
+        .type(ButtonType.Normal)
         .fontSize(Theme.V2C_FONT_BODY)
         .fontColor(Theme.V2C_TEXT_PRIMARY)
         .fontWeight(FontWeight.Medium)
@@ -434,7 +619,8 @@ struct RelationResultPage {
           }
         })
 
-      Button('🏠 回到首页')
+      Button('回到首页')
+        .type(ButtonType.Normal)
         .fontSize(Theme.V2C_FONT_BODY)
         .fontColor(Theme.V2C_TEXT_SECONDARY)
         .fontWeight(FontWeight.Normal)

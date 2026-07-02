@@ -3,6 +3,7 @@ import { Theme } from '../common/Theme';
 import { Routes } from '../common/Routes';
 import { ComplianceFooter } from '../components/ComplianceFooter';
 import { AppBackButton } from '../components/AppBackButton';
+import { DivinationEntryCard } from '../components/DivinationEntryCard';
 
 /**
  * AskHeart 页面路由参数
@@ -28,21 +29,6 @@ interface DivinationEntry {
 @Entry
 @Component
 struct DivinationCenterPage {
-  @State private pressedIndex: number = -1;
-  // ── B 方案月光呼吸动画状态 ──
-  @State private moonlightOpacity: number = 0.6;
-
-  aboutToAppear(): void {
-    // B 方案月光呼吸动画（6s 无限循环）
-    animateTo({
-      duration: Theme.V2_ANIM_MOONLIGHT_BREATH,
-      iterations: -1,
-      curve: Curve.EaseInOut
-    }, () => {
-      this.moonlightOpacity = 1.0;
-    });
-  }
-
   private buildEntries(): DivinationEntry[] {
     const entries: DivinationEntry[] = [
       {
@@ -86,7 +72,7 @@ struct DivinationCenterPage {
         }
       },
       {
-        icon: '◎',
+        icon: '✦',
         title: '旋转牌轮',
         subtitle: '亲手转动牌轮，选择此刻靠近你的牌。',
         routeAction: (): void => {
@@ -159,21 +145,27 @@ struct DivinationCenterPage {
         })
         .hitTestBehavior(HitTestMode.Transparent)
 
-      // ── B 方案月光呼吸光晕层（顶部 6s 循环）──
+      // 旧书封壳感：中轴书脊线与极弱烫金光
       Column()
         .width('100%')
-        .height(220)
+        .height('100%')
         .radialGradient({
-          center: ['50%', '20%'],
-          radius: '55%',
+          center: ['50%', '8%'],
+          radius: '70%',
           colors: [
-            ['rgba(212,172,77,0.04)', 0.0],
-            ['rgba(212,172,77,0.01)', 0.6],
+            ['rgba(197,160,80,0.035)', 0.0],
+            ['rgba(197,160,80,0.012)', 0.42],
             ['rgba(10,13,26,0)', 1.0]
           ]
         })
-        .opacity(this.moonlightOpacity)
         .hitTestBehavior(HitTestMode.None)
+
+      Row()
+        .width(1)
+        .height('84%')
+        .backgroundColor('rgba(197,160,80,0.10)')
+        .position({ x: '50%', y: '8%' })
+        .hitTestBehavior(HitTestMode.Transparent)
 
       // 主内容
       Column() {
@@ -196,7 +188,7 @@ struct DivinationCenterPage {
           .margin({ top: Theme.SPACE_MD })
 
         // 副标题
-        Text('用一张牌、一组牌阵，轻轻照见此刻的心事。')
+        Text('翻开星钥之书，轻轻选择此刻想被照见的心事。')
           .fontSize(Theme.V2C_FONT_BODY)
           .fontColor(Theme.V2C_TEXT_SECONDARY)
           .textAlign(TextAlign.Center)
@@ -207,61 +199,13 @@ struct DivinationCenterPage {
         Scroll() {
           Column() {
             ForEach(this.buildEntries(), (entry: DivinationEntry, index: number) => {
-              Row() {
-                // 图标
-                Text(entry.icon)
-                  .fontSize(28)
-                  .fontColor(Theme.V2C_GOLD_GILT)
-                  .width(56)
-                  .textAlign(TextAlign.Center)
-
-                // 文字
-                Column() {
-                  Text(entry.title)
-                    .fontSize(Theme.V2C_FONT_SUBTITLE)
-                    .fontColor(Theme.V2C_TEXT_PRIMARY)
-                    .fontWeight(FontWeight.Medium)
-
-                  Text(entry.subtitle)
-                    .fontSize(Theme.V2C_FONT_CAPTION)
-                    .fontColor(Theme.V2C_TEXT_SECONDARY)
-                    .margin({ top: 4 })
-                    .lineHeight(18)
-                }
-                .alignItems(HorizontalAlign.Start)
-                .layoutWeight(1)
-                .margin({ left: Theme.SPACE_SM })
-
-                // 箭头
-                Text('›')
-                  .fontSize(24)
-                  .fontColor(Theme.V2C_GOLD_GILT)
-              }
-              .width('92%')
-              .padding({ left: Theme.STARKEY_CARD_PADDING_H, right: Theme.STARKEY_CARD_PADDING_H, top: Theme.STARKEY_CARD_PADDING_V, bottom: Theme.STARKEY_CARD_PADDING_V })
-              .margin({ bottom: Theme.SPACE_SM })
-              .backgroundColor(Theme.V2C_BG_CARD)
-              .borderRadius(Theme.V2C_RADIUS_CARD)
-              .border({ width: 1, color: Theme.V2C_SPINE_LINE })
-              .shadow(Theme.V2C_SHADOW_CARD)
-              .scale({
-                x: this.pressedIndex === index ? Theme.PRESS_SCALE : 1.0,
-                y: this.pressedIndex === index ? Theme.PRESS_SCALE : 1.0
+              DivinationEntryCard({
+                icon: entry.icon,
+                title: entry.title,
+                subtitle: entry.subtitle,
+                action: entry.routeAction
               })
-              .animation({
-                duration: Theme.ANIM_PRESS_DURATION,
-                curve: Curve.EaseOut
-              })
-              .onTouch((event: TouchEvent) => {
-                if (event.type === TouchType.Down) {
-                  this.pressedIndex = index;
-                } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
-                  this.pressedIndex = -1;
-                }
-              })
-              .onClick(() => {
-                entry.routeAction();
-              })
+                .margin({ bottom: Theme.V2_SPACE_SM })
             }, (_entry: DivinationEntry, index: number) => 'entry_' + index.toString())
           }
           .width('100%')

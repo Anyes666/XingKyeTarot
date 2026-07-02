@@ -3,6 +3,7 @@ import { Theme } from '../common/Theme';
 import { Routes } from '../common/Routes';
 import { ComplianceFooter } from '../components/ComplianceFooter';
 import { AppBackButton } from '../components/AppBackButton';
+import { TarotCardImage } from '../components/TarotCardImage';
 import { TAROT_CARDS } from '../data/TarotCardData';
 import { TarotCard, ArcanaType, TarotSuit } from '../model/TarotCard';
 
@@ -167,7 +168,7 @@ struct TarotCardDetailPage {
     return {
       uprightMeaning: `当${name}以正位出现时，它可能提醒你：${keywords}的力量正在你身边流动。这不一定意味着一切都顺利，而是说你可以尝试用这些品质去回应眼前的处境。`,
       reversedMeaning: `当${name}以逆位出现时，它也许在照见一种内在的拉扯——你感到${keywords}变得困难、被阻滞，或者过度使用。这不代表你失败了，只是提醒你可以停下来看看：是不是有什么在暗暗消耗你。`,
-      companionReading: `这张牌不是在告诉你未来一定会怎样。它更像是一面镜子，提醒你看看自己正在经历什么。也许你最近有些疲惫，也许你正在努力维持某种平衡——无论哪种，这张牌都只是轻轻说一句：我看见了。`,
+      companionReading: `这张牌不是在替你预测未来。它更像是一面镜子，提醒你看看自己正在经历什么。也许你最近有些疲惫，也许你正在努力维持某种平衡——无论哪种，这张牌都只是轻轻说一句：我看见了。`,
       relationHint: `在关系的层面，${name}也许在提醒你：关系中的感受同样重要。不必急着判断对错，先问问自己——在这段关系里，你还舒服吗？你被认真对待了吗？`,
       workHint: `在工作或学习中，${name}带来的提示是：也许你不需要一次解决所有问题。先看清眼前最重要的一步，然后温柔地、但坚定地往前走。`,
       selfExploration: `你可以问问自己：\n\n1. 最近有没有什么事情，让我感到${keywords}在靠近（或在远离）？\n2. 如果这张牌是一个朋友，它会对我说什么？\n3. 我现在最需要的是被看见，还是被推动？`
@@ -227,6 +228,20 @@ struct TarotCardDetailPage {
           ]
         })
 
+      Column()
+        .width('100%')
+        .height('38%')
+        .radialGradient({
+          center: ['50%', '8%'],
+          radius: '76%',
+          colors: [
+            ['rgba(197,160,80,0.045)', 0.0],
+            ['rgba(197,160,80,0.012)', 0.46],
+            ['rgba(10,13,26,0)', 1.0]
+          ]
+        })
+        .hitTestBehavior(HitTestMode.Transparent)
+
       // ═══════════════════════════════════════════
       // Layer 2: 主内容
       // ═══════════════════════════════════════════
@@ -236,8 +251,8 @@ struct TarotCardDetailPage {
           AppBackButton({ fallbackUrl: Routes.TAROT_CARDS })
         }
         .width('100%')
-        .height(56)
-        .padding({ top: Theme.SAFE_TOP, left: Theme.SPACE_SM, right: Theme.SPACE_SM })
+        .height(Theme.SAFE_TOP + 48)
+        .padding({ top: Theme.SAFE_TOP, left: Theme.V2_SPACE_SM, right: Theme.V2_SPACE_SM })
         .alignItems(VerticalAlign.Center)
 
         if (this.card && this.reading) {
@@ -245,23 +260,37 @@ struct TarotCardDetailPage {
             Column() {
               // ── 卡牌大图 ──
               Column() {
-                Image(this.getCardImageResource(this.card!))
-                  .objectFit(ImageFit.Contain)
-                  .height(320)
-                  .constraintSize({ maxWidth: '78%' })
-                  .borderRadius(Theme.V2C_RADIUS_CARD)
-                  .border({ width: 1, color: 'rgba(197, 160, 80, 0.35)' })
-                  .shadow(Theme.V2C_SHADOW_CARD)
+                Text(this.getSuitLabel(this.card))
+                  .fontSize(12)
+                  .fontColor(this.getSuitColor(this.card))
+                  .padding({ left: 12, right: 12, top: 4, bottom: 4 })
+                  .backgroundColor('rgba(18,24,54,0.64)')
+                  .border({ width: 1, color: 'rgba(197,160,80,0.18)' })
+                  .borderRadius(Theme.V2C_RADIUS_CHIP)
+                  .margin({ bottom: Theme.V2_SPACE_SM })
+
+                Column() {
+                  TarotCardImage({
+                    cardId: this.card.id,
+                    cardWidth: 164,
+                    cardHeight: 262
+                  })
+                }
+                .padding(6)
+                .backgroundColor('rgba(10,13,26,0.72)')
+                .borderRadius(Theme.V2C_RADIUS_CARD)
+                .border({ width: 1, color: 'rgba(197,160,80,0.28)' })
+                .shadow(Theme.V2C_SHADOW_CARD)
 
                 // 点击提示
                 Text('轻触查看大图')
                   .fontSize(11)
-                  .fontColor(Theme.V2C_GOLD_GILT)
-                  .margin({ top: 6 })
+                  .fontColor(Theme.V2C_TEXT_SECONDARY)
+                  .margin({ top: Theme.V2_SPACE_XS })
               }
               .width('100%')
               .alignItems(HorizontalAlign.Center)
-              .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_SM })
+              .margin({ top: Theme.V2_SPACE_XS, bottom: Theme.V2_SPACE_MD })
               .onClick(() => {
                 this.openPreview();
               })
@@ -269,25 +298,16 @@ struct TarotCardDetailPage {
               // ── 卡牌标题区 ──
               Column() {
                 Text(this.card.nameZh)
-                  .fontSize(Theme.V2C_FONT_TITLE)
+                  .fontSize(Theme.V2C_FONT_CARD_NAME)
                   .fontColor(Theme.V2C_GOLD_GILT_SOFT)
                   .fontWeight(FontWeight.Bold)
                   .textAlign(TextAlign.Center)
 
                 Text(this.card.nameEn)
-                  .fontSize(Theme.V2C_FONT_BODY)
+                  .fontSize(Theme.V2C_FONT_CAPTION)
                   .fontColor(Theme.V2C_TEXT_SECONDARY)
                   .textAlign(TextAlign.Center)
-                  .margin({ top: Theme.SPACE_XS })
-
-                // 类别标签
-                Text(this.getSuitLabel(this.card))
-                  .fontSize(12)
-                  .fontColor(this.getSuitColor(this.card))
-                  .padding({ left: 12, right: 12, top: 4, bottom: 4 })
-                  .border({ width: 0.5, color: this.getSuitColor(this.card), style: BorderStyle.Solid })
-                  .borderRadius(12)
-                  .margin({ top: Theme.SPACE_SM })
+                  .margin({ top: Theme.V2_SPACE_2XS })
 
                 // 关键词
                 Row() {
@@ -295,7 +315,11 @@ struct TarotCardDetailPage {
                     Text(keyword)
                       .fontSize(12)
                       .fontColor(Theme.V2C_GOLD_GILT_SOFT)
-                      .padding({ left: 8, right: 8, top: 3, bottom: 3 })
+                      .height(26)
+                      .padding({ left: 10, right: 10 })
+                      .backgroundColor('rgba(197,160,80,0.08)')
+                      .border({ width: 1, color: 'rgba(197,160,80,0.18)' })
+                      .borderRadius(Theme.V2C_RADIUS_CHIP)
                       .margin({ right: 6, top: 8 })
                   }, (_kw: string, ki: number) => 'detail_kw_' + ki.toString())
                 }
@@ -303,7 +327,7 @@ struct TarotCardDetailPage {
               }
               .width('92%')
               .alignItems(HorizontalAlign.Center)
-              .margin({ top: Theme.SPACE_LG, bottom: Theme.SPACE_LG })
+              .margin({ bottom: Theme.V2_SPACE_LG })
 
               // ── 正位含义 ──
               this.buildReadingSection('正位含义', this.reading.uprightMeaning, Theme.V2C_GOLD_GILT)
@@ -340,6 +364,7 @@ struct TarotCardDetailPage {
           .width('100%')
           .layoutWeight(1)
           .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.Spring)
         } else {
           // 加载中
           Column() {
@@ -457,33 +482,35 @@ struct TarotCardDetailPage {
   buildReadingSection(title: string, content: string, accentColor: string): void {
     Column() {
       // 标题行
-      Row() {
-        Text('·')
-          .fontSize(18)
-          .fontColor(accentColor)
-          .fontWeight(FontWeight.Bold)
-          .margin({ right: 6 })
-
+      Column() {
         Text(title)
-          .fontSize(Theme.V2C_FONT_SUBTITLE)
+          .fontSize(Theme.V2C_FONT_BODY)
           .fontColor(accentColor)
-          .fontWeight(FontWeight.Bold)
+          .fontWeight(FontWeight.Medium)
+          .width('100%')
+
+        Row()
+          .width(44)
+          .height(1)
+          .backgroundColor(accentColor)
+          .opacity(0.42)
+          .margin({ top: Theme.V2_SPACE_XS })
       }
       .width('100%')
-      .margin({ bottom: Theme.SPACE_SM })
+      .margin({ bottom: Theme.V2_SPACE_SM })
 
       // 内容
       Text(content)
         .fontSize(Theme.V2C_FONT_BODY)
         .fontColor(Theme.V2C_TEXT_PRIMARY)
-        .lineHeight(26)
+        .lineHeight(27)
         .width('100%')
     }
     .width('92%')
-    .backgroundColor(Theme.V2C_BG_CARD)
+    .backgroundColor('rgba(18,24,54,0.72)')
     .borderRadius(Theme.V2C_RADIUS_CARD)
-    .border({ width: 1, color: Theme.V2C_SPINE_LINE })
+    .border({ width: 1, color: 'rgba(197,160,80,0.12)' })
     .padding({ left: Theme.STARKEY_CARD_PADDING_H, right: Theme.STARKEY_CARD_PADDING_H, top: Theme.STARKEY_CARD_PADDING_V, bottom: Theme.STARKEY_CARD_PADDING_V })
-    .margin({ bottom: Theme.SPACE_SM })
+    .margin({ bottom: Theme.V2_SPACE_SM })
   }
 }

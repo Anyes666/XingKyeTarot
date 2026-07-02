@@ -11,39 +11,40 @@ import { AppBackButton } from '../components/AppBackButton';
 struct PrivacyPolicyPage {
   build() {
     Column() {
-      // ── 顶部导航栏（P0.3 整改：统一返回按钮）──
+      // ── 顶部导航栏（A 星图档案）──
       Row() {
         AppBackButton({ fallbackUrl: Routes.LAUNCH })
 
         Blank()
 
         Text(LegalDocuments.PRIVACY_POLICY_TITLE)
-          .fontSize(Theme.FONT_SUBTITLE)
-          .fontColor(Theme.TEXT_PRIMARY_LIGHT)
-          .fontWeight(FontWeight.Bold)
+          .fontSize(Theme.V2A_FONT_SUBTITLE)
+          .fontColor(Theme.V2A_TEXT_PRIMARY)
+          .fontWeight(FontWeight.Medium)
+          .letterSpacing(1)
           .textAlign(TextAlign.Center)
 
         Blank()
 
         // 占位保持对齐
         Text('    ')
-          .fontSize(Theme.FONT_BODY)
+          .fontSize(Theme.V2A_FONT_BODY)
           .fontColor(Color.Transparent)
       }
       .width('100%')
-      .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, top: 48, bottom: Theme.SPACE_MD })
+      .padding({ left: Theme.SPACE_MD, right: Theme.SPACE_MD, top: Theme.SAFE_TOP, bottom: Theme.SPACE_SM })
       .backgroundColor(Theme.V2A_BG_BASE)
 
-      // ── 分割线 ──
+      // ── 星轨分割线 ──
       Divider()
         .strokeWidth(0.5)
-        .color(Theme.DEEP_STARRY)
+        .color(Theme.V2A_ORBIT_LINE)
 
       // ── 内容区（可滚动）──
       Scroll() {
         Text(LegalDocuments.PRIVACY_POLICY)
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+          .fontSize(Theme.V2A_FONT_BODY)
+          .fontColor(Theme.V2A_TEXT_PRIMARY)
           .lineHeight(24)
           .width('100%')
           .padding({
@@ -59,6 +60,6 @@ struct PrivacyPolicyPage {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(Theme.BG_DEEP_INDIGO)
+    .backgroundColor(Theme.V2A_BG_BASE)
   }
 }

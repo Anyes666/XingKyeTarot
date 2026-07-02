@@ -3,6 +3,8 @@ import { Theme } from '../common/Theme';
 import { Routes } from '../common/Routes';
 import { ComplianceFooter } from '../components/ComplianceFooter';
 import { AppBackButton } from '../components/AppBackButton';
+import { HeartOptionCard } from '../components/HeartOptionCard';
+import { PressableScaleButton } from '../components/PressableScaleButton';
 import { HEART_OPTIONS, HeartOption } from '../data/HeartOptionsData';
 import { POSITIVE_HEART_OPTIONS, PositiveHeartOption } from '../data/PositiveHeartOptions';
 import { AppStateStore } from '../common/AppStateStore';
@@ -46,8 +48,6 @@ struct AskHeartPage {
   @State private showFirstGuide: boolean = false;
   // 积极方向模式：false=原6选项（接住模式），true=新6选项（看见光模式）
   @State private isPositiveMode: boolean = false;
-  // ── 按压态索引（C 方案按压动画 scale(0.97)）──
-  @State private pressedIndex: number = -1;
 
   aboutToAppear(): void {
     this.prepareFirstGuide();
@@ -113,6 +113,32 @@ struct AskHeartPage {
 
   build() {
     Stack() {
+      Column()
+        .width('100%')
+        .height('100%')
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            [Theme.V2C_BG_BASE, 0.0],
+            ['#090D1C', 0.52],
+            [Theme.V2C_BG_BASE, 1.0]
+          ]
+        })
+
+      Column()
+        .width('100%')
+        .height('100%')
+        .radialGradient({
+          center: ['50%', '8%'],
+          radius: '72%',
+          colors: [
+            ['rgba(197,160,80,0.035)', 0.0],
+            ['rgba(197,160,80,0.012)', 0.42],
+            ['rgba(10,13,26,0)', 1.0]
+          ]
+        })
+        .hitTestBehavior(HitTestMode.Transparent)
+
       Column() {
       // ── P0.3 整改：左上角统一返回按钮（安全区修复）──
       Row() {
@@ -124,7 +150,7 @@ struct AskHeartPage {
       // ── 标题区 ──
       Column() {
         Text(this.getTitle())
-          .fontSize(Theme.V2C_FONT_TITLE)
+          .fontSize(Theme.V2C_FONT_SUBTITLE)
           .fontColor(Theme.V2C_TEXT_PRIMARY)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
@@ -138,6 +164,7 @@ struct AskHeartPage {
           .margin({ top: Theme.SPACE_SM })
       }
       .width('100%')
+      .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD })
       .margin({ top: Theme.SPACE_SM, bottom: Theme.SPACE_MD })
 
       // ── 阶段3A：首次进入单牌入口页引导（仅首次显示）──
@@ -169,48 +196,65 @@ struct AskHeartPage {
           }
         }
         .width('100%')
-        .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: Theme.SPACE_MD })
+        .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: 92 })
       }
       .layoutWeight(1)
       .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
 
-      // ── 确认按钮 ──
-      Button(this.getButtonText())
-        .fontSize(Theme.V2C_FONT_SUBTITLE)
-        .fontColor(Color.White)
-        .fontWeight(FontWeight.Medium)
-        .width('85%')
-        .height(52)
-        .backgroundColor(this.selectedIndex >= 0 ? Theme.V2C_GOLD_GILT : Theme.V2C_SPINE_LINE)
-        .borderRadius(Theme.V2C_RADIUS_BTN)
-        .enabled(this.selectedIndex >= 0 && !this.isTransitioning)
-        .opacity(this.selectedIndex >= 0 ? 1.0 : 0.4)
-        .margin({ bottom: Theme.SPACE_SM })
-        .onClick(() => {
-          this.onConfirm();
+      // ── 底部操作区：深色渐隐托底，避免按钮遮挡可读内容 ──
+      Column() {
+        PressableScaleButton({
+          text: this.getButtonText(),
+          btnWidth: '85%',
+          btnHeight: 50,
+          fontSize: Theme.V2C_FONT_BODY,
+          fontColor: this.selectedIndex >= 0 ? Theme.V2C_GOLD_GILT_SOFT : 'rgba(138,132,152,0.62)',
+          fontWeight: FontWeight.Medium,
+          fillColor: this.selectedIndex >= 0 ? 'rgba(18,24,54,0.86)' : 'rgba(18,24,54,0.38)',
+          pressedFillColor: this.selectedIndex >= 0 ? Theme.V2C_BG_HOVER : 'rgba(18,24,54,0.38)',
+          strokeColor: this.selectedIndex >= 0 ? 'rgba(197,160,80,0.42)' : 'rgba(197,160,80,0.14)',
+          pressedStrokeColor: this.selectedIndex >= 0 ? Theme.V2C_GOLD_GILT_SOFT : 'rgba(197,160,80,0.14)',
+          cornerRadius: Theme.V2_RADIUS_XL,
+          isEnabled: this.selectedIndex >= 0 && !this.isTransitioning,
+          action: (): void => {
+            this.onConfirm();
+          }
         })
+          .margin({ top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_XS })
 
-      // ── 首次体验跳过入口（仅 FIRST_EXPERIENCE 模式显示）──
-      if (this.entryMode === 'FIRST_EXPERIENCE') {
-        Button('暂时跳过，先逛首页')
-          .type(ButtonType.Normal)
-          .fontSize(14)
-          .fontColor(Theme.V2C_TEXT_SECONDARY)
-          .backgroundColor(Color.Transparent)
-          .width('auto')
-          .height(40)
-          .margin({ top: 4, bottom: Theme.SPACE_SM })
-          .onClick(() => {
-            this.skipFirstExperience();
-          })
+        // ── 首次体验跳过入口（仅 FIRST_EXPERIENCE 模式显示）──
+        if (this.entryMode === 'FIRST_EXPERIENCE') {
+          Button('暂时跳过，先逛首页')
+            .type(ButtonType.Normal)
+            .fontSize(14)
+            .fontColor(Theme.V2C_TEXT_SECONDARY)
+            .backgroundColor(Color.Transparent)
+            .width('auto')
+            .height(36)
+            .margin({ top: 2, bottom: Theme.V2_SPACE_XS })
+            .onClick(() => {
+              this.skipFirstExperience();
+            })
+        }
+
+        // ── 合规页脚 ──
+        ComplianceFooter({ fontSize: Theme.V2C_FONT_CAPTION, textColor: Theme.V2C_TEXT_SECONDARY, showDivider: false })
       }
-
-      // ── 合规页脚 ──
-      ComplianceFooter({ fontSize: Theme.V2C_FONT_CAPTION, textColor: Theme.V2C_TEXT_SECONDARY, showDivider: false })
+      .width('100%')
+      .alignItems(HorizontalAlign.Center)
+      .padding({ top: Theme.V2_SPACE_XS, bottom: Theme.V2_SPACE_XS })
+      .linearGradient({
+        direction: GradientDirection.Bottom,
+        colors: [
+          ['rgba(10,13,26,0)', 0.0],
+          ['rgba(10,13,26,0.86)', 0.28],
+          [Theme.V2C_BG_BASE, 1.0]
+        ]
+      })
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(Theme.V2C_BG_BASE)
     .padding({ top: 0, bottom: Theme.SAFE_BOTTOM })
 
       // 顶部渐变遮罩（消除状态栏硬边）
@@ -219,7 +263,7 @@ struct AskHeartPage {
         .height(Theme.SAFE_TOP + 64)
         .linearGradient({
           direction: GradientDirection.Bottom,
-          colors: [[Theme.V2C_BG_BASE, 0], ['rgba(15,15,35,0)', 1]]
+          colors: [[Theme.V2C_BG_BASE, 0], ['rgba(10,13,26,0)', 1]]
         })
         .hitTestBehavior(HitTestMode.Transparent)
         .position({ x: 0, y: 0 })
@@ -236,9 +280,9 @@ struct AskHeartPage {
     Row() {
       Button('今天我想被接住')
         .fontSize(13)
-        .fontColor(this.isPositiveMode ? Theme.V2C_TEXT_SECONDARY : Color.White)
+        .fontColor(this.isPositiveMode ? Theme.V2C_TEXT_SECONDARY : Theme.V2C_GOLD_GILT_SOFT)
         .fontWeight(this.isPositiveMode ? FontWeight.Normal : FontWeight.Bold)
-        .backgroundColor(this.isPositiveMode ? Color.Transparent : Theme.V2C_GOLD_GILT)
+        .backgroundColor(this.isPositiveMode ? Color.Transparent : 'rgba(197,160,80,0.10)')
         .borderRadius(Theme.V2C_RADIUS_BTN)
         .height(36)
         .padding({ left: 16, right: 16 })
@@ -250,9 +294,9 @@ struct AskHeartPage {
 
       Button('今天我想看见光')
         .fontSize(13)
-        .fontColor(this.isPositiveMode ? Color.White : Theme.V2C_TEXT_SECONDARY)
+        .fontColor(this.isPositiveMode ? Theme.V2C_GOLD_GILT_SOFT : Theme.V2C_TEXT_SECONDARY)
         .fontWeight(this.isPositiveMode ? FontWeight.Bold : FontWeight.Normal)
-        .backgroundColor(this.isPositiveMode ? Theme.V2C_GOLD_GILT : Color.Transparent)
+        .backgroundColor(this.isPositiveMode ? 'rgba(197,160,80,0.10)' : Color.Transparent)
         .borderRadius(Theme.V2C_RADIUS_BTN)
         .height(36)
         .padding({ left: 16, right: 16 })
@@ -273,59 +317,14 @@ struct AskHeartPage {
    */
   @Builder
   buildPositiveHeartOption(option: PositiveHeartOption, index: number): void {
-    Column() {
-      Row() {
-        Text(option.emoji)
-          .fontSize(22)
-          .margin({ right: Theme.SPACE_MD })
-
-        Column() {
-          Text(option.label)
-            .fontSize(Theme.V2C_FONT_BODY)
-            .fontColor(this.selectedIndex === index ? Theme.V2C_TEXT_PRIMARY : Theme.V2C_TEXT_SECONDARY)
-            .fontWeight(this.selectedIndex === index ? FontWeight.Bold : FontWeight.Normal)
-            .textAlign(TextAlign.Start)
-            .width('100%')
-
-          Text(option.description)
-            .fontSize(12)
-            .fontColor(this.selectedIndex === index ? 'rgba(197, 160, 80, 0.7)' : Theme.V2C_TEXT_SECONDARY)
-            .textAlign(TextAlign.Start)
-            .width('100%')
-            .margin({ top: 4 })
-            .maxLines(2)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-        }
-        .layoutWeight(1)
+    HeartOptionCard({
+      icon: option.emoji,
+      label: option.label,
+      description: option.description,
+      selected: this.selectedIndex === index,
+      onPress: (): void => {
+        this.selectedIndex = index;
       }
-      .width('100%')
-    }
-    .width('100%')
-    .padding({ left: Theme.SPACE_LG, right: Theme.SPACE_LG, top: 14, bottom: 14 })
-    .backgroundColor(this.selectedIndex === index ? Theme.V2C_BG_FLOATING : Theme.V2C_BG_CARD)
-    .borderRadius(Theme.V2C_RADIUS_CARD)
-    .border({
-      width: this.selectedIndex === index ? 2 : 0,
-      color: this.selectedIndex === index ? Theme.V2C_GOLD_GILT : Color.Transparent,
-      style: BorderStyle.Solid,
-    })
-    .scale({
-      x: this.pressedIndex === index ? Theme.PRESS_SCALE : 1.0,
-      y: this.pressedIndex === index ? Theme.PRESS_SCALE : 1.0
-    })
-    .onTouch((event: TouchEvent) => {
-      if (event.type === TouchType.Down) {
-        this.pressedIndex = index;
-      } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
-        this.pressedIndex = -1;
-      }
-    })
-    .onClick(() => {
-      this.selectedIndex = index;
-    })
-    .animation({
-      duration: Theme.ANIM_PRESS_DURATION,
-      curve: Curve.EaseOut,
     })
   }
 
@@ -334,45 +333,14 @@ struct AskHeartPage {
    */
   @Builder
   buildHeartOption(option: HeartOption, index: number) {
-    Row() {
-      Text(option.emoji)
-        .fontSize(22)
-        .margin({ right: Theme.SPACE_MD })
-
-      Text(option.label)
-        .fontSize(Theme.V2C_FONT_BODY)
-        .fontColor(this.selectedIndex === index ? Theme.V2C_TEXT_PRIMARY : Theme.V2C_TEXT_SECONDARY)
-        .fontWeight(this.selectedIndex === index ? FontWeight.Bold : FontWeight.Normal)
-        .layoutWeight(1)
-        .textAlign(TextAlign.Start)
-    }
-    .width('100%')
-    .height(64)
-    .padding({ left: Theme.SPACE_LG, right: Theme.SPACE_LG })
-    .backgroundColor(this.selectedIndex === index ? Theme.V2C_BG_FLOATING : Theme.V2C_BG_CARD)
-    .borderRadius(Theme.V2C_RADIUS_CARD)
-    .border({
-      width: this.selectedIndex === index ? 2 : 0,
-      color: this.selectedIndex === index ? Theme.V2C_GOLD_GILT : Color.Transparent,
-      style: BorderStyle.Solid,
-    })
-    .scale({
-      x: this.pressedIndex === index ? Theme.PRESS_SCALE : 1.0,
-      y: this.pressedIndex === index ? Theme.PRESS_SCALE : 1.0
-    })
-    .onTouch((event: TouchEvent) => {
-      if (event.type === TouchType.Down) {
-        this.pressedIndex = index;
-      } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
-        this.pressedIndex = -1;
+    HeartOptionCard({
+      icon: option.emoji,
+      label: option.label,
+      description: '',
+      selected: this.selectedIndex === index,
+      onPress: (): void => {
+        this.selectedIndex = index;
       }
-    })
-    .onClick(() => {
-      this.selectedIndex = index;
-    })
-    .animation({
-      duration: Theme.ANIM_PRESS_DURATION,
-      curve: Curve.EaseOut,
     })
   }
 

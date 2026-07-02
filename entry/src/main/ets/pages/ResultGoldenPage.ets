@@ -277,6 +277,14 @@ struct ResultGoldenPage {
     this.hasHeardCompanionResult = true;
   }
 
+  private getOrientationText(): string {
+    return this.isReversed ? '逆位' : '正位';
+  }
+
+  private getCompanionText(): ResultCompanionText {
+    return getSingleCardCompanionText(this.cardName || '这张牌', this.isReversed);
+  }
+
   build() {
     Stack() {
       // ── C 方案底色 ──
@@ -311,31 +319,23 @@ struct ResultGoldenPage {
           .width('100%')
           .padding({ top: Theme.SAFE_TOP, bottom: 0 })
 
-          // ═══════════ 顶部：牌面 + 牌名 + 正位标签 ═══════════
+          // ═══════════ 顶部：牌面 + 牌名 + 正逆位标签 ═══════════
           this.buildHeader()
 
           // ═══════════ 金句区域 ═══════════
           this.buildGoldenSentence()
 
-          // ═══════════ 分割线 ═══════════
-          Divider()
-            .strokeWidth(0.5)
-            .color(Theme.V2C_SPINE_LINE)
-            .margin({ top: Theme.SPACE_LG, bottom: Theme.SPACE_LG })
-
-          // ═══════════ 情绪关键词 + 今日行动 ═══════════
-          this.buildActionSection()
-
           // ═══════════ "为什么是这张牌" ═══════════
           this.buildWhyThisCard()
+
+          // ═══════════ 深度解读（折叠区） ═══════════
+          this.buildDeepInterpretation()
 
           // ═══════════ 星澜陪你看见 ═══════════
           this.buildCompanionSection()
 
-          Divider()
-            .strokeWidth(0.5)
-            .color(Theme.V2C_SPINE_LINE)
-            .margin({ top: Theme.SPACE_LG, bottom: Theme.SPACE_LG })
+          // ═══════════ 情绪关键词 + 今日行动 ═══════════
+          this.buildActionSection()
 
           // ═══════════ 操作按钮区 ═══════════
           this.buildActionButtons()
@@ -347,9 +347,6 @@ struct ResultGoldenPage {
             .strokeWidth(0.5)
             .color(Theme.V2C_SPINE_LINE)
             .margin({ top: Theme.SPACE_LG, bottom: Theme.SPACE_LG })
-
-          // ═══════════ 深度解读（折叠区） ═══════════
-          this.buildDeepInterpretation()
 
           // ═══════════ 合规页脚 ═══════════
           ComplianceFooter({
@@ -377,53 +374,75 @@ struct ResultGoldenPage {
   @Builder
   buildHeader(): void {
     Column() {
-      // C 方案烫金线框 + 牌面图
-      Stack() {
-        // 牌面图片（P0.3 整改 v2：使用统一尺寸常量）
+      Text('星钥之书 · 单牌记录')
+        .fontSize(Theme.V2C_FONT_CAPTION)
+        .fontColor(Theme.V2C_TEXT_SECONDARY)
+        .margin({ bottom: Theme.V2_SPACE_MD })
+
+      Stack({ alignContent: Alignment.Center }) {
+        Column()
+          .width('100%')
+          .height('100%')
+          .backgroundColor(Theme.V2C_BG_CARD)
+          .borderRadius(Theme.V2C_RADIUS_POPUP)
+          .border({ width: 1, color: 'rgba(197, 160, 80, 0.12)' })
+          .shadow(Theme.V2C_SHADOW_CARD)
+
+        Column()
+          .width(1)
+          .height('58%')
+          .backgroundColor(Theme.V2C_SPINE_LINE)
+          .opacity(0.28)
+          .position({ x: 22, y: 58 })
+
+        Row()
+          .width('72%')
+          .height(1)
+          .backgroundColor(Theme.V2C_GOLD_GILT)
+          .opacity(0.18)
+          .position({ x: '14%', y: 18 })
+
+        Row()
+          .width('72%')
+          .height(1)
+          .backgroundColor(Theme.V2C_GOLD_GILT)
+          .opacity(0.12)
+          .position({ x: '14%', y: 270 })
+
         TarotCardImage({
           cardId: this.cardId,
           cardWidth: Theme.CARD_SIZE_SINGLE_RESULT.width,
           cardHeight: Theme.CARD_SIZE_SINGLE_RESULT.height
         })
-
-        // 烫金顶线装饰
-        Row()
-          .width('60%')
-          .height(1)
-          .backgroundColor(Theme.V2C_GOLD_GILT)
-          .opacity(0.4)
-          .position({ x: '20%', y: 8 })
-
-        // 烫金底线装饰
-        Row()
-          .width('60%')
-          .height(1)
-          .backgroundColor(Theme.V2C_GOLD_GILT)
-          .opacity(0.3)
-          .position({ x: '20%', y: '92%' })
+          .rotate({
+            angle: this.isReversed ? 180 : 0,
+            centerX: '50%',
+            centerY: '50%'
+          })
       }
-      .width(Theme.CARD_SIZE_SINGLE_RESULT.width)
-      .height(Theme.CARD_SIZE_SINGLE_RESULT.height)
+      .width('100%')
+      .height(288)
 
       // 牌名（衬线字体）
       Text(this.cardName)
-        .fontSize(Theme.V2C_FONT_CARD_NAME)
+        .fontSize(30)
         .fontColor(Theme.V2C_TEXT_PRIMARY)
         .fontWeight(FontWeight.Bold)
-        .margin({ top: Theme.SPACE_MD })
+        .textAlign(TextAlign.Center)
+        .margin({ top: Theme.V2_SPACE_LG })
 
-      // 正位标签
-      Text('正位')
+      Text(this.getOrientationText())
         .fontSize(Theme.V2C_FONT_CAPTION)
         .fontColor(Theme.V2C_GOLD_GILT)
-        .padding({ left: 12, right: 12, top: 2, bottom: 2 })
+        .padding({ left: 14, right: 14, top: 4, bottom: 4 })
+        .backgroundColor('rgba(197, 160, 80, 0.08)')
         .borderRadius(Theme.V2C_RADIUS_CHIP)
-        .border({ width: 1, color: Theme.V2C_GOLD_GILT })
+        .border({ width: 1, color: 'rgba(197, 160, 80, 0.32)' })
         .margin({ top: Theme.SPACE_XS })
     }
     .width('100%')
     .alignItems(HorizontalAlign.Center)
-    .margin({ top: 48 })
+    .margin({ top: Theme.V2_SPACE_LG })
   }
 
   @Builder
@@ -445,11 +464,17 @@ struct ResultGoldenPage {
         .hitTestBehavior(HitTestMode.None)
 
       Column() {
+        Text('星钥之语')
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_GOLD_GILT)
+          .fontWeight(FontWeight.Medium)
+          .margin({ bottom: Theme.V2_SPACE_SM })
+
         Text(this.goldenSentence)
-          .fontSize(Theme.V2C_FONT_DISPLAY)
+          .fontSize(28)
           .fontColor(Theme.V2C_GOLD_GILT_SOFT)
           .fontWeight(FontWeight.Bold)
-          .lineHeight(52)
+          .lineHeight(40)
           .textAlign(TextAlign.Center)
           .width('100%')
 
@@ -460,10 +485,10 @@ struct ResultGoldenPage {
       }
       .width('100%')
       .alignItems(HorizontalAlign.Center)
-      .padding({ top: Theme.SPACE_LG, bottom: Theme.SPACE_LG })
+      .padding({ left: Theme.V2_SPACE_LG, right: Theme.V2_SPACE_LG, top: Theme.V2_SPACE_LG, bottom: Theme.V2_SPACE_LG })
     }
     .width('100%')
-    .margin({ top: Theme.SPACE_RESULT_GAP })
+    .margin({ top: Theme.V2_SPACE_XL })
     .backgroundColor(Theme.V2C_BG_CARD)
     .borderRadius(Theme.V2C_RADIUS_POPUP)
     .border({ width: 1, color: 'rgba(197, 160, 80, 0.12)' })
@@ -490,43 +515,56 @@ struct ResultGoldenPage {
     .backgroundColor(Theme.V2C_BG_CARD)
     .borderRadius(Theme.V2C_RADIUS_CARD)
     .border({ width: 1, color: 'rgba(197, 160, 80, 0.15)' })
+    .margin({ top: Theme.V2_SPACE_MD })
   }
 
   @Builder
   buildCompanionSection(): void {
     Column() {
-      Text(getSingleCardCompanionText(this.cardName || '这张牌', this.isReversed).title)
-        .fontSize(Theme.V2C_FONT_SUBTITLE)
-        .fontColor(Theme.V2C_GOLD_GILT)
-        .fontWeight(FontWeight.Bold)
-        .width('100%')
-        .margin({ bottom: Theme.V2_SPACE_MD })
+      Row() {
+        Text(this.getCompanionText().title)
+          .fontSize(Theme.V2C_FONT_SUBTITLE)
+          .fontColor(Theme.V2C_GOLD_GILT)
+          .fontWeight(FontWeight.Bold)
+
+        Blank()
+
+        Text('月光旁注')
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
+      }
+      .width('100%')
+      .margin({ bottom: Theme.V2_SPACE_MD })
 
       Column({ space: Theme.V2_SPACE_MD }) {
-        Text(getSingleCardCompanionText(this.cardName || '这张牌', this.isReversed).receive)
+        Text(this.getCompanionText().receive)
           .fontSize(Theme.V2C_FONT_BODY)
           .fontColor(Theme.V2C_TEXT_PRIMARY)
-          .lineHeight(24)
+          .lineHeight(25)
           .width('100%')
 
-        Text(getSingleCardCompanionText(this.cardName || '这张牌', this.isReversed).reflect)
+        Text(this.getCompanionText().reflect)
           .fontSize(Theme.V2C_FONT_BODY)
           .fontColor(Theme.V2C_TEXT_PRIMARY)
-          .lineHeight(24)
+          .lineHeight(25)
           .width('100%')
 
-        Text(getSingleCardCompanionText(this.cardName || '这张牌', this.isReversed).question)
+        Text(this.getCompanionText().question)
           .fontSize(Theme.V2C_FONT_BODY)
           .fontColor(Theme.V2C_GOLD_GILT_SOFT)
           .fontWeight(FontWeight.Medium)
-          .lineHeight(24)
+          .lineHeight(25)
           .width('100%')
+          .padding({ left: Theme.V2_SPACE_MD, right: Theme.V2_SPACE_MD, top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_SM })
+          .backgroundColor('rgba(197, 160, 80, 0.06)')
+          .borderRadius(Theme.V2C_RADIUS_CHIP)
+          .border({ width: 1, color: 'rgba(197, 160, 80, 0.18)' })
           .margin({ top: Theme.V2_SPACE_XS })
 
-        Text(getSingleCardCompanionText(this.cardName || '这张牌', this.isReversed).action)
+        Text(this.getCompanionText().action)
           .fontSize(Theme.V2C_FONT_BODY)
           .fontColor(Theme.V2C_TEXT_SECONDARY)
-          .lineHeight(24)
+          .lineHeight(25)
           .width('100%')
           .fontStyle(FontStyle.Italic)
       }
@@ -534,32 +572,31 @@ struct ResultGoldenPage {
     }
     .width('100%')
     .padding(Theme.V2_SPACE_LG)
-    .backgroundColor(Theme.V2C_BG_CARD)
+    .backgroundColor('rgba(18, 24, 54, 0.78)')
     .borderRadius(Theme.V2C_RADIUS_CARD)
-    .border({ width: 1, color: 'rgba(197, 160, 80, 0.15)' })
+    .border({ width: 1, color: 'rgba(197, 160, 80, 0.12)' })
     .margin({ top: Theme.V2_SPACE_MD })
   }
 
   @Builder
   buildActionSection(): void {
-    Column({ space: Theme.SPACE_MD }) {
-      // 情绪关键词标签组
-      Row({ space: Theme.SPACE_SM }) {
+    Column({ space: Theme.V2_SPACE_MD }) {
+      Flex({ wrap: FlexWrap.Wrap }) {
         ForEach(this.emotionKeywords, (keyword: string) => {
           Text(keyword)
             .fontSize(Theme.V2C_FONT_CAPTION)
             .fontColor(Theme.V2C_GOLD_GILT)
             .padding({ left: 12, right: 12, top: 4, bottom: 4 })
-            .backgroundColor('rgba(197, 160, 80, 0.1)')
-            .borderRadius(Theme.V2C_RADIUS_BTN)
-            .border({ width: 1, color: 'rgba(197, 160, 80, 0.25)' })
+            .margin({ right: Theme.V2_SPACE_XS, bottom: Theme.V2_SPACE_XS })
+            .backgroundColor('rgba(197, 160, 80, 0.08)')
+            .borderRadius(Theme.V2C_RADIUS_CHIP)
+            .border({ width: 1, color: 'rgba(197, 160, 80, 0.22)' })
         }, (keyword: string) => keyword)
       }
       .width('100%')
 
-      // 今日行动卡片
       Column() {
-        Text('✅ 今日行动')
+        Text('今日行动建议')
           .fontSize(Theme.V2C_FONT_CAPTION)
           .fontColor(Theme.V2C_GOLD_GILT)
           .fontWeight(FontWeight.Bold)
@@ -569,24 +606,32 @@ struct ResultGoldenPage {
         Text(this.todayAction)
           .fontSize(Theme.V2C_FONT_BODY)
           .fontColor(Theme.V2C_TEXT_PRIMARY)
-          .lineHeight(24)
+          .lineHeight(25)
           .width('100%')
       }
       .width('100%')
-      .padding(Theme.SPACE_LG)
+      .padding(Theme.V2_SPACE_LG)
       .backgroundColor(Theme.V2C_BG_FLOATING)
       .borderRadius(Theme.V2C_RADIUS_CARD)
+      .border({ width: 1, color: Theme.V2C_SPINE_LINE })
     }
     .width('100%')
-    .margin({ top: Theme.SPACE_LG })
+    .margin({ top: Theme.V2_SPACE_MD })
   }
 
   @Builder
   buildActionButtons(): void {
     Column({ space: Theme.SPACE_MD }) {
+      Text('继续整理这次抽牌')
+        .fontSize(Theme.V2C_FONT_SUBTITLE)
+        .fontColor(Theme.V2C_GOLD_GILT)
+        .fontWeight(FontWeight.Bold)
+        .width('100%')
+        .margin({ bottom: Theme.V2_SPACE_XS })
+
       // ── FIRST_EXPERIENCE 专属：「进入首页」按钮（最上方，金色实心）──
       if (this.entryMode === 'FIRST_EXPERIENCE') {
-        Button('🏠 进入首页')
+        Button('进入首页')
           .fontSize(Theme.V2C_FONT_BODY)
           .fontColor(Theme.V2C_GOLD_GILT)
           .fontWeight(FontWeight.Medium)
@@ -606,7 +651,7 @@ struct ResultGoldenPage {
       }
 
       // 追问道星澜按钮
-      Button('💬 追问星澜')
+      Button('追问星澜')
         .fontSize(Theme.V2C_FONT_BODY)
         .fontColor(Theme.V2C_GOLD_GILT)
         .fontWeight(FontWeight.Medium)
@@ -649,7 +694,7 @@ struct ResultGoldenPage {
         })
 
       // 生成分享卡按钮（P0.2 改为 sourceRecordId + spreadType）
-      Button('📤 生成分享卡')
+      Button('生成分享卡')
         .fontSize(Theme.V2C_FONT_BODY)
         .fontColor(Theme.V2C_GOLD_GILT)
         .fontWeight(FontWeight.Medium)
@@ -690,7 +735,7 @@ struct ResultGoldenPage {
 
       // NORMAL_SINGLE：「回到首页」
       if (this.entryMode !== 'FIRST_EXPERIENCE') {
-        Button('🏠 回到首页')
+        Button('回到首页')
           .fontSize(Theme.V2C_FONT_BODY)
           .fontColor(Theme.V2C_TEXT_SECONDARY)
           .fontWeight(FontWeight.Normal)

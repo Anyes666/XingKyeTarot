@@ -4,7 +4,7 @@ import { image } from '@kit.ImageKit';
 import { Theme } from '../common/Theme';
 import { Routes } from '../common/Routes';
 import { HistoryStore } from '../common/HistoryStore';
-import { DivinationHistoryRecord, SpreadType, DrawnCardRecord } from '../model/DivinationHistoryRecord';
+import { DivinationHistoryRecord, DrawnCardRecord } from '../model/DivinationHistoryRecord';
 import { ComplianceFooter } from '../components/ComplianceFooter';
 import { AppBackButton } from '../components/AppBackButton';
 import { ShareImageService, SaveImageResult } from '../service/ShareImageService';
@@ -140,68 +140,102 @@ struct ShareCardPage {
   }
 
   build() {
-    Scroll() {
-      Column() {
-        // ── P0.3 整改：左上角统一返回按钮 ──
-        Row() {
-          AppBackButton({ fallbackUrl: Routes.HOME })
-        }
+    Stack() {
+      Column()
         .width('100%')
-        .padding({ top: 48 })
+        .height('100%')
+        .backgroundColor(Theme.V2C_BG_BASE)
 
-        // ── 标题区 ──
-        Text('🌙 生成分享卡')
-          .fontSize(Theme.FONT_HEADLINE)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(Theme.GOLD_LIGHT)
-          .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_XS })
+      Column()
+        .width('100%')
+        .height(220)
+        .radialGradient({
+          center: ['50%', '8%'],
+          radius: '74%',
+          colors: [
+            ['rgba(197, 160, 80, 0.045)', 0.0],
+            ['rgba(197, 160, 80, 0.012)', 0.58],
+            ['rgba(10, 13, 26, 0)', 1.0]
+          ]
+        })
+        .hitTestBehavior(HitTestMode.None)
 
-        Text('分享你的星钥时刻')
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.MOON_MUTED)
-          .margin({ bottom: Theme.SPACE_XL })
+      Scroll() {
+        Column() {
+          Row() {
+            AppBackButton({ fallbackUrl: Routes.HOME })
+          }
+          .width('100%')
+          .padding({ top: Theme.SAFE_TOP })
 
-        if (this.isLoading) {
-          LoadingProgress()
-            .width(36)
-            .height(36)
-            .color(Theme.V2C_GOLD_GILT)
-        } else if (!this.record) {
-          Text('记录不存在')
-            .fontSize(Theme.FONT_BODY)
-            .fontColor(Theme.MOON_MUTED)
-            .margin({ top: 40 })
-        } else {
-          // 根据 spreadType 渲染不同布局
-          // 注意：id 设在各卡片本体 Column 上，不设在页面根容器
           Column() {
-            if (this.spreadType === 'SINGLE') {
-              this.buildSingleLayout();
-            } else if (this.spreadType === 'TRIANGLE') {
-              this.buildTriangleLayout();
-            } else if (this.spreadType === 'RELATION') {
-              this.buildRelationLayout();
+            Text('生成分享卡')
+              .fontSize(Theme.V2C_FONT_TITLE)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(Theme.V2C_TEXT_PRIMARY)
+              .textAlign(TextAlign.Center)
+
+            Row()
+              .width(44)
+              .height(1)
+              .backgroundColor(Theme.V2C_GOLD_GILT)
+              .opacity(0.30)
+              .margin({ top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_SM })
+
+            Text('把这一页，保存成一段属于你的记录。')
+              .fontSize(Theme.V2C_FONT_BODY)
+              .fontColor(Theme.V2C_TEXT_SECONDARY)
+              .textAlign(TextAlign.Center)
+              .lineHeight(23)
+          }
+          .width('100%')
+          .alignItems(HorizontalAlign.Center)
+          .margin({ top: Theme.V2_SPACE_MD, bottom: Theme.V2_SPACE_XL })
+
+          if (this.isLoading) {
+            LoadingProgress()
+              .width(36)
+              .height(36)
+              .color(Theme.V2C_GOLD_GILT)
+          } else if (!this.record) {
+            Text('记录不存在')
+              .fontSize(Theme.V2C_FONT_BODY)
+              .fontColor(Theme.V2C_TEXT_SECONDARY)
+              .margin({ top: 40 })
+          } else {
+            // 根据 spreadType 渲染不同布局
+            // 注意：id 设在各卡片本体 Column 上，不设在页面根容器
+            Column() {
+              if (this.spreadType === 'SINGLE') {
+                this.buildSingleLayout();
+              } else if (this.spreadType === 'TRIANGLE') {
+                this.buildTriangleLayout();
+              } else if (this.spreadType === 'RELATION') {
+                this.buildRelationLayout();
+              }
             }
           }
+
+          Blank()
+            .height(Theme.V2_SPACE_XL)
+
+          // ── 合规页脚：页面外壳，不进入截图目标 ──
+          ComplianceFooter({
+            fontSize: Theme.V2C_FONT_CAPTION,
+            textColor: Theme.V2C_TEXT_SECONDARY,
+            showDivider: true,
+          })
         }
-
-        Blank()
-
-        // ── 合规页脚 ──
-        ComplianceFooter({
-          fontSize: Theme.FONT_CAPTION,
-          textColor: Theme.MOON_MUTED,
-          showDivider: true,
-        })
+        .width('100%')
+        .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: Theme.SAFE_BOTTOM + 28 })
+        .alignItems(HorizontalAlign.Center)
       }
       .width('100%')
-      .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, bottom: 36 })
-      .alignItems(HorizontalAlign.Center)
+      .height('100%')
+      .scrollBar(BarState.Off)
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(Theme.BG_DEEP_INDIGO)
-    .scrollBar(BarState.Off)
   }
 
   // ────── SINGLE 布局 ──────
@@ -215,24 +249,32 @@ struct ShareCardPage {
       Column() {
         TarotCardImage({
           cardId: this.record!.cards[0]!.cardId,
-          cardWidth: Theme.CARD_SIZE_TRIO.width,
-          cardHeight: Theme.CARD_SIZE_TRIO.height
+          cardWidth: 118,
+          cardHeight: 189
         })
+          .rotate({
+            angle: this.record!.cards[0]!.isReversed ? 180 : 0,
+            centerX: '50%',
+            centerY: '50%'
+          })
         Text(this.record!.cards[0]!.cardName)
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.GOLD_LIGHT)
-          .margin({ top: Theme.SPACE_XS })
-        Text('此刻照见你的星钥')
-          .fontSize(10)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_PRIMARY)
+          .fontWeight(FontWeight.Bold)
+          .textAlign(TextAlign.Center)
+          .margin({ top: Theme.V2_SPACE_SM })
+        Text(this.record!.cards[0]!.isReversed ? '逆位' : '正位')
+          .fontSize(Theme.V2C_FONT_DISCLAIMER)
+          .fontColor(Theme.V2C_GOLD_GILT_SOFT)
+          .margin({ top: 2 })
       }
-      .width(120)
-      .padding({ top: 10, bottom: 10, left: 8, right: 8 })
+      .width(150)
+      .padding({ top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_SM, left: Theme.V2_SPACE_SM, right: Theme.V2_SPACE_SM })
       .alignItems(HorizontalAlign.Center)
-      .backgroundColor('#0F0F23')
-      .borderRadius(16)
-      .border({ width: 1, color: '#8B6A2B' })
-      .margin({ bottom: Theme.SPACE_MD })
+      .backgroundColor('rgba(10, 13, 26, 0.62)')
+      .borderRadius(Theme.V2_RADIUS_XL)
+      .border({ width: 1, color: 'rgba(197, 160, 80, 0.20)' })
+      .margin({ bottom: Theme.V2_SPACE_MD })
     }
   }
 
@@ -241,114 +283,133 @@ struct ShareCardPage {
     Column({ space: Theme.SPACE_MD }) {
       // 情绪签完整海报（id 设在外层海报容器）
       Column() {
-        Text('星钥塔罗 · 星澜')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.GOLD_LIGHT)
-          .margin({ bottom: Theme.SPACE_XS })
-        Text('✦ 情绪签')
-          .fontSize(Theme.FONT_SUBTITLE)
+        Text('星钥之书 · 单牌记录')
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
+          .margin({ bottom: Theme.V2_SPACE_XS })
+        Text('情绪签')
+          .fontSize(Theme.V2C_FONT_SUBTITLE)
           .fontWeight(FontWeight.Bold)
-          .fontColor(Theme.GOLD_AMBER)
-          .margin({ bottom: Theme.SPACE_MD })
+          .fontColor(Theme.V2C_GOLD_GILT)
+          .margin({ bottom: Theme.V2_SPACE_SM })
+        Row()
+          .width(42)
+          .height(1)
+          .backgroundColor(Theme.V2C_GOLD_GILT)
+          .opacity(0.28)
+          .margin({ bottom: Theme.V2_SPACE_MD })
         this.buildSingleCardFace()
         Text(this.record!.scenarioTag || '此刻心绪')
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_PRIMARY)
+          .lineHeight(24)
           .textAlign(TextAlign.Center)
-          .maxLines(4)
-          .margin({ bottom: Theme.SPACE_XS })
+          .width('100%')
+          .margin({ bottom: Theme.V2_SPACE_XS })
         Text('每一种情绪都是真实自己的回声')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .fontStyle(FontStyle.Italic)
           .textAlign(TextAlign.Center)
-          .margin({ bottom: Theme.SPACE_MD })
-        Text('结果仅供娱乐与自我探索参考，不构成任何专业建议。')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.MOON_MUTED)
-          .textAlign(TextAlign.Center)
+          .margin({ bottom: Theme.V2_SPACE_MD })
+        this.buildShareDisclaimer()
       }
-      .width('88%')
-      .padding(Theme.SPACE_LG)
-      .backgroundColor(Theme.BG_CARD_DARK)
-      .borderRadius(Theme.RADIUS_MD)
-      .border({ width: 1, color: 'rgba(202, 138, 4, 0.12)' })
+      .width('100%')
+      .padding({ left: Theme.V2_SPACE_LG, right: Theme.V2_SPACE_LG, top: Theme.V2_SPACE_LG, bottom: Theme.V2_SPACE_LG })
+      .alignItems(HorizontalAlign.Center)
+      .backgroundColor(Theme.V2C_BG_CARD)
+      .borderRadius(Theme.V2_RADIUS_XL)
+      .border({ width: 1, color: 'rgba(197, 160, 80, 0.18)' })
+      .shadow(Theme.V2C_SHADOW_CARD)
       .id('share_card_emotion')
 
       this.buildSaveButton('share_card_emotion', '情绪签')
 
       // 人设签完整海报
       Column() {
-        Text('星钥塔罗 · 星澜')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.GOLD_LIGHT)
-          .margin({ bottom: Theme.SPACE_XS })
-        Text('✦ 人设签')
-          .fontSize(Theme.FONT_SUBTITLE)
+        Text('星钥之书 · 单牌记录')
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
+          .margin({ bottom: Theme.V2_SPACE_XS })
+        Text('人设签')
+          .fontSize(Theme.V2C_FONT_SUBTITLE)
           .fontWeight(FontWeight.Bold)
-          .fontColor(Theme.GOLD_AMBER)
-          .margin({ bottom: Theme.SPACE_MD })
+          .fontColor(Theme.V2C_GOLD_GILT)
+          .margin({ bottom: Theme.V2_SPACE_SM })
+        Row()
+          .width(42)
+          .height(1)
+          .backgroundColor(Theme.V2C_GOLD_GILT)
+          .opacity(0.28)
+          .margin({ bottom: Theme.V2_SPACE_MD })
         this.buildSingleCardFace()
         Text((this.record!.cards && this.record!.cards.length > 0) ? this.record!.cards[0]!.cardName : '星钥旅人')
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_PRIMARY)
           .fontWeight(FontWeight.Bold)
           .textAlign(TextAlign.Center)
-          .margin({ bottom: Theme.SPACE_XS })
+          .lineHeight(24)
+          .width('100%')
+          .margin({ bottom: Theme.V2_SPACE_XS })
         Text('这张牌映照着此刻的你')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .fontStyle(FontStyle.Italic)
           .textAlign(TextAlign.Center)
-          .margin({ bottom: Theme.SPACE_MD })
-        Text('结果仅供娱乐与自我探索参考，不构成任何专业建议。')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.MOON_MUTED)
-          .textAlign(TextAlign.Center)
+          .margin({ bottom: Theme.V2_SPACE_MD })
+        this.buildShareDisclaimer()
       }
-      .width('88%')
-      .padding(Theme.SPACE_LG)
-      .backgroundColor(Theme.BG_CARD_DARK)
-      .borderRadius(Theme.RADIUS_MD)
-      .border({ width: 1, color: 'rgba(202, 138, 4, 0.12)' })
+      .width('100%')
+      .padding({ left: Theme.V2_SPACE_LG, right: Theme.V2_SPACE_LG, top: Theme.V2_SPACE_LG, bottom: Theme.V2_SPACE_LG })
+      .alignItems(HorizontalAlign.Center)
+      .backgroundColor(Theme.V2C_BG_CARD)
+      .borderRadius(Theme.V2_RADIUS_XL)
+      .border({ width: 1, color: 'rgba(197, 160, 80, 0.18)' })
+      .shadow(Theme.V2C_SHADOW_CARD)
       .id('share_card_persona')
 
       this.buildSaveButton('share_card_persona', '人设签')
 
       // 行动签完整海报
       Column() {
-        Text('星钥塔罗 · 星澜')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.GOLD_LIGHT)
-          .margin({ bottom: Theme.SPACE_XS })
-        Text('✦ 行动签')
-          .fontSize(Theme.FONT_SUBTITLE)
+        Text('星钥之书 · 单牌记录')
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
+          .margin({ bottom: Theme.V2_SPACE_XS })
+        Text('行动签')
+          .fontSize(Theme.V2C_FONT_SUBTITLE)
           .fontWeight(FontWeight.Bold)
-          .fontColor(Theme.GOLD_AMBER)
-          .margin({ bottom: Theme.SPACE_MD })
+          .fontColor(Theme.V2C_GOLD_GILT)
+          .margin({ bottom: Theme.V2_SPACE_SM })
+        Row()
+          .width(42)
+          .height(1)
+          .backgroundColor(Theme.V2C_GOLD_GILT)
+          .opacity(0.28)
+          .margin({ bottom: Theme.V2_SPACE_MD })
         this.buildSingleCardFace()
         Text((this.record!.cards && this.record!.cards.length > 0) ? this.record!.cards[0]!.goldenSentence : (this.record!.summaryText || '今日指引'))
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.TEXT_PRIMARY_LIGHT)
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_PRIMARY)
+          .lineHeight(24)
           .textAlign(TextAlign.Center)
-          .maxLines(4)
-          .margin({ bottom: Theme.SPACE_XS })
+          .width('100%')
+          .margin({ bottom: Theme.V2_SPACE_XS })
         Text('带着这句话回到生活里')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.MOON_MUTED)
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
           .fontStyle(FontStyle.Italic)
           .textAlign(TextAlign.Center)
-          .margin({ bottom: Theme.SPACE_MD })
-        Text('结果仅供娱乐与自我探索参考，不构成任何专业建议。')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.MOON_MUTED)
-          .textAlign(TextAlign.Center)
+          .margin({ bottom: Theme.V2_SPACE_MD })
+        this.buildShareDisclaimer()
       }
-      .width('88%')
-      .padding(Theme.SPACE_LG)
-      .backgroundColor(Theme.BG_CARD_DARK)
-      .borderRadius(Theme.RADIUS_MD)
-      .border({ width: 1, color: 'rgba(202, 138, 4, 0.12)' })
+      .width('100%')
+      .padding({ left: Theme.V2_SPACE_LG, right: Theme.V2_SPACE_LG, top: Theme.V2_SPACE_LG, bottom: Theme.V2_SPACE_LG })
+      .alignItems(HorizontalAlign.Center)
+      .backgroundColor(Theme.V2C_BG_CARD)
+      .borderRadius(Theme.V2_RADIUS_XL)
+      .border({ width: 1, color: 'rgba(197, 160, 80, 0.18)' })
+      .shadow(Theme.V2C_SHADOW_CARD)
       .id('share_card_action')
 
       this.buildSaveButton('share_card_action', '行动签')
@@ -363,49 +424,63 @@ struct ShareCardPage {
     Column({ space: Theme.SPACE_MD }) {
       // 圣三角完整海报（id 设在外层海报容器，包含品牌+标题+牌阵+解读+免责声明）
       Column() {
-        Text('星钥塔罗 · 星澜')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.GOLD_LIGHT)
-          .margin({ bottom: Theme.SPACE_XS })
-        Text('🔺 圣三角')
-          .fontSize(Theme.FONT_SUBTITLE)
+        Text('星钥之书 · 圣三角')
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
+          .margin({ bottom: Theme.V2_SPACE_XS })
+        Text('三张牌，按顺序慢慢读')
+          .fontSize(Theme.V2C_FONT_SUBTITLE)
           .fontWeight(FontWeight.Bold)
-          .fontColor(Theme.GOLD_AMBER)
-          .margin({ bottom: Theme.SPACE_SM })
+          .fontColor(Theme.V2C_GOLD_GILT)
+          .textAlign(TextAlign.Center)
+          .margin({ bottom: Theme.V2_SPACE_SM })
+        Row()
+          .width(42)
+          .height(1)
+          .backgroundColor(Theme.V2C_GOLD_GILT)
+          .opacity(0.28)
+          .margin({ bottom: Theme.V2_SPACE_MD })
 
         // 三张牌展示
         this.buildTarotCardRow(this.record!.cards)
 
         // 综合解读
         Text('圣三角综合解读')
-          .fontSize(Theme.FONT_SUBTITLE)
+          .fontSize(Theme.V2C_FONT_SUBTITLE)
           .fontWeight(FontWeight.Bold)
-          .fontColor(Theme.GOLD_AMBER)
-          .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_XS })
+          .fontColor(Theme.V2C_GOLD_GILT)
+          .width('100%')
+          .margin({ top: Theme.V2_SPACE_MD, bottom: Theme.V2_SPACE_XS })
         Text(this.record!.summaryText || '')
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.TEXT_PRIMARY_LIGHT)
-          .textAlign(TextAlign.Center)
-          .maxLines(6)
-          .margin({ bottom: Theme.SPACE_SM })
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_PRIMARY)
+          .textAlign(TextAlign.Start)
+          .lineHeight(25)
+          .width('100%')
+          .margin({ bottom: Theme.V2_SPACE_SM })
 
         // 趋势提醒
         Text('圣三角不是命运预言，而是一种趋势提醒。它提示你：如果沿着现在的方式继续，接下来最需要留意什么。')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.MOON_MUTED)
-          .textAlign(TextAlign.Center)
-          .margin({ bottom: Theme.SPACE_MD })
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
+          .textAlign(TextAlign.Start)
+          .lineHeight(20)
+          .width('100%')
+          .padding({ left: Theme.V2_SPACE_MD, right: Theme.V2_SPACE_MD, top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_SM })
+          .backgroundColor('rgba(10, 13, 26, 0.36)')
+          .borderRadius(Theme.V2C_RADIUS_CARD)
+          .border({ width: 1, color: Theme.V2C_SPINE_LINE })
+          .margin({ bottom: Theme.V2_SPACE_MD })
 
-        Text('结果仅供娱乐与自我探索参考，不构成任何专业建议。')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.MOON_MUTED)
-          .textAlign(TextAlign.Center)
+        this.buildShareDisclaimer()
       }
-      .width('88%')
-      .padding(Theme.SPACE_LG)
-      .backgroundColor(Theme.BG_CARD_DARK)
-      .borderRadius(Theme.RADIUS_MD)
-      .border({ width: 1, color: 'rgba(202, 138, 4, 0.12)' })
+      .width('100%')
+      .padding({ left: Theme.V2_SPACE_LG, right: Theme.V2_SPACE_LG, top: Theme.V2_SPACE_LG, bottom: Theme.V2_SPACE_LG })
+      .alignItems(HorizontalAlign.Center)
+      .backgroundColor(Theme.V2C_BG_CARD)
+      .borderRadius(Theme.V2_RADIUS_XL)
+      .border({ width: 1, color: 'rgba(197, 160, 80, 0.18)' })
+      .shadow(Theme.V2C_SHADOW_CARD)
       .id('share_card_triangle')
 
       this.buildSaveButton('share_card_triangle', '圣三角')
@@ -420,57 +495,71 @@ struct ShareCardPage {
     Column({ space: Theme.SPACE_MD }) {
       // 关系探索完整海报（id 设在外层海报容器，包含品牌+标题+牌阵+解读+边界提醒+免责声明）
       Column() {
-        Text('星钥塔罗 · 星澜')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.GOLD_LIGHT)
-          .margin({ bottom: Theme.SPACE_XS })
-        Text('💞 关系探索')
-          .fontSize(Theme.FONT_SUBTITLE)
+        Text('星钥之书 · 关系探索')
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
+          .margin({ bottom: Theme.V2_SPACE_XS })
+        Text('把关系放在一页里慢慢看')
+          .fontSize(Theme.V2C_FONT_SUBTITLE)
           .fontWeight(FontWeight.Bold)
-          .fontColor(Theme.GOLD_AMBER)
-          .margin({ bottom: Theme.SPACE_SM })
+          .fontColor(Theme.V2C_GOLD_GILT)
+          .textAlign(TextAlign.Center)
+          .margin({ bottom: Theme.V2_SPACE_SM })
+        Row()
+          .width(42)
+          .height(1)
+          .backgroundColor(Theme.V2C_GOLD_GILT)
+          .opacity(0.28)
+          .margin({ bottom: Theme.V2_SPACE_MD })
 
         // 三张牌展示
-        this.buildTarotCardRow(this.record!.cards)
+        this.buildRelationTarotCardRow(this.record!.cards)
 
         // 综合解读
         Text('关系探索综合解读')
-          .fontSize(Theme.FONT_SUBTITLE)
+          .fontSize(Theme.V2C_FONT_SUBTITLE)
           .fontWeight(FontWeight.Bold)
-          .fontColor(Theme.GOLD_AMBER)
-          .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_XS })
-        Text(this.record!.summaryText || '')
-          .fontSize(Theme.FONT_BODY)
-          .fontColor(Theme.TEXT_PRIMARY_LIGHT)
-          .textAlign(TextAlign.Center)
-          .maxLines(6)
-          .margin({ bottom: Theme.SPACE_SM })
+          .fontColor(Theme.V2C_GOLD_GILT)
+          .width('100%')
+          .margin({ top: Theme.V2_SPACE_MD, bottom: Theme.V2_SPACE_XS })
+        Text(this.record!.shareText || this.record!.summaryText || '')
+          .fontSize(Theme.V2C_FONT_BODY)
+          .fontColor(Theme.V2C_TEXT_PRIMARY)
+          .textAlign(TextAlign.Start)
+          .lineHeight(25)
+          .width('100%')
+          .margin({ bottom: Theme.V2_SPACE_SM })
 
         // 边界提醒
         if (this.record!.adviceText) {
-          Text('⚠️ 边界提醒')
-            .fontSize(Theme.FONT_SUBTITLE)
+          Text('边界提醒')
+            .fontSize(Theme.V2C_FONT_SUBTITLE)
             .fontWeight(FontWeight.Bold)
-            .fontColor(Theme.GOLD_AMBER)
-            .margin({ top: Theme.SPACE_SM, bottom: Theme.SPACE_XS })
+            .fontColor(Theme.V2C_GOLD_GILT)
+            .width('100%')
+            .margin({ top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_XS })
           Text(this.record!.adviceText)
-            .fontSize(Theme.FONT_CAPTION)
-            .fontColor(Theme.MOON_MUTED)
-            .textAlign(TextAlign.Center)
-            .maxLines(6)
-            .margin({ bottom: Theme.SPACE_SM })
+            .fontSize(Theme.V2C_FONT_CAPTION)
+            .fontColor(Theme.V2C_TEXT_SECONDARY)
+            .textAlign(TextAlign.Start)
+            .lineHeight(20)
+            .width('100%')
+            .padding({ left: Theme.V2_SPACE_MD, right: Theme.V2_SPACE_MD, top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_SM })
+            .backgroundColor('rgba(10, 13, 26, 0.36)')
+            .borderRadius(Theme.V2C_RADIUS_CARD)
+            .border({ width: 1, color: Theme.V2C_SPINE_LINE })
+            .margin({ bottom: Theme.V2_SPACE_SM })
         }
 
-        Text('结果仅供娱乐与自我探索参考，不构成任何专业建议。')
-          .fontSize(Theme.FONT_CAPTION)
-          .fontColor(Theme.MOON_MUTED)
-          .textAlign(TextAlign.Center)
+        this.buildShareDisclaimer()
       }
-      .width('88%')
-      .padding(Theme.SPACE_LG)
-      .backgroundColor(Theme.BG_CARD_DARK)
-      .borderRadius(Theme.RADIUS_MD)
-      .border({ width: 1, color: 'rgba(202, 138, 4, 0.12)' })
+      .width('100%')
+      .padding({ left: Theme.V2_SPACE_LG, right: Theme.V2_SPACE_LG, top: Theme.V2_SPACE_LG, bottom: Theme.V2_SPACE_LG })
+      .alignItems(HorizontalAlign.Center)
+      .backgroundColor(Theme.V2C_BG_CARD)
+      .borderRadius(Theme.V2_RADIUS_XL)
+      .border({ width: 1, color: 'rgba(197, 160, 80, 0.18)' })
+      .shadow(Theme.V2C_SHADOW_CARD)
       .id('share_card_relation')
 
       this.buildSaveButton('share_card_relation', '关系探索')
@@ -484,18 +573,30 @@ struct ShareCardPage {
   buildSaveButton(cardId: string, prefix: string): void {
     Button(this.isSaving ? '保存中...' : '保存图片')
       .type(ButtonType.Normal)
-      .width(180)
-      .height(48)
-      .borderRadius(24)
-      .backgroundColor(Theme.V2C_GOLD_GILT)
-      .fontColor(Theme.V2C_BG_BASE)
-      .fontSize(18)
-      .fontWeight(FontWeight.Bold)
+      .width('100%')
+      .constraintSize({ maxWidth: 340 })
+      .height(54)
+      .borderRadius(20)
+      .backgroundColor(this.isSaving ? 'rgba(18, 24, 54, 0.55)' : 'rgba(18, 24, 54, 0.86)')
+      .fontColor(this.isSaving ? Theme.V2_STATE_DISABLED_TEXT : Theme.V2C_GOLD_GILT_SOFT)
+      .fontSize(Theme.V2C_FONT_BODY)
+      .fontWeight(FontWeight.Medium)
+      .border({ width: 1, color: this.isSaving ? Theme.V2C_SPINE_LINE : 'rgba(197, 160, 80, 0.34)' })
       .enabled(!this.isSaving)
-      .margin({ top: 16 })
+      .margin({ top: Theme.V2_SPACE_MD, bottom: Theme.V2_SPACE_MD })
       .onClick(() => {
         this.saveCard(cardId, this.buildFileName(prefix));
       })
+  }
+
+  @Builder
+  buildShareDisclaimer(): void {
+    Text('结果仅供娱乐与自我探索参考，不构成任何专业建议。')
+      .fontSize(Theme.V2C_FONT_CAPTION)
+      .fontColor(Theme.V2C_TEXT_SECONDARY)
+      .textAlign(TextAlign.Center)
+      .lineHeight(19)
+      .width('100%')
   }
 
   // ────── 三张牌横排展示 ──────
@@ -517,20 +618,31 @@ struct ShareCardPage {
               cardWidth: Theme.CARD_SIZE_TRIO.width,
               cardHeight: Theme.CARD_SIZE_TRIO.height
             })
+              .rotate({
+                angle: cardRecord.isReversed ? 180 : 0,
+                centerX: '50%',
+                centerY: '50%'
+              })
 
             Text(cardRecord.cardName)
               .fontSize(Theme.V2C_FONT_CAPTION)
               .fontColor(Theme.V2C_TEXT_PRIMARY)
+              .fontWeight(FontWeight.Medium)
+              .textAlign(TextAlign.Center)
+              .lineHeight(18)
               .margin({ top: Theme.V2_SPACE_XS })
-              .maxLines(1)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+            Text(cardRecord.isReversed ? '逆位' : '正位')
+              .fontSize(10)
+              .fontColor(Theme.V2C_GOLD_GILT_SOFT)
+              .margin({ top: 2 })
 
             Text(cardRecord.keyword)
               .fontSize(10)
+              .textAlign(TextAlign.Center)
+              .lineHeight(15)
               .fontColor(Theme.V2C_TEXT_SECONDARY)
               .margin({ top: 2 })
-              .maxLines(1)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
           }
           .width('30%')
           .alignItems(HorizontalAlign.Center)
@@ -539,9 +651,65 @@ struct ShareCardPage {
       .width('100%')
       .justifyContent(FlexAlign.SpaceEvenly)
       .padding({ top: Theme.SPACE_MD, bottom: Theme.SPACE_MD })
-      .backgroundColor(Theme.BG_CARD_DARK)
-      .borderRadius(Theme.RADIUS_MD)
-      .border({ width: 1, color: 'rgba(202, 138, 4, 0.12)' })
+      .backgroundColor('rgba(10, 13, 26, 0.42)')
+      .borderRadius(Theme.V2C_RADIUS_CARD)
+      .border({ width: 1, color: Theme.V2C_SPINE_LINE })
+    }
+  }
+
+  @Builder
+  buildRelationTarotCardRow(cards: DrawnCardRecord[]): void {
+    if (cards && cards.length > 0) {
+      Row({ space: Theme.SPACE_XS }) {
+        ForEach(cards, (cardRecord: DrawnCardRecord) => {
+          Column() {
+            Text(cardRecord.positionTitle)
+              .fontSize(Theme.V2C_FONT_CAPTION)
+              .fontColor(Theme.V2C_GOLD_GILT)
+              .fontWeight(FontWeight.Bold)
+              .margin({ bottom: Theme.V2_SPACE_XS })
+
+            TarotCardImage({
+              cardId: cardRecord.cardId,
+              cardWidth: 86,
+              cardHeight: 138
+            })
+              .rotate({
+                angle: cardRecord.isReversed ? 180 : 0,
+                centerX: '50%',
+                centerY: '50%'
+              })
+
+            Text(cardRecord.cardName)
+              .fontSize(Theme.V2C_FONT_CAPTION)
+              .fontColor(Theme.V2C_TEXT_PRIMARY)
+              .fontWeight(FontWeight.Medium)
+              .textAlign(TextAlign.Center)
+              .lineHeight(18)
+              .margin({ top: Theme.V2_SPACE_XS })
+
+            Text(cardRecord.isReversed ? '逆位' : '正位')
+              .fontSize(10)
+              .fontColor(Theme.V2C_GOLD_GILT_SOFT)
+              .margin({ top: 2 })
+
+            Text(cardRecord.keyword)
+              .fontSize(10)
+              .fontColor(Theme.V2C_TEXT_SECONDARY)
+              .textAlign(TextAlign.Center)
+              .lineHeight(15)
+              .margin({ top: 2 })
+          }
+          .width('30%')
+          .alignItems(HorizontalAlign.Center)
+        }, (cardRecord: DrawnCardRecord) => cardRecord.positionKey + '_' + cardRecord.cardId)
+      }
+      .width('100%')
+      .justifyContent(FlexAlign.SpaceEvenly)
+      .padding({ top: Theme.SPACE_MD, bottom: Theme.SPACE_MD })
+      .backgroundColor('rgba(10, 13, 26, 0.42)')
+      .borderRadius(Theme.V2C_RADIUS_CARD)
+      .border({ width: 1, color: Theme.V2C_SPINE_LINE })
     }
   }
 

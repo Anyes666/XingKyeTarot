@@ -14,47 +14,63 @@
 
 ---
 
-## 2. 当前核心功能（v2.0.0）
+## 2. 当前核心功能（v2.1.0）
 
 ### 底部导航 5 个一级入口
 
-| Tab | 名称 | 功能 |
-|-----|------|------|
-| 0 | 占卜 | 占卜中心：单牌快占 / 圣三角牌阵 / 关系探索 / 旋转牌轮 / 历史查看 |
-| 1 | 星澜聊天 | 星澜离线陪伴聊天（DirectReply、MiniInteraction、Flow、夜信、星钥小镜子、情绪回声卡、星澜轻记得、今日相处方式） |
-| 2 | 星澜语录 | 1018 条星澜陪伴文案滚动对话流 + 今日一占入口 |
-| 3 | 卡牌总览 | 78 张塔罗牌完整展示与筛选（大阿尔卡那 / 权杖 / 圣杯 / 宝剑 / 星币）+ 详情页含 6 维度解读 |
-| 4 | 设置 | 背景音乐开关 / 重新听听星澜的介绍 / 关于星钥塔罗（版本信息、隐私政策、用户协议、素材与授权） |
+| Tab | 名称 | 图标 | 功能 |
+|-----|------|------|------|
+| 0 | 塔罗 | ⬡ | 占卜中心：单牌快占 / 圣三角牌阵 / 关系探索 / 旋转牌轮 / 历史查看 |
+| 1 | 星澜聊天 | ☾ | 星澜离线陪伴聊天（DirectReply、MiniInteraction、Flow、夜信、星钥小镜子、情绪回声卡、星澜轻记得、今日相处方式） |
+| 2 | 星澜语录 | ✦ | XinglanQuotesTabContent 滚动对话流 + 星澜背景 |
+| 3 | 卡牌总览 | ▤ | 78 张塔罗牌 3 列真实牌面网格 + 6 维度解读详情页 |
+| 4 | 我的 | ◎ | 头像/昵称/BGM 开关/星澜星历/使用说明/关于星钥塔罗 |
 
 ### 占卜模块
 
 | 模式 | 牌数 | 说明 |
 |------|------|------|
-| 单牌快占 | 1 张 | 双模式：情绪方向 + 积极/阳光方向 |
-| 圣三角牌阵 | 3 张 | 过去·现在·可能的方向 |
-| 关系探索 | 3 张 | 我·对方·走向，含完整边界提醒 |
-| 旋转牌轮 | 1 或 3 张 | 环形循环牌轮，惯性 + 吸附，确认前不显示牌名 |
+| 单牌快占 | 1 张 | 双模式：情绪方向 + 积极/阳光方向，结果页含星澜陪伴文案 |
+| 圣三角牌阵 | 3 张 | 过去·现在·可能的方向，结果页含星澜陪伴文案 |
+| 关系探索 | 3 张 | 我·对方·走向，含完整边界提醒 + 关系陪伴文案 |
+| 旋转牌轮 | 1 或 3 张 | 环形循环牌轮，惯性 + 吸附，星澜式文案 |
 
 ### 星澜聊天系统
 
 - **DirectReply**：22 种高频命中类型（危机、成人、专业、预测、角色边界，及情绪/关系/工作等），约 120 条变体回复
-- **MiniInteraction**：8 种轻互动（星澜问我一个问题、陪我解闷、给我一句小纸条等）
-- **交互 Flow**：多条动态交互链路（解闷菜单、心情选择、二选一、心事倾诉等）
+- **MiniInteraction**：8 种轻互动
+- **交互 Flow**：多条动态交互链路
 - **Phase 5.7–5.12 功能**：今日相处方式（5 种模式）、星澜夜信（5 主题）、星钥小镜子（5 主题）、情绪回声卡、星澜轻记得
 - **安全优先级**：CRISIS > ADULT > PROFESSIONAL > PREDICTION > ROLE
-- **30 条纸条约会**（小纸条轻文案池）
 
 ### 其他模块
 
+- **卡牌总览**：78 张牌 3 列真实牌面网格，分类筛选，详情页含 6 维度解读
 - **历史记录**：5 种筛选（全部/单牌/圣三角/关系/牌轮），空状态引导，清空确认弹窗
-- **卡牌总览**：78 张牌按分类筛选，详情页含正位含义、逆位含义、情绪陪伴式解读、关系提示、工作/学习提示、自我探索
-- **分享图**：占卜结果生成分享卡，保存到系统相册
-- **桌面卡片**：2×2 FormExtension 万能卡片
+- **分享卡**：占卜结果生成分享卡，保存到系统相册
+- **星澜星历 + 情绪星**：每日点亮情绪星 + 累计天数 + 星钥等级（8 段阈值）
 - **全局背景音乐**：Calm Ambient（leberch / Pixabay），单例 GlobalBgmManager，支持开关 + 持久化
+- **自定义昵称**：本地保存，星澜入口页个性化问候（20 条文案池）
 
 ---
 
-## 3. 技术栈约定
+## 3. 设计系统（v2）
+
+采用**场景分层混合策略**：
+
+| 场景层 | 方案 | 核心隐喻 | 金色 Token |
+|--------|------|---------|-----------|
+| 聊天陪伴层 | B「月湖映心」 | 深夜湖边月光 | `V2B_GOLD_CORE` (#D4AC4D) |
+| 卡牌内容层 | C「星钥之书」 | 古籍图书馆烫金 | `V2C_GOLD_GILT` (#C5A050) |
+| 时间记录层 | A「星图档案」 | 天文台观测日志 | `V2A_GOLD_ACCENT` (#C9A44B) |
+
+- **按钮反馈**：轻量 scale 0.97 + EaseOut 120ms（`PressableScaleButton`）
+- **底部导航**：Unicode 图标（⬡☾✦▤◎），24vp 固定容器 + 垂直微调
+- **已迁移页面**：25+ 页（含主路径全部页面）
+
+---
+
+## 4. 技术栈约定
 
 ### 使用
 | 技术 | 说明 |
@@ -64,19 +80,9 @@
 | Stage 模型 | 应用模型 |
 | `@kit.*` | 命名空间导入 |
 | hvigorw | 构建工具 |
-| Preferences | 本地存储（bgm_enabled 等持久化偏好） |
+| Preferences | 本地存储（bgm_enabled / user_nickname 等持久化偏好） |
 | FormExtensionAbility | 桌面卡片 |
 | AVPlayer | 背景音乐播放 |
-
-### 避免
-| 模式 | 替代方案 |
-|------|----------|
-| `@ohos.*` 旧导入 | `@kit.*` 命名空间 |
-| 全局 `router.replaceUrl/pushUrl/back` | Navigation 组件 |
-| 全局 `getContext()` | `this.getUIContext().getHostContext()` |
-| 全局 `componentSnapshot.get()` | `this.getUIContext().getComponentSnapshot().get()` |
-| `ImagePacker.packing()` | `ImagePacker.packToData()` |
-| `KEEP_BACKGROUND_RUNNING` | 不申请 |
 
 ### 兼容范围
 - `compatibleSdkVersion: "5.0.0(12)"` — **鸿蒙 5.0 ~ 6.1 通吃**
@@ -84,7 +90,7 @@
 
 ---
 
-## 4. 数据策略
+## 5. 数据策略
 
 ### 塔罗数据 — 编译期内嵌
 
@@ -104,15 +110,14 @@ App **完全离线可用**，无需网络。
 |------|-----|
 | 隐私政策同意状态 | `privacy_accepted_v2` |
 | 背景音乐开关 | `bgm_enabled`（默认 true） |
-| 新手引导完成状态 | `hasSeenHomeGuide` 等 7 个标志位 |
-| 本地用户 ID | `device_user_id` |
+| 用户昵称 | `user_nickname`（默认"未命名旅者"） |
+| 头像 URI | `user_avatar_uri` |
 | 占卜历史记录 | `divination_history_v2`（FIFO 50 条） |
-| 每日一占缓存 | `daily_fortune_` |
-| 桌面卡片 formId | 由 Form 框架管理 |
+| 新手引导完成状态 | `hasSeenHomeGuide` 等 7 个标志位 |
 
 ---
 
-## 5. 合规设计
+## 6. 合规设计
 
 ### 三层覆盖
 
@@ -125,8 +130,10 @@ App **完全离线可用**，无需网络。
 ### 合规文档
 
 - 用户协议 + 隐私政策：编译期内嵌 `LegalDocuments.ets`（约 7500 字）
-- 素材与授权：`MaterialsLicensePage`（9 部分完整归属说明）
+- 素材与授权：`MaterialsLicensePage`（仅列 1 首 bgm_calm_ambient.mp3）
 - 背景音乐：Calm Ambient（leberch / Pixabay Content License）
+- 产品边界：不预测/不承诺/不诊断/不提供专业建议
+- 无红线表达（神准/灵验/复合/正缘/烂桃花/命中注定 等均在检测词库中用于拦截，不出现在用户可见文案）
 
 ### 开发者信息
 
@@ -135,51 +142,17 @@ App **完全离线可用**，无需网络。
 
 ---
 
-## 6. 权限说明
-
-当前仅申请 **一个权限**：
-
-| 权限 | 用途 |
-|------|------|
-| `ohos.permission.WRITE_IMAGEVIDEO` | 用户主动点击"保存分享图片"时，将占卜结果图片保存到系统相册 |
-
-### 不做
-- ❌ 不读取相册
-- ❌ 不上传图片
-- ❌ 不分析相册
-- ❌ 不申请网络权限
-- ❌ 不申请后台常驻权限
-- ❌ 不需要 `KEEP_BACKGROUND_RUNNING`
-
----
-
 ## 7. 架构概览
-
-### 页面地图（26 个页面）
-
-| 类别 | 页面 | 说明 |
-|------|------|------|
-| 启动 | LaunchPage | 隐私门禁 + 路由分流 |
-| 主框架 | MainFramePage | 5 Tab 条件渲染容器 + CompanionBottomNav |
-| 占卜 | DivinationCenterPage | 占卜中心（5 入口） |
-| 占卜 | AskHeartPage → CardDrawPage → ResultGoldenPage | 单牌快占 |
-| 占卜 | TriangleIntroPage → TriangleDrawPage → TriangleResultPage | 圣三角牌阵 |
-| 占卜 | RelationIntroPage → RelationDrawPage → RelationResultPage | 关系探索 |
-| 占卜 | CardWheelModePage → CardWheelDrawPage | 旋转牌轮 |
-| 历史 | HistoryPage → HistoryDetailPage | 历史记录 |
-| 聊天 | XinglanChatPage | 星澜离线聊天（2000+ 行） |
-| 语录 | HomePage | 星澜语录（1018 条文案池） |
-| 卡牌 | TarotCardsPage → TarotCardDetailPage | 78 张牌总览与详情 |
-| 设置 | SettingsPage / AboutPage / VersionInfoPage / PrivacyPolicyPage / UserAgreementPage / MaterialsLicensePage | 设置与合规 |
 
 ### 关键组件
 
-- `CompanionBottomNav` — 5 键毛玻璃悬浮胶囊底部导航
+- `CompanionBottomNav` — 5 键毛玻璃悬浮胶囊底部导航（⬡☾✦▤◎）
+- `PressableScaleButton` — 轻量按压反馈按钮组件
 - `GlobalBgmManager` — 全局背景音乐单例（唯一 AVPlayer）
 - `TarotCardImage` — 统一卡牌图片组件（78 张映射 + fallback）
 - `AppBackButton` — 统一返回按钮
 - `HistoryStore` — 历史记录存储服务（FIFO 50 条）
-- `PreferenceStore` — 本地偏好存储封装
+- `UserProfileStore` — 头像/昵称/等级本地存储
 
 ### 星澜聊天引擎
 
@@ -189,17 +162,10 @@ xinglan/engine/
 ├── XinglanMiniInteractionEngine.ets — 8 种轻互动
 ├── XinglanInteractionFlowEngine.ets — 动态交互 Flow
 ├── XinglanInterruptDetector.ets    — 打断检测
-├── XinglanSafetyGuard.ets          — 安全守卫
-├── XinglanComposer.ets             — 回复合成
-├── XinglanRouter.ets               — 路由规划
-├── XinglanAnalyzer.ets             — 输入分析
-├── XinglanSessionManager.ets       — 会话管理
-├── XinglanSpecialIntentResolver.ets — 特殊意图
-├── XinglanCompanionModeEngine.ets  — 陪伴模式
-├── XinglanNightLetters.ets         — 星澜夜信
-├── XinglanStarKeyMirror.ets        — 星钥小镜子
-├── XinglanEchoCards.ets            — 情绪回声卡
-└── XinglanLightMemory.ets          — 星澜轻记得
+├── XinglanSafetyGuard.ets          — 安全守卫（CRISIS > ADULT > PROFESSIONAL > PREDICTION > ROLE）
+├── XinglanComposer.ets / Router.ets / Analyzer.ets / SessionManager.ets
+├── XinglanNightLetters.ets / StarKeyMirror.ets / EchoCards.ets / LightMemory.ets
+└── XinglanCompanionModeEngine.ets / SpecialIntentResolver.ets / TopicSlotExtractor.ets
 ```
 
 ---
@@ -210,91 +176,52 @@ xinglan/engine/
 |------|------|
 | `hvigorw assembleHap` | ✅ **BUILD SUCCESSFUL** |
 | ArkTS ERROR | **0** |
-| 业务 WARN | **0**（已清零） |
+| 业务 WARN | **0** |
 | 剩余 WARN | 仅 DevEco 工具链 `sun.misc.Unsafe` + 既有 deprecated API 提示（非阻塞） |
-| 签名 | ⏸️ `No signingConfig found`（后续单独配置） |
+| 签名 | ⏸️ 后续单独配置 |
 
 ---
 
-## 9. 发布工程清理（已完成）
-
-- ✅ 移除仓库中的签名材料（.p12/.csr/.cer/.p7b）
-- ✅ 补充 `.gitignore`
-- ✅ 移除配置中的密码
-- ✅ Release 构建开启混淆
-- ✅ 移除 `KEEP_BACKGROUND_RUNNING` 权限
-- ✅ 文档同步当前真实权限
-- ✅ 背景音乐开关持久化 + 反复开关功能修复
-- ⏸️ 签名部署——暂缓，后续单独配置
-
----
-
-## 10. 近期 P0 修复记录
-
-| 日期 | 问题 | 修复 |
-|------|------|------|
-| 2026-06-30 | 背景音乐开关"一次性按钮"：关闭后无法重新开启 | `setMusicEnabled(false)` 从 `AVPlayer.stop()` 改为 `pause()`，保持 prepared 状态 |
-| 2026-06-30 | 背景音乐开关前后台状态丢失：切 tab/后台回来后开关自动恢复开启 | 修复 `toggleBgm()` 反馈回路：接受 `isOn` 参数 + `isLoadingBgmState` 抑制标志 + 双守卫 |
-
----
-
-## 11. 版本路线
+## 9. 版本路线
 
 | 版本 | 内容 | 状态 |
 |------|------|------|
-| **v1.0–v1.4** | 基础塔罗功能（单牌、圣三角、分享、历史） | ✅ 已交付 |
-| **v2.0.0** | 底部导航重构 + 星澜聊天 MVP + 卡牌总览 + 旋转牌轮 + 设置/关于/授权 + 全局 BGM | ✅ **当前版本** |
-| v2.1 | 星澜聊天 Phase 5.7–5.12 全部功能 + 背景音乐开关修复 | ✅ 已完成 |
-| v2.2 | 真机回归测试 + 授权页同步 + 签名部署 | 🔜 下一步 |
+| **v1.0–v1.4** | 基础塔罗功能（单牌、圣三角、分享、历史） | ✅ |
+| **v2.0.0** | 底部导航重构 + 星澜聊天 MVP + 卡牌总览 + 旋转牌轮 + 设置/关于/授权 + 全局 BGM | ✅ |
+| **v2.1.0** | v2 设计系统迁移（25+ 页）+ 星澜陪伴文案 + 按钮反馈 + 卡牌总览牌面化 + 昵称系统 + 合规收口 | ✅ **当前版本** |
+| v2.2 | 真机回归测试 + 签名部署 | 🔜 下一步 |
 | v3.0 | 账号、云同步、AI 解读或商业化 | 📋 规划中 |
 
 ---
 
-## 12. 已知待办（P0/P1）
+## 10. Phase 7–8 修复与增强记录
 
-| 优先级 | 事项 | 说明 |
-|--------|------|------|
-| P0 | 授权页同步 | `MaterialsLicensePage` 列出 5 首音乐但仅接入 1 首，审核风险 |
-| P0 | 上架资料最终确认 | `docs/release/app-description.md` 已更新 v2.0，待人工终审 |
-| P1 | 真机回归测试 | 旋转牌轮历史保存、BGM 开关黑盒测试、聊天系统全流程 |
-| P1 | 签名部署 | 配置 release 签名 |
-| P1 | 图片映射代码去重 | `getCardImageResource` 在 3 个文件中重复定义 |
-| P2 | 设置页丰富化 | 当前仅 2 个入口，可扩展 |
-| P2 | 动效物理动力学 | 牌轮已有惯性+吸附，其余页面待落地 |
+| Phase | 日期 | 内容 |
+|-------|------|------|
+| 7-A | 2026-07-01 | P0 定时器泄漏修复（CardDraw/TriangleDraw/RelationDraw 的 setTimeout 生命周期管理） |
+| 7-B-1 | 2026-07-01 | 聊天页右上角头像定位修复（硬编码 position+translate → Row 容器布局） |
+| 8-A | 2026-07-01 | 卡牌总览牌面化（文字列表 → 3 列真实牌面网格） |
+| 8-B | 2026-07-01 | 旋转牌轮文案补齐（星澜式陪伴文案） |
+| 8-C | 2026-07-01 | 结果页文案丰富（ResultGolden/Triangle/Relation 三个结果页 + XinglanResultCompanionText.ets） |
+| 8-D | 2026-07-01 | 按钮点击反馈（PressableScaleButton + 5 个主按钮接入） |
+| 8-E | 2026-07-01 | 上架前合规收口（BGM 授权同步、红线表达清理、隐私/离线说明统一） |
+| 8-F | 2026-07-01 | 主路径回归测试（9 条路径静态审计，零 P0/P1 问题） |
+| 8-G-1 | 2026-07-01 | 底部导航图标升级（Unicode 字符 ⬡☾✦▤◎） + 垂直对齐修正 |
 
 ---
 
-## 13. 工程进度
+## 11. 已知待办
 
-| 日期 | 事项 | 状态 |
-|------|------|------|
-| 2026-06-30 | 项目结构整理 Phase 1：根目录归档 48 文件 | ✅ 完成 |
-| 2026-06-30 | 应用图标分层资源专项复查 | ✅ 通过 |
-| 2026-06-30 | 上架资料 v2.0 替换（去算命化 + 情绪陪伴定位） | ✅ 完成 |
-| 2026-06-30 | BGM 开关修复（一次性按钮 + 前后台状态丢失） | ✅ 完成 |
-| — | 上架前人工复测（29 项清单） | 🔜 待执行 |
-| — | Release 签名配置 | 🔜 待执行 |
+| 优先级 | 事项 | 说明 |
+|--------|------|------|
+| P1 | 真机回归测试 | BGM 前后台恢复、分享卡相册保存、牌轮手感、emoji 昵称等 |
+| P1 | 签名部署 | 配置 release 签名 |
+| P2 | 旧路线页面清理 | HomePage.ets 等遗留不可达页面 |
+| P2 | 图片映射代码去重 | `getCardImageResource` 在 3 个文件中重复定义 |
+| P2 | 抽牌模式扩展到 78 张 | 非牌轮模式目前使用 MVP 8 张牌池 |
 
 ---
 
 > **开发者**：杨鹏宇 · **邮箱**：3364153745@qq.com  
 > **Bundle ID**：com.xingkey.tarot · **SDK**：5.0.0(12)~6.1.1(24)  
-> **当前版本**：v2.0.0 · **最近构建**：2026-06-30 · BUILD SUCCESSFUL · ERROR=0
-
----
-
-## 14. 项目目录说明
-
-| 目录 | 说明 |
-|------|------|
-| `entry/` | HarmonyOS 主应用模块（ArkTS 源码、资源、配置） |
-| `AppScope/` | 应用级配置与图标资源 |
-| `docs/` | 设计文档、系统检查报告、阶段报告、上架文档、调研资料、Roadmap |
-| `deliverables/` | 交付物：截图、预览图、生成图片、音乐源文件、官网部署 |
-| `tools/` | 辅助脚本：图标生成、图片处理 |
-| `xingkey-tarot-website/` | 星钥塔罗官网 / Landing Page（待稳定后迁至 website/） |
-| `backup/` | 整理前备份或历史文件 |
-| `hvigor/` | HarmonyOS 构建工具相关（不移动） |
-| `沉浸式UI/` `Tarot-main/` `milk-main/` | 参考项目（冻结，后续统一迁 reference/） |
-
-> 根目录仅保留 HarmonyOS 必需配置文件：`build-profile.json5`、`hvigorfile.ts`、`oh-package.json5`、`oh-package-lock.json5`、`local.properties`、`.gitignore`、`README.md`
+> **当前版本**：v2.1.0 · **最近构建**：2026-07-01 · BUILD SUCCESSFUL · ERROR=0

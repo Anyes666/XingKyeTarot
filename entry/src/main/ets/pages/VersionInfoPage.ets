@@ -29,9 +29,10 @@ struct VersionInfoPage {
 
           // 标题
           Text('版本信息')
-          .fontSize(Theme.FONT_HEADLINE)
-          .fontColor(Theme.V2A_GOLD_ACCENT)
-          .fontWeight(FontWeight.Bold)
+          .fontSize(Theme.V2A_FONT_TITLE)
+          .fontColor(Theme.V2A_TEXT_PRIMARY)
+          .fontWeight(FontWeight.Medium)
+          .letterSpacing(2)
           .textAlign(TextAlign.Center)
           .width('100%')
           .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_LG })
@@ -40,29 +41,30 @@ struct VersionInfoPage {
         Column() {
           // 应用名
           Text('星钥塔罗')
-            .fontSize(Theme.FONT_TITLE)
+            .fontSize(Theme.V2A_FONT_TITLE)
             .fontColor(Theme.V2A_TEXT_PRIMARY)
-            .fontWeight(FontWeight.Bold)
+            .fontWeight(FontWeight.Medium)
             .textAlign(TextAlign.Center)
             .width('100%')
 
-          // 版本号
+          // 版本号（等宽时间戳风格 · 小面积金色点缀）
           Text('v1.0.0')
-            .fontSize(Theme.FONT_BODY)
+            .fontSize(Theme.V2A_FONT_DATE_NUM)
             .fontColor(Theme.V2A_GOLD_ACCENT)
+            .letterSpacing(1)
             .textAlign(TextAlign.Center)
             .width('100%')
             .margin({ top: Theme.SPACE_SM })
 
           Divider()
             .strokeWidth(0.5)
-            .color(Theme.DEEP_STARRY)
+            .color(Theme.V2A_ORBIT_LINE)
             .margin({ top: Theme.SPACE_MD, bottom: Theme.SPACE_MD })
 
-          // 更新内容
+          // 更新内容（柔和金次级标题）
           Text('v1.0.0 更新内容')
-            .fontSize(Theme.FONT_SUBTITLE)
-            .fontColor(Theme.V2A_GOLD_ACCENT)
+            .fontSize(Theme.V2A_FONT_SUBTITLE)
+            .fontColor(Theme.V2A_GOLD_GLOW)
             .fontWeight(FontWeight.Medium)
             .width('100%')
             .margin({ bottom: Theme.SPACE_SM })
@@ -84,15 +86,16 @@ struct VersionInfoPage {
             '· 设置与隐私：背景音乐开关、隐私数据管理、关于页面与版本信息\n' +
             '· 新中式星空视觉风格：深蓝紫底色 + 温润金色点缀 + 精致塔罗牌翻牌动画'
           )
-            .fontSize(Theme.FONT_BODY)
+            .fontSize(Theme.V2A_FONT_BODY)
             .fontColor(Theme.V2A_TEXT_PRIMARY)
             .lineHeight(26)
             .width('100%')
         }
         .width('92%')
-        .backgroundColor('rgba(27, 27, 48, 0.68)')
-        .borderRadius(Theme.RADIUS_MD)
-        .padding(Theme.SPACE_MD)
+        .backgroundColor(Theme.V2A_BG_CARD)
+        .borderRadius(Theme.V2A_RADIUS_CARD)
+        .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
+        .padding(Theme.V2_SPACE_MD)
 
         Blank()
         }

@@ -248,95 +248,72 @@ export struct XinglanChatEntranceContent {
         .height('100%')
         .backgroundColor(Theme.V2B_BG_BASE)
 
-      // ── Layer 2: 极弱月光氛围层（无圆盘、无边框）──
+      // ── Layer 2: 月湖背景融合层（低透明，避免人物主视觉过强）──
+      Image($r('app.media.xinglan_home_main'))
+        .width('100%')
+        .height('72%')
+        .objectFit(ImageFit.Cover)
+        .opacity(0.34)
+        .position({ x: 0, y: 0 })
+        .hitTestBehavior(HitTestMode.None)
+
+      Column()
+        .width('100%')
+        .height('100%')
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [
+            ['rgba(6, 11, 26, 0.62)', 0.0],
+            ['rgba(6, 11, 26, 0.34)', 0.24],
+            ['rgba(6, 11, 26, 0.08)', 0.46],
+            ['rgba(6, 11, 26, 0.68)', 0.78],
+            [Theme.V2B_BG_BASE, 1.0]
+          ]
+        })
+        .hitTestBehavior(HitTestMode.None)
+
+      Column()
+        .width('72%')
+        .height(1)
+        .backgroundColor('rgba(236, 216, 157, 0.10)')
+        .position({ x: '14%', y: '58%' })
+        .hitTestBehavior(HitTestMode.None)
+
+      // ── Layer 3: 极弱月光氛围层（无圆盘、无边框）──
       MoonlightLayer({ strong: false, reducedMotion: this.reducedMotion })
 
-      // ── Layer 3: 静态星点（少量，不闪烁）──
+      // ── Layer 4: 静态星点（少量，不闪烁）──
       this.buildStaticStars()
 
-      // ── Layer 4: 主内容（固定布局，不可滚动）──
+      // ── Layer 5: 主内容（固定布局，不可滚动）──
       Column() {
           // 顶部留白（兼容独立页返回按钮 / Tab 状态栏）
           Column()
             .width('100%')
             .height(TOP_RESERVE_VP)
 
-          // ══ 星澜立绘区域（图片放大裁边 + 四向加厚遮罩 + 独立月牙）══
+          // ══ 星澜氛围区域（不再二次裁切图片，避免形成硬矩形）══
           Stack() {
-            // 立绘本体：放大 1.15×，Cover 填充更大区域，Stack clip 裁掉原图硬边
-            Image($r('app.media.xinglan_home_main'))
-              .width(this.figureWidth * 1.15)
-              .height(this.figureHeight * 1.15)
-              .objectFit(ImageFit.Cover)
-              .opacity(0.94)
-
-            // 顶部渐隐（80vp，#060B1A → 透明）
-            Column()
-              .width(this.figureWidth)
-              .height(FIGURE_FADE_TOP_VP)
-              .linearGradient({
-                direction: GradientDirection.Bottom,
-                colors: [
-                  ['rgba(6, 11, 26, 1)', 0.0],
-                  ['rgba(6, 11, 26, 0.55)', 0.55],
-                  ['rgba(6, 11, 26, 0)', 1.0]
-                ]
-              })
-              .position({ x: 0, y: 0 })
-              .hitTestBehavior(HitTestMode.None)
-
-            // 底部渐隐（200vp，加厚加强，消除底部横线）
-            Column()
-              .width(this.figureWidth)
-              .height(FIGURE_FADE_BOTTOM_VP)
-              .linearGradient({
-                direction: GradientDirection.Bottom,
-                colors: [
-                  ['rgba(6, 11, 26, 0)', 0.0],
-                  ['rgba(6, 11, 26, 0.35)', 0.30],
-                  ['rgba(6, 11, 26, 0.78)', 0.65],
-                  ['rgba(6, 11, 26, 1)', 1.0]
-                ]
-              })
-              .position({ x: 0, y: this.figureHeight - FIGURE_FADE_BOTTOM_VP })
-              .hitTestBehavior(HitTestMode.None)
-
-            // 左侧渐隐（80vp）
-            Column()
-              .width(FIGURE_FADE_LEFT_VP)
-              .height(this.figureHeight)
-              .linearGradient({
-                direction: GradientDirection.Right,
-                colors: [
-                  ['rgba(6, 11, 26, 1)', 0.0],
-                  ['rgba(6, 11, 26, 0.5)', 0.55],
-                  ['rgba(6, 11, 26, 0)', 1.0]
-                ]
-              })
-              .position({ x: 0, y: 0 })
-              .hitTestBehavior(HitTestMode.None)
-
-            // 右侧渐隐（120vp，加宽加强，彻底盖住原图右边缘竖条）
-            Column()
-              .width(FIGURE_FADE_RIGHT_VP)
-              .height(this.figureHeight)
-              .linearGradient({
-                direction: GradientDirection.Right,
-                colors: [
-                  ['rgba(6, 11, 26, 0)', 0.0],
-                  ['rgba(6, 11, 26, 0.55)', 0.35],
-                  ['rgba(6, 11, 26, 1)', 1.0]
-                ]
-              })
-              .position({ x: this.figureWidth - FIGURE_FADE_RIGHT_VP, y: 0 })
-              .hitTestBehavior(HitTestMode.None)
-
-            // 月牙：独立元素，放在立绘中下部，远离底部硬边
+            // 月牙：轻放在背景之上，不承担主视觉
             Text('🌙')
               .fontSize(36)
               .fontColor('#D4AC4D')
-              .opacity(0.38)
+              .opacity(0.30)
               .position({ x: 18, y: this.figureHeight * 0.52 })
+              .hitTestBehavior(HitTestMode.None)
+
+            Column()
+              .width(this.figureWidth)
+              .height(this.figureHeight)
+              .radialGradient({
+                center: ['52%', '42%'],
+                radius: '82%',
+                colors: [
+                  ['rgba(6, 11, 26, 0)', 0.0],
+                  ['rgba(6, 11, 26, 0.05)', 0.70],
+                  ['rgba(6, 11, 26, 0)', 1.0]
+                ]
+              })
               .hitTestBehavior(HitTestMode.None)
           }
           .width(this.figureWidth)
@@ -346,10 +323,10 @@ export struct XinglanChatEntranceContent {
 
           // ══ 主文案 ══
           Text(this.greetingTitle)
-            .fontSize(TITLE_FONT_SIZE_VP)
+            .fontSize(this.titleFontSize)
             .fontColor('#F2EDDD')
             .fontWeight(FontWeight.Lighter)
-            .lineHeight(TITLE_LINE_HEIGHT_VP)
+            .lineHeight(this.titleLineHeight)
             .textAlign(TextAlign.Center)
             .maxLines(2)
             .width(320)
@@ -363,20 +340,20 @@ export struct XinglanChatEntranceContent {
             .lineHeight(SUBTITLE_LINE_HEIGHT_VP)
             .textAlign(TextAlign.Center)
             .width(320)
-            .margin({ bottom: 44 })
+            .margin({ bottom: this.subtitleBottomMargin })
 
           // ══ 进入按钮 ══
           Button('走进月光门廊')
             .type(ButtonType.Normal)
             .width(BUTTON_WIDTH_VP)
             .height(BUTTON_HEIGHT_VP)
-            .fontSize(Theme.V2B_FONT_SUBTITLE)
-            .fontColor('#E8D5A3')
+            .fontSize(Theme.V2B_FONT_BODY)
+            .fontColor(Theme.V2B_GOLD_RIPPLE)
             .fontWeight(FontWeight.Medium)
-            .backgroundColor('#0F1835')
-            .border({ width: 1, color: 'rgba(212, 172, 77, 0.55)' })
+            .backgroundColor('rgba(15, 24, 53, 0.76)')
+            .border({ width: 1, color: 'rgba(236, 216, 157, 0.38)' })
             .borderRadius(BUTTON_RADIUS_VP)
-            .shadow({ radius: 18, color: 'rgba(212, 172, 77, 0.12)', offsetX: 0, offsetY: 0 })
+            .shadow({ radius: 14, color: 'rgba(212, 172, 77, 0.10)', offsetX: 0, offsetY: 0 })
             .scale({
               x: this.btnPressed ? 0.98 : 1.0,
               y: this.btnPressed ? 0.98 : 1.0
@@ -403,7 +380,7 @@ export struct XinglanChatEntranceContent {
             .textAlign(TextAlign.Center)
             .lineHeight(17)
             .width('80%')
-            .margin({ top: 16 })
+            .margin({ top: this.disclaimerTopMargin })
         }
         .width('100%')
         .height('100%')

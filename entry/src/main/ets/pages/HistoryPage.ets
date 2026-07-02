@@ -247,8 +247,9 @@ struct HistoryPage {
 
         Text('清空')
           .fontSize(Theme.V2A_FONT_CAPTION)
-          .fontColor('#E5998A')
-          .opacity(this.records.length > 0 ? 1.0 : 0.35)
+          .fontColor(Theme.V2A_CRISIS)
+          .letterSpacing(0.5)
+          .opacity(this.records.length > 0 ? 0.85 : 0.3)
           .onClick(() => {
             if (this.records.length > 0) {
               this.confirmClearAll();
@@ -260,7 +261,8 @@ struct HistoryPage {
 
       Text('回看最近的星钥记录，看看那些反复出现的心事。')
         .fontSize(Theme.V2A_FONT_CAPTION)
-        .fontColor(Theme.V2A_TEXT_SECONDARY)
+        .fontColor(Theme.V2_TEXT_TERTIARY)
+        .letterSpacing(0.5)
         .padding({ left: Theme.V2_SPACE_LG, right: Theme.V2_SPACE_LG, bottom: Theme.V2_SPACE_MD })
         .width('100%')
 
@@ -275,26 +277,26 @@ struct HistoryPage {
 
       Divider().strokeWidth(0.3).color('rgba(255,255,255,0.06)')
 
-      // ── 筛选 Tab（横向滑动 chips）──
+      // ── 筛选 Tab（横向滑动 chips · A 档案标签）──
       Scroll() {
-        Row({ space: Theme.SPACE_SM }) {
+        Row({ space: Theme.V2_SPACE_XS }) {
           ForEach(this.filterOptions, (opt: string) => {
             Text(opt)
-              .fontSize(Theme.V2A_FONT_BODY)
-              .fontColor(this.filterType === opt ? Color.White : Theme.V2A_GOLD_ACCENT)
-              .fontWeight(FontWeight.Medium)
-              .height(38)
-              .padding({ left: 18, right: 18, top: 0, bottom: 0 })
+              .fontSize(Theme.V2A_FONT_CAPTION)
+              .fontColor(this.filterType === opt ? Theme.V2A_GOLD_ACCENT : Theme.V2A_TEXT_SECONDARY)
+              .fontWeight(this.filterType === opt ? FontWeight.Medium : FontWeight.Normal)
+              .height(34)
+              .padding({ left: Theme.V2_SPACE_MD, right: Theme.V2_SPACE_MD, top: 0, bottom: 0 })
               .textAlign(TextAlign.Center)
-              .backgroundColor(this.filterType === opt ? Theme.V2A_GOLD_ACCENT : Theme.V2A_BG_CARD)
+              .backgroundColor(this.filterType === opt ? 'rgba(201,164,75,0.10)' : 'rgba(16,20,42,0.5)')
               .borderRadius(Theme.V2A_RADIUS_CHIP)
-              .border({ width: 1, color: this.filterType === opt ? Theme.V2A_GOLD_ACCENT : Theme.V2A_ORBIT_LINE })
+              .border({ width: 1, color: this.filterType === opt ? 'rgba(201,164,75,0.45)' : Theme.V2A_ORBIT_LINE })
               .onClick(() => {
                 this.filterType = opt;
               })
           }, (opt: string) => opt)
         }
-        .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, top: Theme.SPACE_MD, bottom: Theme.SPACE_SM })
+        .padding({ left: Theme.SPACE_SCREEN_PAD, right: Theme.SPACE_SCREEN_PAD, top: Theme.V2_SPACE_SM, bottom: Theme.V2_SPACE_SM })
       }
       .scrollable(ScrollDirection.Horizontal)
       .scrollBar(BarState.Off)
@@ -356,33 +358,37 @@ struct HistoryPage {
    */
   @Builder
   buildEmptyState(): void {
-    Column({ space: Theme.SPACE_MD }) {
-      // 小星钥图标（居中装饰）
-      Text('☽')
-        .fontSize(48)
+    Column({ space: Theme.V2_SPACE_SM }) {
+      // 月相符号（A 档案克制感）
+      Text('☾')
+        .fontSize(56)
         .fontColor(Theme.V2A_GOLD_GLOW)
-        .opacity(0.35)
+        .opacity(0.28)
+        .margin({ bottom: Theme.V2_SPACE_XS })
 
       Text('还没有占卜记录')
         .fontSize(Theme.V2A_FONT_BODY)
         .fontColor(Theme.V2A_TEXT_PRIMARY)
         .fontWeight(FontWeight.Medium)
+        .letterSpacing(0.5)
 
       Text('还没有记录。等你愿意的时候，再从一张星钥开始。')
         .fontSize(Theme.V2A_FONT_CAPTION)
-        .fontColor(Theme.V2A_TEXT_SECONDARY)
+        .fontColor(Theme.V2_TEXT_TERTIARY)
         .textAlign(TextAlign.Center)
         .maxLines(2)
+        .lineHeight(20)
 
       Button(this.getEmptyActionText())
         .type(ButtonType.Normal)
-        .fontSize(Theme.V2A_FONT_BODY)
-        .fontColor(Color.White)
+        .fontSize(Theme.V2A_FONT_CAPTION)
+        .fontColor(Theme.V2A_GOLD_ACCENT)
         .fontWeight(FontWeight.Medium)
-        .backgroundColor(Theme.V2A_GOLD_ACCENT)
+        .backgroundColor('rgba(201,164,75,0.10)')
+        .border({ width: 1, color: 'rgba(201,164,75,0.40)' })
         .borderRadius(Theme.V2_RADIUS_FULL)
-        .padding({ left: 28, right: 28, top: 10, bottom: 10 })
-        .margin({ top: Theme.SPACE_SM })
+        .padding({ left: Theme.V2_SPACE_XL, right: Theme.V2_SPACE_XL, top: 10, bottom: 10 })
+        .margin({ top: Theme.V2_SPACE_MD })
         .onClick(() => {
           this.goEmptyAction();
         })
@@ -395,67 +401,83 @@ struct HistoryPage {
 
   @Builder
   buildHistoryItem(record: DivinationHistoryRecord): void {
-    Column() {
-      Row() {
-        Column() {
-          // 记录类型
+    Row() {
+      // 档案脊线（左侧细金线 · A 方案档案锚点）
+      Column()
+        .width(2)
+        .height(42)
+        .backgroundColor('rgba(201,164,75,0.35)')
+        .borderRadius(1)
+        .margin({ right: Theme.V2_SPACE_MD, top: 0, bottom: 0 })
+
+      Column() {
+        // 第一行：记录类型 + 场景标签
+        Row() {
           Text(record.modeTitle)
-            .fontSize(Theme.V2A_FONT_BODY)
-            .fontColor(Theme.V2A_GOLD_ACCENT)
-            .fontWeight(FontWeight.Bold)
-            .margin({ bottom: 4 })
-
-          // 时间
-          Text(this.formatDate(record.timestamp))
             .fontSize(Theme.V2A_FONT_CAPTION)
-            .fontColor(Theme.V2A_TEXT_SECONDARY)
-            .margin({ bottom: 4 })
+            .fontColor(Theme.V2A_GOLD_GLOW)
+            .fontWeight(FontWeight.Medium)
+            .letterSpacing(0.5)
 
-          // 牌名摘要
-          if (this.getCardSummary(record).length > 0) {
-            Text(this.getCardSummary(record))
-              .fontSize(Theme.V2A_FONT_CAPTION)
-              .fontColor(Theme.V2A_TEXT_PRIMARY)
-              .maxLines(1)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-              .margin({ bottom: 4 })
-          }
-
-          // 问题摘要
-          if (record.questionText && record.questionText.length > 0) {
-            Text(record.questionText)
-              .fontSize(Theme.V2A_FONT_CAPTION)
-              .fontColor(Theme.V2A_TEXT_SECONDARY)
+          if (record.scenarioTag && record.scenarioTag.length > 0) {
+            Text(record.scenarioTag)
+              .fontSize(10)
+              .fontColor(Theme.V2_TEXT_TERTIARY)
+              .margin({ left: Theme.V2_SPACE_XS })
+              .padding({ left: 6, right: 6, top: 1, bottom: 1 })
+              .backgroundColor('rgba(138,132,152,0.10)')
+              .borderRadius(Theme.V2_RADIUS_XS)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
           }
         }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start)
+        .width('100%')
+        .margin({ bottom: 3 })
 
-        // 右箭头
-        Text('›')
-          .fontSize(24)
-          .fontColor(Theme.V2A_TEXT_SECONDARY)
-          .opacity(0.4)
-          .margin({ left: Theme.SPACE_SM })
+        // 时间戳（等宽字体 · 档案标记感）
+        Text(this.formatDate(record.timestamp))
+          .fontSize(Theme.V2A_FONT_TIMESTAMP)
+          .fontColor(Theme.V2_TEXT_TERTIARY)
+          .fontFamily('HarmonyOS Sans Mono')
+          .letterSpacing(0.5)
+          .margin({ bottom: 4 })
 
-        // 删除按钮
-        Text('删除')
-          .fontSize(10)
-          .fontColor('#E5998A')
-          .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-          .border({ width: 1, color: '#E5998A', style: BorderStyle.Solid })
-          .borderRadius(Theme.RADIUS_SM)
-          .margin({ left: Theme.SPACE_SM })
-          .onClick(() => {
-            this.confirmDeleteRecord(record);
-          })
+        // 牌名摘要
+        if (this.getCardSummary(record).length > 0) {
+          Text(this.getCardSummary(record))
+            .fontSize(Theme.V2A_FONT_CAPTION)
+            .fontColor(Theme.V2A_TEXT_PRIMARY)
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .margin({ bottom: 3 })
+        }
+
+        // 问题摘要
+        if (record.questionText && record.questionText.length > 0) {
+          Text(record.questionText)
+            .fontSize(Theme.V2A_FONT_DISCLAIMER)
+            .fontColor(Theme.V2A_TEXT_SECONDARY)
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+        }
       }
-      .width('100%')
-      .padding({ top: 18, bottom: 18, left: 20, right: 20 })
+      .layoutWeight(1)
+      .alignItems(HorizontalAlign.Start)
+
+      // 删除按钮（图标式降级 · 暖铜色细线）
+      Text('删除')
+        .fontSize(10)
+        .fontColor(Theme.V2A_CRISIS)
+        .padding({ left: 10, right: 10, top: 4, bottom: 4 })
+        .border({ width: 1, color: 'rgba(212,133,107,0.35)', style: BorderStyle.Solid })
+        .borderRadius(Theme.V2_RADIUS_SM)
+        .margin({ left: Theme.V2_SPACE_SM })
+        .onClick(() => {
+          this.confirmDeleteRecord(record);
+        })
     }
     .width('100%')
+    .padding({ top: Theme.V2_SPACE_MD, bottom: Theme.V2_SPACE_MD, left: Theme.V2_SPACE_MD, right: Theme.V2_SPACE_MD })
     .backgroundColor(Theme.V2A_BG_CARD)
     .borderRadius(Theme.V2A_RADIUS_CARD)
     .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
