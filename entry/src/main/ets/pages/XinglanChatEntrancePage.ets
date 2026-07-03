@@ -7,6 +7,7 @@ import { MoonlightLayer } from '../components/MoonlightLayer';
 import { PreferenceStore } from '../data/PreferenceStore';
 import { UserProfileStore } from '../common/UserProfileStore';
 import { selectEntryGreeting } from '../data/XinglanNicknameGreetings';
+import { XinglanNeed } from '../xinglan/types/XinglanTypes';
 
 /**
  * 星澜聊天入口页 — 月光门廊
@@ -84,6 +85,30 @@ interface StaticStarItem {
   s: number;
   o: number;
 }
+
+/**
+ * CHAT-1：陪伴方向入口卡条目
+ * 每张卡对应一个 XinglanNeed，点击后携带 need 进入聊天页
+ */
+interface CompanionEntryCard {
+  need: XinglanNeed;
+  title: string;
+  hint: string;
+}
+
+/** CHAT-1：聊天页路由入参（显式 interface，不用匿名对象） */
+interface XinglanChatRouteParams {
+  need?: XinglanNeed;
+}
+
+/** CHAT-1：五种陪伴方向入口卡（顺序固定，对应 V2 计划 9.1 节） */
+const COMPANION_ENTRY_CARDS: CompanionEntryCard[] = [
+  { need: XinglanNeed.LISTEN, title: '我想说说发生了什么', hint: '星澜会先听你说完' },
+  { need: XinglanNeed.COMFORT, title: '我现在只想被安慰', hint: '今晚先不急着分析' },
+  { need: XinglanNeed.ORGANIZE, title: '帮我把思绪理一理', hint: '一起把感受放慢' },
+  { need: XinglanNeed.ADVICE, title: '给我一个很小的建议', hint: '只找一个很小的下一步' },
+  { need: XinglanNeed.QUIET, title: '我不想说话，安静待一会儿', hint: '这里没有必须回答的问题' }
+];
 
 @Entry
 @Component
@@ -285,8 +310,9 @@ export struct XinglanChatEntranceContent {
       // ── Layer 4: 静态星点（少量，不闪烁）──
       this.buildStaticStars()
 
-      // ── Layer 5: 主内容（固定布局，不可滚动）──
-      Column() {
+      // ── Layer 5: 主内容（CHAT-1：五卡片可能溢出小屏，改为可滚动）──
+      Scroll() {
+        Column() {
           // 顶部留白（兼容独立页返回按钮 / Tab 状态栏）
           Column()
             .width('100%')
@@ -342,8 +368,20 @@ export struct XinglanChatEntranceContent {
             .width(320)
             .margin({ bottom: this.subtitleBottomMargin })
 
-          // ══ 进入按钮 ══
-          Button('走进月光门廊')
+          // ══ CHAT-1：五种陪伴方向入口卡 ══
+          // B 月湖映心：湖中石板底 + 月光细线边 + 暖金克制（仅选中态/按压态微亮）
+          // 五卡片按压圆角一致（V2B_RADIUS_CARD=20）
+          Column({ space: 10 }) {
+            ForEach(COMPANION_ENTRY_CARDS, (card: CompanionEntryCard) => {
+              this.buildCompanionEntryCard(card)
+            }, (card: CompanionEntryCard) => card.need)
+          }
+          .width('100%')
+          .alignItems(HorizontalAlign.Center)
+
+          // ══ 底部直接输入入口（走默认 LISTEN）══
+          // 文案保留"也可以直接说一句……"，点击直接进聊天不传 need（聊天页按 LISTEN 开场）
+          Button('也可以直接说一句……')
             .type(ButtonType.Normal)
             .width(BUTTON_WIDTH_VP)
             .height(BUTTON_HEIGHT_VP)
@@ -370,8 +408,9 @@ export struct XinglanChatEntranceContent {
               }
             })
             .onClick(() => {
-              this.navigateToChat();
+              this.navigateToChat(XinglanNeed.LISTEN);
             })
+            .margin({ top: 20 })
 
           // ══ 免责声明 ══
           Text('星澜是离线陪伴，不替代专业心理咨询。')
@@ -383,7 +422,6 @@ export struct XinglanChatEntranceContent {
             .margin({ top: this.disclaimerTopMargin })
         }
         .width('100%')
-        .height('100%')
         .alignItems(HorizontalAlign.Center)
         .padding({
           top: 0,
@@ -394,6 +432,12 @@ export struct XinglanChatEntranceContent {
           duration: 600,
           curve: Curve.EaseOut
         })
+      }
+      .width('100%')
+      .height('100%')
+      .scrollBar(BarState.Off)
+      .edgeEffect(EdgeEffect.Spring)
+      .align(Alignment.Top)
     }
     .width('100%')
     .height('100%')
@@ -401,16 +445,71 @@ export struct XinglanChatEntranceContent {
 
   /**
    * 跳转到星澜聊天页（params 变量 + RouterOptions + try/catch）
+   * CHAT-1：携带 need 参数，影响聊天页顶部状态文案与开场
    */
-  private navigateToChat(): void {
+  private navigateToChat(need: XinglanNeed): void {
     try {
+      const params: XinglanChatRouteParams = { need };
       const options: router.RouterOptions = {
-        url: Routes.XINGLAN_CHAT
+        url: Routes.XINGLAN_CHAT,
+        params
       };
       router.pushUrl(options);
     } catch (_err) {
       // 跳转失败静默
     }
+  }
+
+  /**
+   * CHAT-1：构建单个陪伴方向入口卡
+   * B 月湖映心风格：湖中石板底 + 月光细线边 + 暖金克制
+   * 按压圆角统一 V2B_RADIUS_CARD，按压 scale 一致
+   */
+  @Builder
+  private buildCompanionEntryCard(card: CompanionEntryCard): void {
+    Button() {
+      Column() {
+        Text(card.title)
+          .fontSize(Theme.V2B_FONT_BODY)
+          .fontColor(Theme.V2B_TEXT_PRIMARY)
+          .fontWeight(FontWeight.Medium)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+        Text(card.hint)
+          .fontSize(Theme.V2B_FONT_CAPTION)
+          .fontColor(Theme.V2B_TEXT_SECONDARY)
+          .margin({ top: 4 })
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      }
+      .alignItems(HorizontalAlign.Start)
+      .width('100%')
+      .padding({ left: 20, right: 20, top: 14, bottom: 14 })
+    }
+    .type(ButtonType.Normal)
+    .width(BUTTON_WIDTH_VP)
+    .backgroundColor(Theme.V2B_BG_CARD)
+    .border({ width: 1, color: 'rgba(236, 216, 157, 0.22)' })
+    .borderRadius(Theme.V2B_RADIUS_CARD)
+    .shadow({ radius: 10, color: 'rgba(0, 0, 0, 0.18)', offsetX: 0, offsetY: 2 })
+    .scale({
+      x: this.btnPressed ? 0.97 : 1.0,
+      y: this.btnPressed ? 0.97 : 1.0
+    })
+    .animation({
+      duration: Theme.ANIM_PRESS_DURATION,
+      curve: Curve.EaseOut
+    })
+    .onTouch((event: TouchEvent) => {
+      if (event.type === TouchType.Down) {
+        this.btnPressed = true;
+      } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+        this.btnPressed = false;
+      }
+    })
+    .onClick(() => {
+      this.navigateToChat(card.need);
+    })
   }
 
   /**

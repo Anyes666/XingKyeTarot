@@ -40,6 +40,7 @@
     "pages/AvatarCropPage",
     "pages/XinglanChatEntrancePage",
     "pages/StarCalendarPage",
-    "daily/pages/DailyLightPage"
+    "daily/pages/DailyLightPage",
+    "daily/pages/DailyReflectionPage"
   ]
 }

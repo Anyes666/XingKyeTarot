@@ -13,7 +13,7 @@ import { getPositiveScenarioContent, PositiveEmotionTag } from '../data/Positive
 import { Routes } from '../common/Routes';
 import { EmotionTag, ScenarioContent, StructuredInterpretation } from '../model/TarotCard';
 import { HistoryStore } from '../common/HistoryStore';
-import { getSingleCardCompanionText, ResultCompanionText } from '../data/XinglanResultCompanionText';
+import { getSingleCardCompanionText, getHeldCompanionText, getLightCompanionText, ResultCompanionText } from '../data/XinglanResultCompanionText';
 import { AppStateStore } from '../common/AppStateStore';
 import {
   SpreadType,
@@ -24,9 +24,16 @@ import {
 import { TarotCardRepository } from '../data/TarotCardRepository';
 import { COMPANION_RESULT_LINES } from '../data/CompanionResultLines';
 import { EmotionStarStorage, EmotionStarRecord, StarKeyLevel, NextLevelInfo } from '../common/EmotionStarStorage';
+import { ResultFeedbackChips } from '../components/ResultFeedbackChips';
+import { DivinationConversationContext } from '../model/DivinationConversationContext';
 
 /**
  * 结果页路由入参（P0.2 扩展）
+ *
+ * RESULT-2 新增 heartMode：问心模式路由字段
+ *   - 'held'  今天我想被接住
+ *   - 'light' 今天我想看见光
+ *   - ''      未经过问心页的入口，走默认通用文案
  */
 interface ResultPageParams {
   entryMode: string;
@@ -38,6 +45,7 @@ interface ResultPageParams {
   emotionTag: string;
   goldenSentence: string;
   questionText: string;
+  heartMode: string;
 }
 
 /**
@@ -69,6 +77,15 @@ interface EmotionStarRouteParams {
   cardId: string
   totalLightDays: number
   currentLevelTitle: string
+}
+
+/**
+ * FLOW-1：星澜聊天页路由参数（"和星澜继续聊聊"入口）
+ *
+ * 携带 DivinationConversationContext，星澜不重新抽牌、不改正逆位、不推断新牌阵事实。
+ */
+interface XinglanChatRouteParams {
+  divinationContext: DivinationConversationContext
 }
 
 /**
@@ -105,16 +122,22 @@ struct ResultGoldenPage {
   @State private hasHeardCompanionResult: boolean = false;
   @State private companionResultLine: string = '';
   @State private isPositiveMode: boolean = false;
+  // ── RESULT-2：问心模式路由字段（held / light / ''）──
+  @State private heartMode: string = '';
 
   // ── 情绪星点亮状态 ──
   @State private isTodayLit: boolean = false;
   @State private followUpPressed: boolean = false;
   @State private sharePressed: boolean = false;
+  @State private chatPressed: boolean = false;
   @State private totalLightDays: number = 0;
   @State private currentLevelTitle: string = '初见';
 
   // ── B 方案月光呼吸动画状态 ──
   @State private moonlightOpacity: number = 0.6;
+
+  // ── RESULT-1 反馈 Chips 安静模式（用户点"我只想安静一会儿"后置 true，隐藏解释推送）──
+  @State private quietMode: boolean = false;
 
   async aboutToAppear(): Promise<void> {
     const rawParams: Object | undefined = router.getParams();
@@ -129,12 +152,15 @@ struct ResultGoldenPage {
       this.goldenSentence = params.goldenSentence ?? '';
       this.entryMode = params.entryMode ?? 'NORMAL_SINGLE';
       this.questionText = params.questionText ?? '';
+      // RESULT-2：接收问心模式路由字段；缺失时降级为空字符串，走默认文案
+      this.heartMode = params.heartMode ?? '';
     } else {
       // 降级默认值
       this.cardId = 'major_18_moon';
       this.cardName = '月亮';
       this.emotionTag = '寻求安慰';
       this.entryMode = 'NORMAL_SINGLE';
+      this.heartMode = '';
     }
 
     // 判断是否为积极方向模式
@@ -282,6 +308,16 @@ struct ResultGoldenPage {
   }
 
   private getCompanionText(): ResultCompanionText {
+    // RESULT-2：根据问心模式路由陪伴文案
+    //   held  → 先承接不建议，结尾允许暂停
+    //   light → 先承接 + 一个可选角度 + 最多一个微小行动
+    //   其他  → 现有通用文案（默认/未选择/非问心入口）
+    if (this.heartMode === 'held') {
+      return getHeldCompanionText(this.cardName || '这张牌', this.isReversed);
+    }
+    if (this.heartMode === 'light') {
+      return getLightCompanionText(this.cardName || '这张牌', this.isReversed);
+    }
     return getSingleCardCompanionText(this.cardName || '这张牌', this.isReversed);
   }
 
@@ -333,6 +369,9 @@ struct ResultGoldenPage {
 
           // ═══════════ 星澜陪你看见 ═══════════
           this.buildCompanionSection()
+
+          // ═══════════ RESULT-1 反馈 Chips ═══════════
+          ResultFeedbackChips({ quietMode: this.quietMode })
 
           // ═══════════ 情绪关键词 + 今日行动 ═══════════
           this.buildActionSection()
@@ -650,6 +689,35 @@ struct ResultGoldenPage {
           })
       }
 
+      // ── FLOW-1："和星澜继续聊聊" — 携带 DivinationConversationContext 进入星澜聊天 ──
+      Button('和星澜继续聊聊')
+        .fontSize(Theme.V2C_FONT_BODY)
+        .fontColor(Theme.V2C_GOLD_GILT)
+        .fontWeight(FontWeight.Medium)
+        .width('100%')
+        .height(48)
+        .backgroundColor(Theme.V2C_BG_CARD)
+        .borderRadius(Theme.V2C_RADIUS_BTN)
+        .border({ width: 1, color: Theme.V2C_GOLD_GILT })
+        .scale({
+          x: this.chatPressed ? Theme.PRESS_SCALE : 1.0,
+          y: this.chatPressed ? Theme.PRESS_SCALE : 1.0
+        })
+        .animation({
+          duration: Theme.ANIM_PRESS_DURATION,
+          curve: Theme.V2_EASE_OUT
+        })
+        .onTouch((event: TouchEvent) => {
+          if (event.type === TouchType.Down) {
+            this.chatPressed = true;
+          } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+            this.chatPressed = false;
+          }
+        })
+        .onClick(() => {
+          this.handleContinueWithXinglan();
+        })
+
       // 追问道星澜按钮
       Button('追问星澜')
         .fontSize(Theme.V2C_FONT_BODY)
@@ -753,26 +821,28 @@ struct ResultGoldenPage {
           })
       }
 
-        // ── 阶段4A：星澜补充文案区（点击"再听一句"后显示）──
-        if (this.companionResultLine.length > 0) {
-          Text(this.companionResultLine)
-            .fontSize(14)
-            .fontColor(Theme.V2C_TEXT_SECONDARY)
-            .textAlign(TextAlign.Center)
-            .lineHeight(22)
-            .padding({ left: 24, right: 24, top: 12, bottom: 12 })
-        }
+        // ── 阶段4A：星澜补充文案区（安静模式下隐藏，不再推送解释）──
+        if (!this.quietMode) {
+          if (this.companionResultLine.length > 0) {
+            Text(this.companionResultLine)
+              .fontSize(14)
+              .fontColor(Theme.V2C_TEXT_SECONDARY)
+              .textAlign(TextAlign.Center)
+              .lineHeight(22)
+              .padding({ left: 24, right: 24, top: 12, bottom: 12 })
+          }
 
-        // ── 阶段4A："再听星澜说一句"入口（轻文字风格，弱于主操作）──
-        Text('再听星澜说一句')
-          .fontSize(14)
-          .fontColor(this.hasHeardCompanionResult ? Theme.V2C_TEXT_SECONDARY : Theme.V2C_TEXT_SECONDARY)
-          .opacity(this.hasHeardCompanionResult ? 0.35 : 0.85)
-          .textAlign(TextAlign.Center)
-          .width('100%')
-          .constraintSize({ minHeight: 44 })
-          .padding({ top: 12, bottom: 12 })
-          .onClick(() => { this.onHearCompanionAgain(); })
+          // ── 阶段4A："再听星澜说一句"入口（轻文字风格，弱于主操作）──
+          Text('再听星澜说一句')
+            .fontSize(14)
+            .fontColor(this.hasHeardCompanionResult ? Theme.V2C_TEXT_SECONDARY : Theme.V2C_TEXT_SECONDARY)
+            .opacity(this.hasHeardCompanionResult ? 0.35 : 0.85)
+            .textAlign(TextAlign.Center)
+            .width('100%')
+            .constraintSize({ minHeight: 44 })
+            .padding({ top: 12, bottom: 12 })
+            .onClick(() => { this.onHearCompanionAgain(); })
+        }
     }
     .width('100%')
     .margin({ top: Theme.SPACE_LG })
@@ -924,6 +994,55 @@ struct ResultGoldenPage {
   private isPositiveEmotionTag(tag: string): boolean {
     const positiveTags: string[] = ['给我鼓励', '今日微光', '找回力量', '一点勇气', '积极一面', '一句提醒'];
     return positiveTags.includes(tag);
+  }
+
+  /**
+   * FLOW-1：构造占卜结果转入聊天上下文
+   *
+   * 星澜不重新抽牌、不改正逆位、不推断新牌阵事实。
+   * coreSummary 仅取金句一句话，不重复整篇结果。
+   */
+  private buildDivinationContext(): DivinationConversationContext {
+    const cardNames: string[] = [this.cardName];
+    const orientations: ('upright' | 'reversed')[] = [this.isReversed ? 'reversed' : 'upright'];
+    const positionNames: string[] = ['指引'];
+
+    // heartMode 仅在有效值时填入，缺失则 undefined（走默认通用文案）
+    const heartMode: 'held' | 'light' | undefined =
+      (this.heartMode === 'held') ? 'held' :
+      (this.heartMode === 'light') ? 'light' : undefined;
+
+    const ctx: DivinationConversationContext = {
+      mode: 'single',
+      cardNames: cardNames,
+      orientations: orientations,
+      positionNames: positionNames,
+      coreSummary: this.goldenSentence || (this.cardName + ' · ' + this.getOrientationText()),
+      userAcceptedInterpretation: this.quietMode ? false : true,
+    };
+    if (heartMode) {
+      ctx.heartMode = heartMode;
+    }
+    return ctx;
+  }
+
+  /**
+   * FLOW-1："和星澜继续聊聊" — 携带 DivinationConversationContext 跳转星澜聊天页
+   *
+   * 显式 params 变量 + RouterOptions + try/catch，路由参数用显式 interface。
+   */
+  private handleContinueWithXinglan(): void {
+    const ctx: DivinationConversationContext = this.buildDivinationContext();
+    const params: XinglanChatRouteParams = { divinationContext: ctx };
+    const options: router.RouterOptions = {
+      url: Routes.XINGLAN_CHAT,
+      params: params
+    };
+    try {
+      router.pushUrl(options);
+    } catch (err) {
+      console.error('pushUrl to XinglanChat failed: ' + JSON.stringify(err));
+    }
   }
 
   /**

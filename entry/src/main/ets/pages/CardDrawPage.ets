@@ -21,6 +21,11 @@ interface CardDrawPageParams {
 
 /**
  * 结果页路由参数 (P0.2 扩展)
+ *
+ * RESULT-2 新增 heartMode：问心模式路由字段，取值：
+ *   - 'held'  今天我想被接住（isPositiveMode = false，含首次体验）
+ *   - 'light' 今天我想看见光（isPositiveMode = true）
+ *   - ''      未经过问心页的入口（旋转牌轮等），结果页走默认文案
  */
 interface ResultGoldenRouteParams {
   entryMode: string;
@@ -32,6 +37,7 @@ interface ResultGoldenRouteParams {
   emotionTag: string;
   goldenSentence: string;
   questionText: string;
+  heartMode: string;
 }
 
 /**
@@ -188,6 +194,8 @@ struct CardDrawPage {
 
     const recordId: string = generateRecordId();
     const cardName: string = MVP8_CARD_NAMES[this.cardId] ?? '未知';
+    // RESULT-2：基于问心模式计算 heartMode，传给结果页路由文案
+    const heartMode: string = this.isPositiveMode ? 'light' : 'held';
     const routeParams: ResultGoldenRouteParams = {
       entryMode: this.entryMode,
       recordId: recordId,
@@ -198,6 +206,7 @@ struct CardDrawPage {
       emotionTag: this.emotionTag,
       goldenSentence: this.goldenSentence,
       questionText: this.questionText,
+      heartMode: heartMode,
     };
 
     const routeOptions: router.RouterOptions = {

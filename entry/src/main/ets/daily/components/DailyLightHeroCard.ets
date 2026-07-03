@@ -1,4 +1,7 @@
+import { router } from '@kit.ArkUI';
 import { Theme } from '../../common/Theme';
+import { Routes } from '../../common/Routes';
+import { SafeUiActions } from '../../common/SafeUiActions';
 import { DailyRitualStore } from '../service/DailyRitualStore';
 import { DailyRitualState } from '../model/DailyRitualState';
 import { DailyLightContent } from '../model/DailyLightContent';
@@ -45,6 +48,8 @@ export struct DailyLightHeroCard {
   @State private expandPressed: boolean = false;
   @State private reviewPressed: boolean = false;
   @State private chatPressed: boolean = false;
+  // DAILY-7：「回望今天」入口按压态
+  @State private reflectPressed: boolean = false;
 
   async aboutToAppear(): Promise<void> {
     try {
@@ -64,6 +69,25 @@ export struct DailyLightHeroCard {
       this.completed = false;
       this.mainLine = '';
       this.stateLoaded = true;
+    }
+  }
+
+  /**
+   * DAILY-7：跳转月湖回望页。
+   *
+   * 不强制晚上才能进入（V2 计划 5.4：不设置强制倒计时，白天也可进入）。
+   * 路由跳转遵循 ArkTS 规则：先声明 RouterOptions，try/catch 包裹。
+   * 不携带上下文参数（DailyReflectionPage 自行读取 DailyRitualStore）。
+   */
+  private handleReflect(): void {
+    try {
+      const options: router.RouterOptions = {
+        url: Routes.DAILY_REFLECTION
+      };
+      router.pushUrl(options);
+    } catch (_err) {
+      hilog.warn(0x0000, TAG, 'navigate to daily reflection failed');
+      SafeUiActions.safeToast('暂时没能打开月湖回望，请稍后再试');
     }
   }
 
@@ -291,6 +315,36 @@ export struct DailyLightHeroCard {
           })
           .onClick(() => {
             this.onChatWithXinglan();
+          })
+
+        // DAILY-7：回望今天（最轻入口，跳转月湖回望页）
+        // 不带「晚上」字样，白天也可进入，符合 V2 计划 5.4「不设置强制倒计时」
+        Text('回望今天')
+          .fontSize(Theme.V2C_FONT_CAPTION)
+          .fontColor(Theme.V2C_TEXT_SECONDARY)
+          .textAlign(TextAlign.Center)
+          .width('100%')
+          .height(36)
+          .borderRadius(Theme.V2C_RADIUS_BTN)
+          .backgroundColor('rgba(10,13,26,0.0)')
+          .scale({
+            x: this.reflectPressed ? Theme.PRESS_SCALE : 1.0,
+            y: this.reflectPressed ? Theme.PRESS_SCALE : 1.0
+          })
+          .animation({ duration: Theme.ANIM_PRESS_DURATION, curve: Theme.V2_EASE_OUT })
+          .margin({ top: Theme.V2_SPACE_2XS })
+          .accessibilityGroup(true)
+          .accessibilityText('回望今天，进入月湖回望')
+          .accessibilityLevel('yes')
+          .onTouch((event: TouchEvent) => {
+            if (event.type === TouchType.Down) {
+              this.reflectPressed = true;
+            } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+              this.reflectPressed = false;
+            }
+          })
+          .onClick(() => {
+            this.handleReflect();
           })
       }
       .width('100%')

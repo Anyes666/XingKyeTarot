@@ -23,7 +23,10 @@ import {
   XinglanChatLine,
   XinglanBoundaryTag,
   XinglanSubTopicTag,
-  XinglanSpecialIntent
+  XinglanSpecialIntent,
+  XinglanAnalysisResult,
+  XinglanDialogState,
+  XinglanChatRole
 } from '../types/XinglanTypes';
 import {
   getLinesByStrategy,
@@ -45,6 +48,15 @@ import {
   XINGLAN_CRISIS_MAX_CHARS
 } from '../data/XinglanTemplates';
 import { validateOutput } from './XinglanSafetyGuard';
+// CHAT-2 增量接入：十二状态机 + 退避规则
+import { resolveNextState, getInitialState } from './XinglanDialogStateMachine';
+import {
+  detectBackoffSignals,
+  applyBackoffToPlan,
+  recordTurnEnd,
+  enforceSingleQuestion,
+  countQuestions
+} from './XinglanBackoffRules';
 
 /**
  * 从指定策略池中随机抽取一条未使用的文案
@@ -123,15 +135,51 @@ export function composeReply(
   plan: XinglanReplyPlan,
   state: XinglanSessionState
 ): XinglanComposeResult {
+  // ═══ CHAT-2 增量接入：十二状态机 + 退避规则（入口）═══
+  // 从 plan 构造简化 analysisResult（plan 已含路由后的 emotion/topic/boundary/subTopic）
+  // 从 state.messages 取最后一条用户消息作为信号检测输入
+  const analysisFromPlan: XinglanAnalysisResult = {
+    emotion: plan.emotion,
+    topic: plan.topic,
+    boundary: plan.boundary,
+    subTopic: plan.subTopic,
+    specialIntent: XinglanSpecialIntent.NONE,
+    score: 0
+  };
+  let userInput: string = '';
+  const msgs = state.messages;
+  for (let mi = msgs.length - 1; mi >= 0; mi--) {
+    if (msgs[mi].role === XinglanChatRole.USER) {
+      userInput = msgs[mi].text;
+      break;
+    }
+  }
+
+  // 初始化状态机（首次调用时 currentState 缺省视为 ENTRY）
+  const currentState: XinglanDialogState = state.currentState || getInitialState();
+  const stateRounds: number = state.stateRoundsCount || 0;
+
+  // 检测退避信号
+  const signals = detectBackoffSignals(userInput, state, analysisFromPlan);
+
+  // 状态转移决策
+  const transition = resolveNextState(currentState, stateRounds, analysisFromPlan, signals);
+
+  // 应用退避规则调整 plan
+  const adjustedPlan: XinglanReplyPlan = applyBackoffToPlan(
+    plan, transition.newState, signals, state
+  );
+  // ═══ CHAT-2 增量接入结束 ═══
+
   const usedLineIds: string[] = [];
 
-  // 按策略序列逐条抽取
+  // 按策略序列逐条抽取（使用经退避调整后的 plan）
   const parts: string[] = [];
-  for (let i = 0; i < plan.strategies.length; i++) {
-    const strategy: XinglanReplyStrategy = plan.strategies[i];
+  for (let i = 0; i < adjustedPlan.strategies.length; i++) {
+    const strategy: XinglanReplyStrategy = adjustedPlan.strategies[i];
     const picked: XinglanChatLine | null = pickOneLine(
       strategy,
-      plan.emotion,
+      adjustedPlan.emotion,
       state.usedLineIds
     );
     if (picked) {
@@ -146,7 +194,7 @@ export function composeReply(
   let replyText: string = parts.join('\n\n');
 
   // 长度限制
-  const maxChars: number = plan.boundary === XinglanBoundaryTag.CRISIS
+  const maxChars: number = adjustedPlan.boundary === XinglanBoundaryTag.CRISIS
     ? XINGLAN_CRISIS_MAX_CHARS
     : XINGLAN_REPLY_MAX_CHARS;
 
@@ -168,12 +216,20 @@ export function composeReply(
   }
 
   // Phase 4: 相关性检查（短情绪词/想谈恋爱/角色互动）
-  replyText = checkRelevance(replyText, plan.subTopic || XinglanSubTopicTag.ANY, plan.boundary, plan.topic, plan.emotion);
+  replyText = checkRelevance(replyText, adjustedPlan.subTopic || XinglanSubTopicTag.ANY, adjustedPlan.boundary, adjustedPlan.topic, adjustedPlan.emotion);
+
+  // ═══ CHAT-2 增量接入：R1 每轮最多一个问题（拼装后强制）═══
+  replyText = enforceSingleQuestion(replyText);
+  // ═══ CHAT-2 增量接入结束 ═══
 
   // 确保至少有一点内容
   if (replyText.trim().length === 0) {
     replyText = '星澜在这里。你可以慢慢说。';
   }
+
+  // ═══ CHAT-2 增量接入：记录轮次结束（更新状态机计数器）═══
+  recordTurnEnd(state, adjustedPlan, transition.newState, transition.stateChanged, analysisFromPlan);
+  // ═══ CHAT-2 增量接入结束 ═══
 
   return {
     replyText: replyText,

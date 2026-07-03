@@ -16,11 +16,11 @@
         "material": {
           "certpath": "C:\\Users\\pc\\.ohos\\config\\release_XingKeyTarot_7b6Qe0V1i69Dfz1gQdk6527UNfWOdcDTduVdWk55zFw=.cer",
           "keyAlias": "debugKey",
-          "keyPassword": "0000001AD282C1E3B37995A2C74C4D99975914AF09D893AFDB0BC76848C89B6E3F941CE204E0B22FA1E3",
+          "keyPassword": "0000001A96E90B200160B4450685078883DAC51857025A4ED119DD1326FEE5D3F4B00C87786E2B8984BE",
           "profile": "C:\\Users\\pc\\.ohos\\config\\release_XingKeyTarot_7b6Qe0V1i69Dfz1gQdk6527UNfWOdcDTduVdWk55zFw=.p7b",
           "signAlg": "SHA256withECDSA",
           "storeFile": "C:\\Users\\pc\\.ohos\\config\\release_XingKeyTarot_7b6Qe0V1i69Dfz1gQdk6527UNfWOdcDTduVdWk55zFw=.p12",
-          "storePassword": "0000001AAA5215CFDFC559526A314C0CF3272FFB38573330A1B215B625CB3532DBE1F2AD7D25A3CA6C71"
+          "storePassword": "0000001A1A254D75443218850344223C5E27C6D3CAE47BAF8747E8D40510274258A5B30728661B03FE22"
         }
       },
       {

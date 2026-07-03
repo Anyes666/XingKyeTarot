@@ -13,6 +13,8 @@ import {
   generateHistoryRecordId,
 } from '../model/DivinationHistoryRecord';
 import { COMPANION_RESULT_LINES } from '../data/CompanionResultLines';
+import { ResultFeedbackChips } from '../components/ResultFeedbackChips';
+import { DivinationConversationContext } from '../model/DivinationConversationContext';
 
 /**
  * 圣三角结果页路由参数
@@ -46,6 +48,15 @@ interface ShareCardRouteParams {
 }
 
 /**
+ * FLOW-1：星澜聊天页路由参数（"和星澜继续聊聊"入口）
+ *
+ * 携带 DivinationConversationContext，星澜不重新抽牌、不改正逆位、不推断新牌阵事实。
+ */
+interface XinglanChatRouteParams {
+  divinationContext: DivinationConversationContext;
+}
+
+/**
  * 圣三角结果页
  *
  * 展示三张牌（过去/现在/可能的方向）+ 综合解读 + 自动保存历史
@@ -61,6 +72,11 @@ struct TriangleResultPage {
   @State private source: string = '';
   @State private hasHeardCompanionResult: boolean = false;
   @State private companionResultLine: string = '';
+
+  // ── RESULT-1 反馈 Chips 安静模式（用户点"我只想安静一会儿"后置 true，隐藏解释推送）──
+  @State private quietMode: boolean = false;
+  // ── FLOW-1："和星澜继续聊聊"按钮按压态 ──
+  @State private chatPressed: boolean = false;
 
   async aboutToAppear(): Promise<void> {
     const rawParams: Object | undefined = router.getParams();
@@ -165,6 +181,53 @@ struct TriangleResultPage {
     this.hasHeardCompanionResult = true;
   }
 
+  /**
+   * FLOW-1：构造占卜结果转入聊天上下文
+   *
+   * 星澜不重新抽牌、不改正逆位、不推断新牌阵事实。
+   * coreSummary 仅取综合解读一句话，不重复整篇结果。
+   */
+  private buildDivinationContext(): DivinationConversationContext {
+    const cardNames: string[] = [];
+    const orientations: ('upright' | 'reversed')[] = [];
+    const positionNames: string[] = [];
+    for (let i = 0; i < this.cards.length; i++) {
+      const c: CardResultSlotInfo = this.cards[i];
+      cardNames.push(c.cardName);
+      orientations.push(c.isReversed ? 'reversed' : 'upright');
+      positionNames.push(c.positionTitle);
+    }
+
+    const ctx: DivinationConversationContext = {
+      mode: 'triangle',
+      cardNames: cardNames,
+      orientations: orientations,
+      positionNames: positionNames,
+      coreSummary: this.buildSummaryText(),
+      userAcceptedInterpretation: this.quietMode ? false : true,
+    };
+    return ctx;
+  }
+
+  /**
+   * FLOW-1："和星澜继续聊聊" — 携带 DivinationConversationContext 跳转星澜聊天页
+   *
+   * 显式 params 变量 + RouterOptions + try/catch，路由参数用显式 interface。
+   */
+  private handleContinueWithXinglan(): void {
+    const ctx: DivinationConversationContext = this.buildDivinationContext();
+    const params: XinglanChatRouteParams = { divinationContext: ctx };
+    const options: router.RouterOptions = {
+      url: Routes.XINGLAN_CHAT,
+      params: params
+    };
+    try {
+      router.pushUrl(options);
+    } catch (err) {
+      console.error('pushUrl to XinglanChat failed: ' + JSON.stringify(err));
+    }
+  }
+
   private getOrientationText(card: CardResultSlotInfo): string {
     return card.isReversed ? '逆位' : '正位';
   }
@@ -257,6 +320,9 @@ struct TriangleResultPage {
 
           // ── 星澜陪你整理 ──
           this.buildCompanionSection()
+
+          // ── RESULT-1 反馈 Chips ──
+          ResultFeedbackChips({ quietMode: this.quietMode })
 
           Divider().strokeWidth(0.5).color(Theme.V2C_SPINE_LINE)
 
@@ -564,6 +630,36 @@ struct TriangleResultPage {
         .width('100%')
         .margin({ bottom: Theme.V2_SPACE_XS })
 
+      // ── FLOW-1："和星澜继续聊聊" — 携带 DivinationConversationContext 进入星澜聊天 ──
+      Button('和星澜继续聊聊')
+        .type(ButtonType.Normal)
+        .fontSize(Theme.V2C_FONT_BODY)
+        .fontColor(Theme.V2C_GOLD_GILT)
+        .fontWeight(FontWeight.Medium)
+        .width('100%')
+        .height(48)
+        .backgroundColor(Theme.V2C_BG_CARD)
+        .borderRadius(Theme.V2C_RADIUS_BTN)
+        .border({ width: 1, color: Theme.V2C_GOLD_GILT })
+        .scale({
+          x: this.chatPressed ? Theme.PRESS_SCALE : 1.0,
+          y: this.chatPressed ? Theme.PRESS_SCALE : 1.0
+        })
+        .animation({
+          duration: Theme.ANIM_PRESS_DURATION,
+          curve: Theme.V2_EASE_OUT
+        })
+        .onTouch((event: TouchEvent) => {
+          if (event.type === TouchType.Down) {
+            this.chatPressed = true;
+          } else if (event.type === TouchType.Up || event.type === TouchType.Cancel) {
+            this.chatPressed = false;
+          }
+        })
+        .onClick(() => {
+          this.handleContinueWithXinglan();
+        })
+
       // 生成分享卡
       Button('生成分享卡')
         .type(ButtonType.Normal)
@@ -626,26 +722,28 @@ struct TriangleResultPage {
           }
         })
 
-      // ── 阶段4B：星澜补充文案区（点击"再听一句"后显示）──
-      if (this.companionResultLine.length > 0) {
-        Text(this.companionResultLine)
-          .fontSize(14)
-          .fontColor(Theme.V2C_TEXT_SECONDARY)
-          .textAlign(TextAlign.Center)
-          .lineHeight(22)
-          .padding({ left: 24, right: 24, top: 12, bottom: 12 })
-      }
+      // ── 阶段4B：星澜补充文案区（安静模式下隐藏，不再推送解释）──
+      if (!this.quietMode) {
+        if (this.companionResultLine.length > 0) {
+          Text(this.companionResultLine)
+            .fontSize(14)
+            .fontColor(Theme.V2C_TEXT_SECONDARY)
+            .textAlign(TextAlign.Center)
+            .lineHeight(22)
+            .padding({ left: 24, right: 24, top: 12, bottom: 12 })
+        }
 
-      // ── 阶段4B："再听星澜说一句"入口（轻文字风格，弱于主操作）──
-      Text('再听星澜说一句')
-        .fontSize(14)
-        .fontColor(this.hasHeardCompanionResult ? Theme.V2C_TEXT_SECONDARY : Theme.V2C_TEXT_SECONDARY)
-        .opacity(this.hasHeardCompanionResult ? 0.35 : 0.85)
-        .textAlign(TextAlign.Center)
-        .width('100%')
-        .constraintSize({ minHeight: 44 })
-        .padding({ top: 12, bottom: 12 })
-        .onClick(() => { this.onHearCompanionAgain(); })
+        // ── 阶段4B："再听星澜说一句"入口（轻文字风格，弱于主操作）──
+        Text('再听星澜说一句')
+          .fontSize(14)
+          .fontColor(this.hasHeardCompanionResult ? Theme.V2C_TEXT_SECONDARY : Theme.V2C_TEXT_SECONDARY)
+          .opacity(this.hasHeardCompanionResult ? 0.35 : 0.85)
+          .textAlign(TextAlign.Center)
+          .width('100%')
+          .constraintSize({ minHeight: 44 })
+          .padding({ top: 12, bottom: 12 })
+          .onClick(() => { this.onHearCompanionAgain(); })
+      }
     }
     .width('100%')
   }

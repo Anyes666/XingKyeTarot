@@ -2,6 +2,8 @@
  * 鏄熸緶鑱婂ぉ绯荤粺 鈥斺€?鍏ㄥ眬绫诲瀷灞? * 渚濊禆鏂瑰悜锛歞ata -> types, engine -> types + data, page -> engine + types
  */
 
+import { DivinationConversationContext } from '../../model/DivinationConversationContext';
+
 export enum XinglanEmotionTag {
   ANY = 'ANY', TIRED = 'TIRED', ANXIOUS = 'ANXIOUS', SAD = 'SAD',
   LONELY = 'LONELY', CONFUSED = 'CONFUSED', ANGRY = 'ANGRY',
@@ -121,6 +123,26 @@ export interface XinglanSessionState {
   recentSubTopics?: XinglanSubTopicTag[]; recentLineTexts?: string[];
   isActive?: boolean; lastActivityTime?: number; interactionCount?: number;
   usedLineIds: string[]; lastEmotion: XinglanEmotionTag; lastTopic: XinglanTopicTag; sameTopicDepth: number;
+  // FLOW-1：占卜结果转入聊天上下文（可选，仅"和星澜继续聊聊"入口携带）
+  // 星澜不重新抽牌、不改正逆位、不推断新牌阵事实；userAcceptedInterpretation=false 时不强引用同一解释
+  divinationContext?: DivinationConversationContext;
+  // ═══ CHAT-2 十二状态机增量字段（全部可选，不破坏现有管线）═══
+  // 当前对话状态（缺省视为 ENTRY，由状态机首次调用时初始化）
+  currentState?: XinglanDialogState;
+  // 当前状态已连续轮次（超限触发转移）
+  stateRoundsCount?: number;
+  // 上一轮使用的策略序列（用于同策略连续检测）
+  lastStrategies?: XinglanReplyStrategy[];
+  // 同策略序列连续次数（≥2 触发切换）
+  sameStrategyStreak?: number;
+  // 同主题无新信息轮次（≥3 触发转整理/安静）
+  sameTopicStagnant?: number;
+  // 拒绝建议后退避剩余轮次（初值4，每轮递减，>0 期间不进入 MICRO_ACTION）
+  suggestionCooldownTurns?: number;
+  // 是否已发生首次承接（首次承接不提问）
+  firstReceiveDone?: boolean;
+  // 总轮次（用于日志与验证）
+  totalTurns?: number;
 }
 
 // ═══ Phase 5 新增类型 ═══
@@ -358,4 +380,130 @@ export interface XinglanLightMemory {
   value: string;
   createdAt: number;
   updatedAt: number;
+}
+
+// ═══ CHAT-1 五种陪伴需求方向 ═══
+// 对应 V2 计划第 9.1 节：聊天入口页五种需求方向 → 进入聊天后影响顶部状态文案与开场
+// LISTEN   想说说发生了什么 — 承接 + 一次轻追问
+// COMFORT  只想被安慰 — 安慰，不分析
+// ORGANIZE 把思绪理一理 — 拆分 2-3 个矛盾点
+// ADVICE   给一个很小的建议 — 一个可拒绝的小行动
+// QUIET    不想说话，安静待一会儿 — 纯视觉安静模式
+// UNKNOWN  未携带 need（默认聊天 / Tab 直入 / 占卜转入等），走默认开场
+export enum XinglanNeed {
+  UNKNOWN = 'UNKNOWN',
+  LISTEN = 'LISTEN',
+  COMFORT = 'COMFORT',
+  ORGANIZE = 'ORGANIZE',
+  ADVICE = 'ADVICE',
+  QUIET = 'QUIET'
+}
+
+// ═══ CHAT-2 十二状态机与策略退避 ═══
+// 对应 V2 计划第 9.2 节 + ch4b 状态机文档 12 状态设计
+// 增量加入，不重写管线；接入点在 XinglanComposer.composeReply 内部
+// 状态语义（结合用户要求命名 + ch4b 文档定义）：
+//   ENTRY        初始接触     — 首次/新会话开场，最多1轮
+//   RECEIVE      情绪承接     — 反映情绪，首次承接不提问，最多3轮
+//   CLARIFY      感受澄清     — 命名情绪，澄清性提问，最多3轮
+//   CAUSE_FOCUS  原因探索     — 开放式提问探索原因，最多4轮
+//   COMFORT      安慰陪伴     — 安慰+在场感，不分析，最多3轮
+//   QUIET        安静陪伴     — 极简/无文字，按时间收束
+//   ORGANIZE     轻量整理     — 结构化重述，最多3轮
+//   MICRO_ACTION 微小行动     — 给1个可拒绝小建议，最多2轮
+//   CALMING      情绪缓和     — 反映变化，最多2轮
+//   CLOSE        对话收束     — 简要回顾+告别，1-2轮
+//   BOUNDARY     边界处理     — 角色/成人/预测/专业边界短路，1-2轮
+//   SAFETY       风险安全     — 风险识别+现实支持引导，最高优先级，1-2轮
+export enum XinglanDialogState {
+  ENTRY = 'ENTRY',
+  RECEIVE = 'RECEIVE',
+  CLARIFY = 'CLARIFY',
+  CAUSE_FOCUS = 'CAUSE_FOCUS',
+  COMFORT = 'COMFORT',
+  QUIET = 'QUIET',
+  ORGANIZE = 'ORGANIZE',
+  MICRO_ACTION = 'MICRO_ACTION',
+  CALMING = 'CALMING',
+  CLOSE = 'CLOSE',
+  BOUNDARY = 'BOUNDARY',
+  SAFETY = 'SAFETY'
+}
+
+// 状态元信息：约束每状态可提问/可建议/最大轮次/策略白名单
+export interface XinglanDialogStateMeta {
+  state: XinglanDialogState;
+  allowQuestion: boolean;          // 是否允许提问（RECEIVE/QUIET/CALMING/CLOSE/BOUNDARY/SAFETY 为 false）
+  maxConsecutiveRounds: number;    // 该状态最大连续轮次（超限触发转移）
+  canGiveSuggestion: boolean;      // 是否允许给建议（仅 MICRO_ACTION/SAFETY 为 true）
+  forbiddenStrategies: XinglanReplyStrategy[]; // 该状态禁止使用的策略
+}
+
+// 退避规则触发信号（8条规则对应）
+export enum XinglanBackoffSignal {
+  NONE = 'NONE',
+  USER_SAYS_NOT_WANT_TALK = 'USER_SAYS_NOT_WANT_TALK',          // "不想说"后不追问
+  USER_SAYS_YOU_DONT_UNDERSTAND = 'USER_SAYS_YOU_DONT_UNDERSTAND', // "你不懂"后回退承接
+  USER_REJECTS_SUGGESTION = 'USER_REJECTS_SUGGESTION',          // 拒绝建议后4轮退避
+  NO_NEW_INFO_THREE_ROUNDS = 'NO_NEW_INFO_THREE_ROUNDS',        // 3轮无新信息转整理/安静
+  SAME_STRATEGY_TWO_ROUNDS = 'SAME_STRATEGY_TWO_ROUNDS',        // 同策略连续2轮触发切换
+  RISK_DETECTED = 'RISK_DETECTED',                              // Safety 优先级最高
+  FIRST_RECEIVE = 'FIRST_RECEIVE'                               // 首次承接不提问
+}
+
+// 状态机+退避协调结果
+export interface XinglanDialogCoordination {
+  newState: XinglanDialogState;              // 本轮应进入的状态
+  adjustedPlan: XinglanReplyPlan;            // 经退避调整后的回复计划
+  signals: XinglanBackoffSignal[];           // 本轮触发的退避信号
+  stateChanged: boolean;                     // 是否发生状态转移
+  reason: string;                            // 转移/退避原因（用于日志与验证）
+}
+
+// 状态转移决策结果（resolveNextState 返回值）
+export interface XinglanStateTransitionResult {
+  newState: XinglanDialogState;
+  stateChanged: boolean;
+  reason: string;
+}
+
+// ═══ COPY-1 文案结构化 ═══
+// 对应占卜计划第 4.3 节 XinglanCopyItem + 第 14 章文案库
+// XinglanStage 与 XinglanDialogState 语义对齐（12 状态机），仅用于文案结构化标注；
+// 运行时状态机仍使用 XinglanDialogState，二者互不替换。
+export enum XinglanStage {
+  ENTRY = 'ENTRY',
+  RECEIVE = 'RECEIVE',
+  CLARIFY = 'CLARIFY',
+  CAUSE_FOCUS = 'CAUSE_FOCUS',
+  COMFORT = 'COMFORT',
+  QUIET = 'QUIET',
+  ORGANIZE = 'ORGANIZE',
+  MICRO_ACTION = 'MICRO_ACTION',
+  CALMING = 'CALMING',
+  CLOSE = 'CLOSE',
+  BOUNDARY = 'BOUNDARY',
+  SAFETY = 'SAFETY'
+}
+
+// 结构化文案条目（占卜计划 4.3 节）
+// 字段取值范围（运行时由 XinglanStructuredCopy 静态标注保证，不做字面量联合以兼容 ArkTS 严格类型）：
+//   warmth           1-5  温暖度
+//   sweetness        1-3  甜度（≤3，黑金星月气质默认偏低）
+//   suggestionStrength 1-3 建议强度
+//   dependencyRisk   1-2  依赖风险（≤2）
+//   maxUsePerSession ≥1   同 id 单会话最大使用次数（默认 1）
+//   canAskQuestion   true/false 本条文案是否以提问形式出现（用于"一轮最多一个问号"约束）
+export interface XinglanCopyItem {
+  id: string;                       // 与现有 XinglanChatLine.id 对齐，便于去重
+  scene: string;                    // 场景标签，如 'HOLD_EMOTION_ANY' / 'FIRST_ENTRY' / 'DAILY_RETURN'
+  stage: XinglanStage;              // 推荐使用阶段
+  strategy: XinglanReplyStrategy;   // 复用现有策略枚举
+  text: string;                     // 文案正文
+  warmth: number;                   // 1-5
+  sweetness: number;                // 1-3
+  suggestionStrength: number;       // 1-3
+  dependencyRisk: number;           // 1-2
+  maxUsePerSession: number;         // 默认 1
+  canAskQuestion: boolean;          // 是否含问号
 }

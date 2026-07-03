@@ -58,4 +58,7 @@ export class Routes {
 
   // ── DAILY-4: 今日星页完整页面 ──
   static readonly DAILY_LIGHT: string = 'daily/pages/DailyLightPage';
+
+  // ── DAILY-7: 月湖回望页面 ──
+  static readonly DAILY_REFLECTION: string = 'daily/pages/DailyReflectionPage';
 }

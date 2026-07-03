@@ -3,6 +3,7 @@ import { Theme } from '../common/Theme';
 import { Routes } from '../common/Routes';
 import { AppBackButton } from '../components/AppBackButton';
 import { EmotionStarStorage, EmotionStarRecord, StarKeyLevel, NextLevelInfo } from '../common/EmotionStarStorage';
+import { WeeklyConstellationCard } from '../daily/components/WeeklyConstellationCard';
 
 /**
  * 最近7日星图条目
@@ -39,6 +40,8 @@ struct StarCalendarPage {
   @State private nextLevelTitle: string = '星火初亮';
   @State private daysToNextLevel: number = 1;
   @State private isMaxLevel: boolean = false;
+  // DAILY-8：昨天是否未点亮（用于每周星图卡显示漏一天文案）
+  @State private missedYesterday: boolean = false;
 
   aboutToAppear(): void {
     this.loadStarData();
@@ -64,12 +67,42 @@ struct StarCalendarPage {
       this.daysToNextLevel = nextInfo.daysLeft;
       this.isMaxLevel = nextInfo.isMaxLevel;
 
+      // DAILY-8：计算漏一天状态
+      // 仅当昨天未点亮且今天也未点亮时显示漏一天文案。
+      // 今天已点亮则用户已经回来，不再提醒。
+      this.missedYesterday = this.computeMissedYesterday(records);
+
       // 构建最近7日星图
       this.weekStars = this.buildWeekStars(records);
     } catch (_err) {
       // 加载失败时保持初始空状态
       this.weekStars = this.buildEmptyWeek();
     }
+  }
+
+  /**
+   * DAILY-8：计算昨天是否未点亮且今天也未点亮。
+   * 用于每周星图卡显示 V2 计划 10.2 漏一天安慰文案。
+   */
+  private computeMissedYesterday(records: EmotionStarRecord[]): boolean {
+    const today: string = EmotionStarStorage.todayString();
+    // 昨天日期字符串
+    const d: Date = new Date();
+    d.setDate(d.getDate() - 1);
+    const yesterday: string = EmotionStarStorage.formatDateString(
+      d.getFullYear(), d.getMonth() + 1, d.getDate()
+    );
+    let hasYesterday: boolean = false;
+    let hasToday: boolean = false;
+    for (let i: number = 0; i < records.length; i++) {
+      if (records[i].date === yesterday) {
+        hasYesterday = true;
+      }
+      if (records[i].date === today) {
+        hasToday = true;
+      }
+    }
+    return !hasYesterday && !hasToday;
   }
 
   /**
@@ -333,6 +366,15 @@ struct StarCalendarPage {
             .border({ width: 1, color: Theme.V2A_ORBIT_LINE })
             .shadow(Theme.V2A_SHADOW_CARD)
             .margin({ bottom: Theme.V2_SPACE_XL })
+
+            // ══ DAILY-8 每周星图（累计非连续 7 次点亮形成一幅小星图）══
+            // 纯视觉奖励，A 星图档案风格，无货币/抽奖/稀有度/补签/付费。
+            WeeklyConstellationCard({
+              totalLightDays: this.totalLightDays,
+              missedYesterday: this.missedYesterday
+            })
+              .width('92%')
+              .margin({ bottom: Theme.V2_SPACE_XL })
 
             // ══ 温柔提示 ══
             Text('每一颗星，都是你认真面对自己的证明。')
