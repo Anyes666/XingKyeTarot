@@ -1,0 +1,11 @@
+{
+  "name": "ohosTest",
+  "version": "1.0.0",
+  "description": "星钥塔罗测试模块",
+  "main": "",
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "@ohos/hypium": "1.0.15"
+  }
+}

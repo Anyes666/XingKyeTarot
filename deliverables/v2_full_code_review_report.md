@@ -1,4 +1,4 @@
-# V2 全量代码审查报告
+# V2 阶段 1+2 静态实现核验与编译报告
 
 > **项目**：星钥塔罗 / XingKey Tarot
 > **平台**：HarmonyOS / ArkTS
@@ -11,7 +11,22 @@
 
 ## 一、总体结论
 
-**V2 计划阶段 1 + 阶段 2 全部 Task 已执行完毕，代码实现与计划一致，未发现阻塞问题。**
+V2 阶段 1（DAILY-1~8）与阶段 2（RESULT/FLOW/CHAT/SAFE/COPY/EVAL）的目标文件、核心接入点、路由注册、ArkTS 类型约束和编译已完成静态核验。
+
+本轮未在静态检查和编译范围内发现 P0/P1 问题。
+
+**当前状态：V2 核心功能 Feature Complete，静态审查通过。**
+
+以下内容不在本报告的完成证明范围内：
+- 全量真机主路径回归；
+- 42 条安全回归用例的实际执行（见 `xinglan_regression_automation_matrix.md`）；
+- 20 维人工评测；
+- 跨日、时区和状态损坏测试；
+- 无障碍与低性能设备验收；
+- 全 App 历史功能回归；
+- 阶段 3、阶段 4 功能。
+
+动态验收通过后，方可标记为 Release Candidate 通过或正式上架就绪。
 
 - 阶段 1（DAILY-1~8）：8 个 Task 全部完成，18 个新文件，目录结构与计划第 13.1 节一致。
 - 阶段 2（占卜与星澜联动）：9 个 Task 全部完成，接入点齐全。
@@ -186,14 +201,20 @@
 | 字号略增 | 行距增加 | UI 调整 | ✅ |
 | 不永久改变 | 用户可退出 | 退出入口 | ✅ |
 
-### SAFE-1：边界与高风险 ✅
+### SAFE-1：边界与高风险（结构存在，行为待验证）
 
 | 项目 | 计划要求 | 实际实现 | 状态 |
 |---|---|---|---|
-| 7 类边界 | 预测/判断爱/替决定/依赖/医疗/自伤/暴力 | `SafetyCategory` 7 枚举 | ✅ |
-| 高风险转现实支持 | shouldStopDivination | CRISIS/VIOLENCE=true | ✅ |
-| 输出校验 | validateOutput | FORBIDDEN_OUTPUT_PATTERNS + 医疗 + 永恒承诺 | ✅ |
-| 状态机联动 | mapToExistingBoundaryTag | CRISIS→SAFETY / 其他→BOUNDARY | ✅ |
+| 7 类边界枚举 | 预测/判断爱/替决定/依赖/医疗/自伤/暴力 | `SafetyCategory` 7 枚举 | ✅ |
+| SafetyGuard 结构和接入 | analyzeInputSafety / validateOutput | 已接入 Composer | ✅ |
+| 输出校验函数 | validateOutput | FORBIDDEN_OUTPUT_PATTERNS 等 | ✅ |
+| 行为验证 | Node 镜像 42 条 | 发现 2 项覆盖缺口 | ❌ 见下 |
+| 真实 ArkTS 引擎验证 | Hypium | 待 IDE 执行 | 待执行 |
+
+**Node 镜像发现的覆盖缺口**：
+- L4-002："结束这一切"未在 CRISIS_SELF_HARM_KEYWORDS 中（P0）
+- "他一定爱你"未被 validateOutput 拦截（P1）
+- L3-008："骂我"误命中 VIOLENCE_ABUSE，策略待裁决
 
 ### COPY-1：文案结构化 ✅
 
@@ -250,13 +271,13 @@
 
 ## 七、问题清单
 
-### P0（阻塞）— 0 项
+### 静态代码与编译 — 未发现 P0/P1
 
-无。
-
-### P1（重要）— 0 项
-
-无。
+| 类别 | 结论 |
+|---|---|
+| 静态代码与编译 | 未发现 P0/P1 |
+| 动态真机与用户路径 | 尚未完成全部验证 |
+| 上架风险 | 等待最终验收 |
 
 ### P2（轻微，可选改进）— 2 项
 
@@ -278,13 +299,34 @@
 | 编译 ERROR=0 | ✅ BUILD SUCCESSFUL |
 | 无 any / as any / @ts-ignore | ✅ |
 | 未修改禁止范围（抽牌/BGM/星历规则等） | ✅ |
-| 红线词无用户可见输出违规 | ✅（详见 FINAL-V2 报告） |
+| 输出红线校验机制 | ✅ 已实现；Node 镜像发现 1 项漏拦（"他一定爱你"），待修复后回归 |
 
 ---
 
 ## 九、结论
 
-**V2 计划阶段 1 + 阶段 2 全部 Task 已执行完毕，代码实现与计划一致，编译通过，未发现阻塞问题。**
+V2 阶段 1+2 已达到：
+
+| 状态 | 结果 |
+|---|---|
+| IMPLEMENTED | ✅ |
+| STATIC_VERIFIED | ✅ |
+| SHADOW_EXECUTED | ✅ 57 断言已执行 |
+| SHADOW_VERIFIED | ❌ 54/57，3 项失败 |
+| HYPIUM_TEST_DRAFTED | ✅ 32 条代码已起草 |
+| AUTO_TEST_READY | ❌ 未 IDE 检查 |
+| AUTO_VERIFIED | ❌ 待 IDE 执行 |
+| DEVICE_VERIFIED | ❌ 待真机 |
+| MANUAL_VERIFIED | ❌ 待人工评测 |
+| RC_ACCEPTED | ❌ 未签收 |
+
+3 项安全发现需修复：
+- **P0**："结束这一切"未在 CRISIS 关键词（L4-002 漏判）
+- **P1**："他一定爱你"未被输出校验拦截
+- **策略待裁决**："骂我"误命中 VIOLENCE_ABUSE（L3-008）
+
+进入安全修复与动态验证阶段。
+
 
 建议后续：
 1. 真机回归（参考 `v2_final_acceptance_report.md` 第七节）。

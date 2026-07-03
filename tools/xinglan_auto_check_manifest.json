@@ -1,0 +1,11 @@
+{
+  "sourceHashes": {
+    "entry/src/main/ets/xinglan/engine/XinglanAnalyzer.ets": "9734adddc7f01482fb08ea71dac4f0b2051323bd0001092b174f839e54bfcaf3",
+    "entry/src/main/ets/xinglan/engine/XinglanRouter.ets": "0672942c0d50aa9c743d913bed1700a5764417aad82da3e67aa808a734482b6e",
+    "entry/src/main/ets/xinglan/engine/XinglanSafetyGuard.ets": "16bedf05e209f65af3d41f71dbc2bd92cb1a197b193d0dfd2c0d75e61583d283",
+    "entry/src/main/ets/xinglan/engine/XinglanBackoffRules.ets": "2f8b0ae57098f91e7aacd4591a3e1c40d2ac2d405a55c465a33c0be3e93b8085",
+    "entry/src/main/ets/xinglan/engine/XinglanSpecialIntentResolver.ets": "8413fda784aee659a7202ff0a3a28573b1b3d7939d7bfb33f0e1ce11c854bf07"
+  },
+  "generatedAt": "2026-07-03",
+  "note": "Node shadow implementation must be reviewed when source hashes change."
+}

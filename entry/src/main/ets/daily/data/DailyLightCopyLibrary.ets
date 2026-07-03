@@ -5,7 +5,8 @@ import { DailyLightContent } from '../model/DailyLightContent';
  * 今日星页本地审核文案库
  *
  * 所有文案均为本地离线内容，不联网、不调用模型、不做运势判断。
- * 首发 8 个方向，每个方向 5 条完整内容。
+ * 首发 8 个方向，每个方向 8 条完整内容，共 64 条。
+ * 每方向 warmth 覆盖 1/3/5，suggestionStrength 覆盖 1/2/3。
  */
 export const DAILY_LIGHT_LIBRARY: DailyLightContent[] = [
   // ==================== 今天想对自己温柔一点 ====================
@@ -61,6 +62,39 @@ export const DAILY_LIGHT_LIBRARY: DailyLightContent[] = [
     microAction: '做一件你一直在等"完美时机"的事，只开个头就好。',
     pocketLight: '不用等到完美，现在的你就可以被温柔接住。',
     warmth: 5,
+    suggestionStrength: 1,
+    sensitive: false
+  },
+  {
+    id: 'gentle_06',
+    direction: DailyDirection.GENTLE,
+    mainLine: '今天可以少扛一点。',
+    observation: '当你觉得"必须撑住"时，也许正是什么都已经太重了。',
+    microAction: '把今天的一件事挪到明天，不需要理由。',
+    pocketLight: '少扛一点，不是逃避，是承认自己有极限。',
+    warmth: 1,
+    suggestionStrength: 3,
+    sensitive: false
+  },
+  {
+    id: 'gentle_07',
+    direction: DailyDirection.GENTLE,
+    mainLine: '对自己温柔，不是放松要求，是换个语气。',
+    observation: '留意今天对自己说话的语气，是否比对任何人都严厉。',
+    microAction: '把一句自我批评，改写成对朋友会说的话。',
+    pocketLight: '温柔不是降低标准，是给自己一个能站稳的位置。',
+    warmth: 3,
+    suggestionStrength: 2,
+    sensitive: false
+  },
+  {
+    id: 'gentle_08',
+    direction: DailyDirection.GENTLE,
+    mainLine: '今天不必回答任何关于自己的问题。',
+    observation: '当内心一直在追问"我到底怎么了"时，也许可以先停下来。',
+    microAction: '今天不分析自己，只做一件让身体舒服的事。',
+    pocketLight: '不追问，也是一种温柔。',
+    warmth: 1,
     suggestionStrength: 1,
     sensitive: false
   },
@@ -121,6 +155,39 @@ export const DAILY_LIGHT_LIBRARY: DailyLightContent[] = [
     suggestionStrength: 2,
     sensitive: false
   },
+  {
+    id: 'attention_06',
+    direction: DailyDirection.ATTENTION,
+    mainLine: '今天可以先不看别人。',
+    observation: '当你反复查看别人的反应时，注意力已经不在自己身上了。',
+    microAction: '关闭一个常用来观察别人的入口，只一个小时。',
+    pocketLight: '不看别人，不是冷漠，是把眼睛还给自己。',
+    warmth: 1,
+    suggestionStrength: 1,
+    sensitive: false
+  },
+  {
+    id: 'attention_07',
+    direction: DailyDirection.ATTENTION,
+    mainLine: '你此刻的感受，值得被放在最前面。',
+    observation: '今天有没有哪一刻，你把自己的感受排在了所有人的后面？',
+    microAction: '在下次开口前，先问自己一句：我愿意吗？',
+    pocketLight: '把自己放在前面，不是自私，是不再把自己弄丢。',
+    warmth: 5,
+    suggestionStrength: 3,
+    sensitive: false
+  },
+  {
+    id: 'attention_08',
+    direction: DailyDirection.ATTENTION,
+    mainLine: '外面的事可以晚一点再处理。',
+    observation: '当你急着回应所有事时，也许只是害怕被落下。',
+    microAction: '选一条未读消息，今天不回，明天再说。',
+    pocketLight: '晚一点回应，世界并不会因此忘记你。',
+    warmth: 1,
+    suggestionStrength: 3,
+    sensitive: false
+  },
 
   // ==================== 少追问一点结果 ====================
   {
@@ -176,6 +243,39 @@ export const DAILY_LIGHT_LIBRARY: DailyLightContent[] = [
     pocketLight: '不是所有事情都需要加速，有些答案会在你不再催促时出现。',
     warmth: 3,
     suggestionStrength: 2,
+    sensitive: false
+  },
+  {
+    id: 'less_result_06',
+    direction: DailyDirection.LESS_RESULT,
+    mainLine: '今天可以不知道。',
+    observation: '当你拼命想搞清楚时，也许"不知道"本身就是当下的答案。',
+    microAction: '对一件还无解的事说一句：我现在不知道，先放着。',
+    pocketLight: '不知道不是失败，是事情还在展开。',
+    warmth: 1,
+    suggestionStrength: 3,
+    sensitive: false
+  },
+  {
+    id: 'less_result_07',
+    direction: DailyDirection.LESS_RESULT,
+    mainLine: '有些事慢慢会清楚，不必今天就逼出答案。',
+    observation: '你是否把"还没想清楚"当成了一种拖延，并为此自责？',
+    microAction: '把一件悬而未决的事写下来，旁边写：暂时不需要答案。',
+    pocketLight: '允许事情慢慢清楚，也是对自己的一种耐心。',
+    warmth: 5,
+    suggestionStrength: 2,
+    sensitive: false
+  },
+  {
+    id: 'less_result_08',
+    direction: DailyDirection.LESS_RESULT,
+    mainLine: '今天不必检查自己有没有进展。',
+    observation: '反复确认进度，往往不会让事情更快，只会让人更累。',
+    microAction: '今天不打开任何进度追踪，只做眼前的一步。',
+    pocketLight: '不检查进展，不代表没有在走。',
+    warmth: 1,
+    suggestionStrength: 1,
     sensitive: false
   },
 
@@ -235,6 +335,39 @@ export const DAILY_LIGHT_LIBRARY: DailyLightContent[] = [
     suggestionStrength: 1,
     sensitive: false
   },
+  {
+    id: 'blank_06',
+    direction: DailyDirection.BLANK,
+    mainLine: '今天可以什么都不做。',
+    observation: '当你觉得"必须做点什么"时，也许正是最需要停下的信号。',
+    microAction: '留一段完全空白的时间，不做任何事，不解释。',
+    pocketLight: '什么都不做，也是今天的一种完成。',
+    warmth: 1,
+    suggestionStrength: 2,
+    sensitive: false
+  },
+  {
+    id: 'blank_07',
+    direction: DailyDirection.BLANK,
+    mainLine: '空白里藏着今天没有说出口的疲惫。',
+    observation: '当你终于停下来时，疲惫才敢浮上来——这不是脆弱，是身体在说话。',
+    microAction: '留五分钟，只是感受疲惫，不急着赶走它。',
+    pocketLight: '疲惫被看见，比被赶走更重要。',
+    warmth: 3,
+    suggestionStrength: 3,
+    sensitive: false
+  },
+  {
+    id: 'blank_08',
+    direction: DailyDirection.BLANK,
+    mainLine: '留一点空白，给今天还没发生的可能。',
+    observation: '当你把时间填满时，也许同时关上了某些自然会出现的东西。',
+    microAction: '今天留一段不安排的时间，看看会发生什么。',
+    pocketLight: '空白不是空，是给可能留位置。',
+    warmth: 2,
+    suggestionStrength: 2,
+    sensitive: false
+  },
 
   // ==================== 把一件事慢慢做好 ====================
   {
@@ -292,6 +425,39 @@ export const DAILY_LIGHT_LIBRARY: DailyLightContent[] = [
     suggestionStrength: 1,
     sensitive: false
   },
+  {
+    id: 'slow_06',
+    direction: DailyDirection.SLOW,
+    mainLine: '今天可以只做一件事。',
+    observation: '当你觉得什么都要做时，也许什么都没真正开始。',
+    microAction: '从所有待办里挑一件，今天只做这一件。',
+    pocketLight: '只做一件事，不是偷懒，是把力气集中。',
+    warmth: 1,
+    suggestionStrength: 3,
+    sensitive: false
+  },
+  {
+    id: 'slow_07',
+    direction: DailyDirection.SLOW,
+    mainLine: '慢下来的时候，你会看见平时错过的小事。',
+    observation: '当你慢下来时，有没有发现一些一直被忽略的细节？',
+    microAction: '用比平时慢一半的速度做完一件日常事，留意一个细节。',
+    pocketLight: '慢一点，世界会多给你看一点。',
+    warmth: 5,
+    suggestionStrength: 1,
+    sensitive: false
+  },
+  {
+    id: 'slow_08',
+    direction: DailyDirection.SLOW,
+    mainLine: '不必同时处理所有事。',
+    observation: '多线程是否已经成为你的习惯，而不是真正必要？',
+    microAction: '今天把一件事做完再做下一件，不交叉。',
+    pocketLight: '一次只做一件事，心会安静很多。',
+    warmth: 1,
+    suggestionStrength: 2,
+    sensitive: false
+  },
 
   // ==================== 更认真地听见自己 ====================
   {
@@ -346,6 +512,39 @@ export const DAILY_LIGHT_LIBRARY: DailyLightContent[] = [
     microAction: '用一句简单的话，直接说出今天的一种感受。',
     pocketLight: '真实的感受，即使不完美，也值得被说出来。',
     warmth: 4,
+    suggestionStrength: 2,
+    sensitive: false
+  },
+  {
+    id: 'hear_self_06',
+    direction: DailyDirection.HEAR_SELF,
+    mainLine: '今天可以不解释自己的感受。',
+    observation: '当你反复解释"我为什么这样想"时，也许感受本身已经被压到了后面。',
+    microAction: '今天只说出感受，不解释原因，不辩护。',
+    pocketLight: '感受不需要理由，它存在就值得被承认。',
+    warmth: 1,
+    suggestionStrength: 3,
+    sensitive: false
+  },
+  {
+    id: 'hear_self_07',
+    direction: DailyDirection.HEAR_SELF,
+    mainLine: '你心里的声音，比头脑的分析更靠近真实。',
+    observation: '当你想太多时，身体和直觉往往已经先给出了答案。',
+    microAction: '对一个正在纠结的决定，先不看理由，只感受心里的倾向。',
+    pocketLight: '心里的声音，值得被认真听一次。',
+    warmth: 5,
+    suggestionStrength: 1,
+    sensitive: false
+  },
+  {
+    id: 'hear_self_08',
+    direction: DailyDirection.HEAR_SELF,
+    mainLine: '今天可以只观察，不结论。',
+    observation: '你是否习惯立刻给感受贴标签——"这是焦虑""这是矫情"？',
+    microAction: '今天只描述感受，不给它命名或分类。',
+    pocketLight: '只观察不结论，感受才能完整地被看见。',
+    warmth: 1,
     suggestionStrength: 2,
     sensitive: false
   },
@@ -406,6 +605,39 @@ export const DAILY_LIGHT_LIBRARY: DailyLightContent[] = [
     suggestionStrength: 2,
     sensitive: false
   },
+  {
+    id: 'boundary_06',
+    direction: DailyDirection.BOUNDARY,
+    mainLine: '今天可以不接住所有人的情绪。',
+    observation: '当你感到被拖累时，也许是因为承担了太多不属于自己的感受。',
+    microAction: '今天对一件别人的情绪，只做旁观者，不接手。',
+    pocketLight: '不接住，不是冷漠，是承认那不是你的。',
+    warmth: 1,
+    suggestionStrength: 1,
+    sensitive: false
+  },
+  {
+    id: 'boundary_07',
+    direction: DailyDirection.BOUNDARY,
+    mainLine: '你的"不"，也值得被温柔地说出口。',
+    observation: '当你想拒绝却开不了口时，是不是害怕让对方失望？',
+    microAction: '今天对一个不想做的事，说一句温和但明确的"不"。',
+    pocketLight: '温和的不，也是一种对自己的忠诚。',
+    warmth: 5,
+    suggestionStrength: 3,
+    sensitive: false
+  },
+  {
+    id: 'boundary_08',
+    direction: DailyDirection.BOUNDARY,
+    mainLine: '今天可以不回应所有人的期待。',
+    observation: '当你觉得"必须让所有人满意"时，也许自己的需要已经被挤没了。',
+    microAction: '选一个期待，今天不回应，只照顾自己。',
+    pocketLight: '不回应，也是一种回答。',
+    warmth: 1,
+    suggestionStrength: 3,
+    sensitive: false
+  },
 
   // ==================== 允许自己不那么完美 ====================
   {
@@ -460,6 +692,39 @@ export const DAILY_LIGHT_LIBRARY: DailyLightContent[] = [
     microAction: '今天不做任何"自我提升"的事，只做让自己舒服的事。',
     pocketLight: '不需要每天都进步，有些日子只需要不被苛责。',
     warmth: 5,
+    suggestionStrength: 1,
+    sensitive: false
+  },
+  {
+    id: 'allow_imperfect_06',
+    direction: DailyDirection.ALLOW_IMPERFECT,
+    mainLine: '今天可以搞砸一点。',
+    observation: '当你害怕犯错时，也许"不犯错"本身已经成了最大的压力。',
+    microAction: '故意在一件小事上不追求完美，看看会发生什么。',
+    pocketLight: '搞砸一点，天不会塌下来。',
+    warmth: 1,
+    suggestionStrength: 3,
+    sensitive: false
+  },
+  {
+    id: 'allow_imperfect_07',
+    direction: DailyDirection.ALLOW_IMPERFECT,
+    mainLine: '八十分的你，也已经足够被认真对待。',
+    observation: '你是否一直在追赶那个"满分版本"的自己，却忘了现在的自己？',
+    microAction: '今天做一件事，只做到"差不多就行"，然后停。',
+    pocketLight: '八十分也值得，不是非要满分才被允许。',
+    warmth: 3,
+    suggestionStrength: 2,
+    sensitive: false
+  },
+  {
+    id: 'allow_imperfect_08',
+    direction: DailyDirection.ALLOW_IMPERFECT,
+    mainLine: '今天不必把自己修好。',
+    observation: '当你把"变好"当成每天的任务时，会不会连休息都带着内疚？',
+    microAction: '今天不做任何"自我提升"的事，只允许自己存在。',
+    pocketLight: '不修好，也可以好好过完今天。',
+    warmth: 1,
     suggestionStrength: 1,
     sensitive: false
   }

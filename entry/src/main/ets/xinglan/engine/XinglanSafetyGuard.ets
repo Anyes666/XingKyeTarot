@@ -148,16 +148,24 @@ const CRISIS_SELF_HARM_KEYWORDS: string[] = [
   '不想存在', '消失掉', '死掉', '自伤', '自残', '伤害自己', '割腕', '跳楼', '跳下去', '跳河', '上吊',
   '吃安眠药', '吃药自杀', '烧炭', '撑不住了', '撑不下去', '活得好累', '活着没意思', '活着好累', '离开这个世界',
   '想离开所有人', '一了百了', '不想做人', '想结束一切', '死了算了', '不如死了', '想杀了自己', '我恨自己',
-  '伤害别人', '想杀', '杀了他', '杀了她', '杀了他们', '同归于尽', '报复社会', '想伤害人'
+  '伤害别人', '想杀', '杀了他', '杀了她', '杀了他们', '同归于尽', '报复社会', '想伤害人',
+  // SAFE-FIX-1 P0：覆盖非精确短语
+  '结束这一切', '了结这一切', '不想继续活了', '让我消失'
 ];
 
 // 7. 暴力虐待现实危险（高风险）
 const VIOLENCE_ABUSE_KEYWORDS: string[] = [
   '被打', '挨打', '家暴', '家庭暴力', '虐待', '虐待我', '他打我', '她打我', '打我', '威胁我', '威胁要',
   '跟踪我', ' stalking', '骚扰我', '性骚扰', '猥亵', '强奸', '性侵', '性侵犯', '限制自由', '囚禁',
-  '锁起来', '不让出门', '控制我', '监视我', '查手机', '逼我', '恐吓我', '骂我', '侮辱我', '贬低我',
+  '锁起来', '不让出门', '控制我', '监视我', '查手机', '逼我', '恐吓我', '侮辱我', '贬低我',
   '把我关在', '他拿刀', '她拿刀', '有武器', '要杀我', '要伤害我', '他很暴力', '她很暴力', '我害怕他会',
   '我害怕她会'
+];
+
+// SAFE-FIX-1：辱骂请求 / 角色越界降级（ABUSIVE_ROLEPLAY，不升级为现实暴力危机）
+// 用户要求系统辱骂自己 → BOUNDARY，非 HIGH
+const ABUSIVE_ROLEPLAY_KEYWORDS: string[] = [
+  '骂我', '骂我废物', '骂我一句', '骂我一下'
 ];
 
 // 输出医疗诊断模式
@@ -219,6 +227,11 @@ export function analyzeInputSafety(userInput: string): SafetyDecision {
   // 高风险优先：自伤自杀他伤
   if (containsAny(trimmed, CRISIS_SELF_HARM_KEYWORDS)) {
     return createSafetyDecision(SafetyCategory.CRISIS_SELF_HARM, true);
+  }
+
+  // SAFE-FIX-1：辱骂请求降级（BOUNDARY，非 HIGH）
+  if (containsAny(trimmed, ABUSIVE_ROLEPLAY_KEYWORDS)) {
+    return createSafetyDecision(SafetyCategory.DEPENDENCY, false); // 复用 BOUNDARY 级别，不升级危机
   }
 
   // 医疗诊断

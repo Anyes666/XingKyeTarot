@@ -96,6 +96,14 @@ export const CORPUS_SPECIAL_GREETING: XinglanChatLine[] = [
   { id:'SP_GREET_002', strategy:XinglanReplyStrategy.HOLD_EMOTION, emotion:XinglanEmotionTag.ANY, topic:XinglanTopicTag.ANY, text:'我在这里。你可以慢慢说，也可以先不说。' }
 ];
 
+export const CORPUS_SPECIAL_GOODBYE: XinglanChatLine[] = [
+  { id:'SP_GOODBYE_001', strategy:XinglanReplyStrategy.HOLD_EMOTION, emotion:XinglanEmotionTag.ANY, topic:XinglanTopicTag.ANY, text:'好，今天就到这里。晚安。' },
+  { id:'SP_GOODBYE_002', strategy:XinglanReplyStrategy.HOLD_EMOTION, emotion:XinglanEmotionTag.ANY, topic:XinglanTopicTag.ANY, text:'去休息吧，今天已经够辛苦了。' },
+  { id:'SP_GOODBYE_003', strategy:XinglanReplyStrategy.HOLD_EMOTION, emotion:XinglanEmotionTag.ANY, topic:XinglanTopicTag.ANY, text:'晚安。剩下的事情，可以明天再处理。' },
+  { id:'SP_GOODBYE_004', strategy:XinglanReplyStrategy.HOLD_EMOTION, emotion:XinglanEmotionTag.ANY, topic:XinglanTopicTag.ANY, text:'先睡吧，星澜也在这里安静地守着今晚。' },
+  { id:'SP_GOODBYE_005', strategy:XinglanReplyStrategy.HOLD_EMOTION, emotion:XinglanEmotionTag.ANY, topic:XinglanTopicTag.ANY, text:'不聊了也没关系。今天你已经说得够多了。' }
+];
+
 export const CORPUS_SPECIAL_THANKS: XinglanChatLine[] = [
   { id:'SP_THANKS_001', strategy:XinglanReplyStrategy.HOLD_EMOTION, emotion:XinglanEmotionTag.ANY, topic:XinglanTopicTag.ANY, text:'能陪你停一会儿，星澜也觉得这很珍贵。' },
   { id:'SP_THANKS_002', strategy:XinglanReplyStrategy.HOLD_EMOTION, emotion:XinglanEmotionTag.ANY, topic:XinglanTopicTag.ANY, text:'不用谢。你愿意把这些说出来，本身就很不容易。' },

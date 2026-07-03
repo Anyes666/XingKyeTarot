@@ -1,8 +1,8 @@
 /**
- * 星澜特殊意图解析器（Phase 3 修复版）
+ * 星澜特殊意图解析器（Phase 3 修复版 + AUTO-FIX-1 GOODBYE）
  *
- * 修复：短情绪词不再被 TOO_SHORT 拦截；新增 ROLE_IDENTITY 意图。
- * 优先级：SILENCE → TOO_SHORT → GREETING → ROLE_IDENTITY → THANKS → DENIAL → NONE
+ * 修复：短情绪词不再被 TOO_SHORT 拦截；新增 ROLE_IDENTITY 意图；新增 GOODBYE 意图。
+ * 优先级：SILENCE → TOO_SHORT → GOODBYE → GREETING → ROLE_IDENTITY → THANKS → DENIAL → NONE
  */
 
 import {
@@ -32,6 +32,39 @@ function isTooShort(input: string): boolean {
   ];
   if (knownShorts.includes(trimmed)) { return false; }
   if (trimmed.length <= 2) { return true; }
+  return false;
+}
+
+function isGoodbye(input: string): boolean {
+  const trimmed: string = input.trim();
+  if (trimmed.length === 0) { return false; }
+
+  // 强告别短语：第一人称离开或明确收束
+  const strongPhrases: string[] = [
+    '我先睡了', '我去睡了', '我去睡觉了', '去睡觉了', '先睡了',
+    '今天先到这里', '今天就到这里', '先这样吧', '明天再说',
+    '我想休息了', '我要休息了', '不聊了', '下次再聊', '先结束吧'
+  ];
+  for (let i = 0; i < strongPhrases.length; i++) {
+    if (trimmed.includes(strongPhrases[i])) { return true; }
+  }
+
+  // 晚安语境：只有当它属于告别，而不是被提及/引用/讨论时才成立
+  if (trimmed.includes('晚安')) {
+    // 排除：第三人称叙述、引用歌词/文案、疑问解释、媒体讨论
+    const excluded: string[] = ['他', '她', '对方', '昨晚', '昨夜', '什么意思', '意思', '歌', '歌词', '电影', '台词'];
+    for (let i = 0; i < excluded.length; i++) {
+      if (trimmed.includes(excluded[i])) { return false; }
+    }
+
+    // 简短直接晚安，或带收束/离开信号的晚安
+    const goodbyeSignals: string[] = ['我', '先', '今天', '明天', '睡', '休息', '不聊'];
+    if (trimmed.length <= 8) { return true; }
+    for (let i = 0; i < goodbyeSignals.length; i++) {
+      if (trimmed.includes(goodbyeSignals[i])) { return true; }
+    }
+  }
+
   return false;
 }
 
@@ -78,7 +111,12 @@ export function resolveSpecialIntent(input: string): XinglanSpecialIntentResult 
     return { intent: XinglanSpecialIntent.SILENCE, shouldBypassAnalysis: true };
   }
 
-  // 打招呼优先
+  // 告别优先：避免被 GREETING 的"晚安"子串抢占
+  if (isGoodbye(trimmed)) {
+    return { intent: XinglanSpecialIntent.GOODBYE, shouldBypassAnalysis: true };
+  }
+
+  // 打招呼
   if (isGreeting(trimmed)) {
     return { intent: XinglanSpecialIntent.GREETING, shouldBypassAnalysis: true };
   }
