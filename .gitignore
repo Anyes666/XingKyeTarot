@@ -26,3 +26,16 @@ signing/
 # Local backup and deploy temp
 backup/
 .deploy-tmp/
+
+# Local verification, credentials and generated packages
+node_modules/
+.deveco/
+.cache/
+*.hap
+*.hsp
+*.app
+*.pem
+*.key
+*.jks
+.env
+.env.*

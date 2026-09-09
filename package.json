@@ -1,0 +1,10 @@
+{
+  "name": "xingkey-tarot-source-checks",
+  "private": true,
+  "scripts": {
+    "test": "node tools/test_source.js && node tools/xinglan_auto_check.js"
+  },
+  "devDependencies": {
+    "typescript": "5.6.3"
+  }
+}

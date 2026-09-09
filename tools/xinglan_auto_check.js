@@ -33,7 +33,7 @@ const SOURCE_FILES = [
 function computeFileHash(filePath) {
   const abs = path.join(ROOT, filePath);
   if (!fs.existsSync(abs)) return null;
-  const content = fs.readFileSync(abs);
+  const content = fs.readFileSync(abs, 'utf8').replace(/\r\n/g, '\n');
   return crypto.createHash('sha256').update(content).digest('hex');
 }
 
@@ -71,7 +71,7 @@ function updateManifest() {
   const manifest = {
     sourceHashes: {},
     generatedAt: new Date().toISOString().split('T')[0],
-    note: 'Node shadow implementation must be reviewed when source hashes change.'
+    note: 'SHA-256 of UTF-8 source with LF line endings. Mirror covers safety categories/output only; npm test also executes the actual special-intent module.'
   };
   for (const relPath of SOURCE_FILES) {
     manifest.sourceHashes[relPath] = computeFileHash(relPath);

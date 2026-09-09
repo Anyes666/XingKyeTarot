@@ -3,40 +3,12 @@
     "products": [
       {
         "name": "default",
-        "signingConfig": "release",
         "compatibleSdkVersion": "5.0.0(12)",
         "runtimeOS": "HarmonyOS",
         "targetSdkVersion": "5.0.0(12)"
       }
     ],
-    "signingConfigs": [
-      {
-        "name": "release",
-        "type": "HarmonyOS",
-        "material": {
-          "certpath": "C:\\Users\\pc\\.ohos\\config\\release_XingKeyTarot_7b6Qe0V1i69Dfz1gQdk6527UNfWOdcDTduVdWk55zFw=.cer",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001A96E90B200160B4450685078883DAC51857025A4ED119DD1326FEE5D3F4B00C87786E2B8984BE",
-          "profile": "C:\\Users\\pc\\.ohos\\config\\release_XingKeyTarot_7b6Qe0V1i69Dfz1gQdk6527UNfWOdcDTduVdWk55zFw=.p7b",
-          "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\pc\\.ohos\\config\\release_XingKeyTarot_7b6Qe0V1i69Dfz1gQdk6527UNfWOdcDTduVdWk55zFw=.p12",
-          "storePassword": "0000001A1A254D75443218850344223C5E27C6D3CAE47BAF8747E8D40510274258A5B30728661B03FE22"
-        }
-      },
-      {
-        "name": "666",
-        "type": "HarmonyOS",
-        "material": {
-          "storeFile": "D:/XingKeyTarot/signing/xingkeyCSR.p12",
-          "storePassword": "0000001B1884EC033E92CBED5D623982D72839462ED3D5CBFF36C2EA919E473AD8AD7130D33460B18F38B0",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001B797A6761F9470889ED5C2CAFA8458DFAEE68C9AE71CB707FA1EC428FA682A768F9F5C5031B707E",
-          "signAlg": "SHA256withECDSA",
-          "profile": "D:/XingKeyTarot/signing/xingkeyRelease.p7b",
-          "certpath": "D:/XingKeyTarot/signing/xingkey.cer"
-        }
-      }
-    ]
+
   },
   "modules": [
     {
